@@ -1,13 +1,15 @@
-package com.oe.rehooked.item.hooks;
+package com.oe.rehooked.item.hooks.def;
 
 import net.minecraft.world.item.Item;
 
 public interface HookProperties {
     // The name to display on the item
-    String Name();
+    String DisplayName();
     
     // The item properties of the hook
-    Item.Properties ItemProperties();
+    default Item.Properties ItemProperties() {
+        return new Item.Properties().defaultDurability(0).stacksTo(1);
+    }
     
     // The number of simultaneous hooks allowed
     int Count();
