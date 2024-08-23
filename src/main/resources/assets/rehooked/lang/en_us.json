@@ -1,4 +1,6 @@
 {
+  "item.rehooked.wood_hook": "Wood Hook",
   "item.rehooked.iron_hook": "Iron Hook",
-  "item.rehooked.diamond_hook": "Diamond Hook"
+  "item.rehooked.diamond_hook": "Diamond Hook",
+  "creative.tab.hooks": "Hooks"
 }
