@@ -24,7 +24,9 @@ public interface HookProperties {
     double PullSpeed();
     
     // The distance from the impact point to where the chain should attach
-    double Length();
+    default double Length() {
+        return 0.5;
+    }
     
     // The cooldown between firing hooks in ms
     int Cooldown();

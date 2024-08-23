@@ -34,11 +34,6 @@ public class DiamondHookItem extends BaseHookItem {
             }
 
             @Override
-            public double Length() {
-                return 0.5;
-            }
-
-            @Override
             public int Cooldown() {
                 return 5;
             }
