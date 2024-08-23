@@ -20,17 +20,17 @@ public class IronHookItem extends BaseHookItem {
 
             @Override
             public double Range() {
-                return 20;
+                return 16;
             }
 
             @Override
             public double Speed() {
-                return 2;
+                return 16;
             }
 
             @Override
             public double PullSpeed() {
-                return 2;
+                return 8;
             }
 
             @Override

@@ -20,22 +20,22 @@ public class WoodHookItem extends BaseHookItem {
 
             @Override
             public double Range() {
-                return 10;
+                return 8;
             }
 
             @Override
             public double Speed() {
-                return 1;
+                return 8;
             }
 
             @Override
             public double PullSpeed() {
-                return 0.5;
+                return 4;
             }
 
             @Override
             public int Cooldown() {
-                return 1000;
+                return 100;
             }
         });
     }

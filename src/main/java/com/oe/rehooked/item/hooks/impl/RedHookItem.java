@@ -20,17 +20,17 @@ public class RedHookItem extends BaseHookItem {
 
             @Override
             public double Range() {
-                return 20;
+                return 24;
             }
 
             @Override
             public double Speed() {
-                return 20;
+                return 24;
             }
 
             @Override
             public double PullSpeed() {
-                return 5;
+                return 20;
             }
 
             @Override

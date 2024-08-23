@@ -20,17 +20,17 @@ public class EnderHookItem extends BaseHookItem {
 
             @Override
             public double Range() {
-                return 150;
+                return 64;
             }
 
             @Override
             public double Speed() {
-                return 150;
+                return Double.MAX_VALUE;
             }
 
             @Override
             public double PullSpeed() {
-                return 50;
+                return 45;
             }
 
             @Override

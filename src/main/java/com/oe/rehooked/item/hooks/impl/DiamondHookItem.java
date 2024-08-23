@@ -20,12 +20,12 @@ public class DiamondHookItem extends BaseHookItem {
 
             @Override
             public double Range() {
-                return 100;
+                return 24;
             }
 
             @Override
             public double Speed() {
-                return 20;
+                return 24;
             }
 
             @Override
