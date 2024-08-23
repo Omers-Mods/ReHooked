@@ -22,6 +22,7 @@ public class ReHookedCreativeModeTab {
                         pOutput.accept(ReHookedItems.WOOD_HOOK.get());
                         pOutput.accept(ReHookedItems.IRON_HOOK.get());
                         pOutput.accept(ReHookedItems.DIAMOND_HOOK.get());
+                        pOutput.accept(ReHookedItems.RED_HOOK.get());
                     })
                     .build());
     

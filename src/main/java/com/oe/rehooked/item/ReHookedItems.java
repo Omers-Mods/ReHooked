@@ -3,6 +3,7 @@ package com.oe.rehooked.item;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.item.hooks.impl.DiamondHookItem;
 import com.oe.rehooked.item.hooks.impl.IronHookItem;
+import com.oe.rehooked.item.hooks.impl.RedHookItem;
 import com.oe.rehooked.item.hooks.impl.WoodHookItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -16,6 +17,7 @@ public class ReHookedItems {
     public static final RegistryObject<Item> WOOD_HOOK = ITEMS.register(WoodHookItem.NAME, WoodHookItem::new);
     public static final RegistryObject<Item> IRON_HOOK = ITEMS.register(IronHookItem.NAME, IronHookItem::new);
     public static final RegistryObject<Item> DIAMOND_HOOK = ITEMS.register(DiamondHookItem.NAME, DiamondHookItem::new);
+    public static final RegistryObject<Item> RED_HOOK = ITEMS.register(RedHookItem.NAME, RedHookItem::new);
     
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
