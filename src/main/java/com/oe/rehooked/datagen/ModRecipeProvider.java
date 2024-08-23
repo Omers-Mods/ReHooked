@@ -28,5 +28,51 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_sticks", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(Items.STICK).build()))
                 .save(pWriter);
+        
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.IRON_HOOK.get())
+                .pattern("IIP")
+                .pattern(" HI")
+                .pattern("C I")
+                .define('C', Items.CHAIN)
+                .define('I', Items.IRON_INGOT)
+                .define('P', Items.IRON_PICKAXE)
+                .define('H', ReHookedItems.WOOD_HOOK.get())
+                .unlockedBy("has_wooden_hook", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.WOOD_HOOK.get()).build()))
+                .save(pWriter);
+        
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.DIAMOND_HOOK.get())
+                .pattern("DDP")
+                .pattern(" HD")
+                .pattern("C D")
+                .define('C', Items.CHAIN)
+                .define('D', Items.DIAMOND)
+                .define('P', Items.DIAMOND_PICKAXE)
+                .define('H', ReHookedItems.IRON_HOOK.get())
+                .unlockedBy("has_iron_hook", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.IRON_HOOK.get()).build()))
+                .save(pWriter);
+        
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.RED_HOOK.get())
+                .pattern("HRR")
+                .pattern(" CR")
+                .pattern("C H")
+                .define('C', Items.CHAIN)
+                .define('R', Items.REDSTONE_BLOCK)
+                .define('H', ReHookedItems.DIAMOND_HOOK.get())
+                .unlockedBy("has_diamond_hook",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.DIAMOND_HOOK.get()).build()))
+                .save(pWriter);
+        
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.ENDER_HOOK.get())
+                .pattern("EEH")
+                .pattern(" PE")
+                .pattern("P E")
+                .define('P', Items.ENDER_PEARL)
+                .define('E', Items.ENDER_EYE)
+                .define('H', ReHookedItems.DIAMOND_HOOK.get())
+                .unlockedBy("has_diamond_hook",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.DIAMOND_HOOK.get()).build()))
+                .save(pWriter);
     }
 }
