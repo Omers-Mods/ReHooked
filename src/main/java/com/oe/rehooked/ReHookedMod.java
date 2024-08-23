@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 @Mod(ReHookedMod.MOD_ID)
 public class ReHookedMod {
     public static final String MOD_ID = "rehooked";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public ReHookedMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
