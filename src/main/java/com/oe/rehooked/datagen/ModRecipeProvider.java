@@ -54,14 +54,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .save(pWriter);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.RED_HOOK.get())
-                .pattern("HRR")
+                .pattern("HRH")
                 .pattern(" CR")
                 .pattern("C H")
                 .define('C', Items.CHAIN)
                 .define('R', Items.REDSTONE_BLOCK)
-                .define('H', ReHookedItems.DIAMOND_HOOK.get())
-                .unlockedBy("has_diamond_hook",
-                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.DIAMOND_HOOK.get()).build()))
+                .define('H', ReHookedItems.IRON_HOOK.get())
+                .unlockedBy("has_iron_hook",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.IRON_HOOK.get()).build()))
                 .save(pWriter);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.ENDER_HOOK.get())
