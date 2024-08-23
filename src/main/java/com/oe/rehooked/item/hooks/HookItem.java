@@ -1,8 +1,11 @@
 package com.oe.rehooked.item.hooks;
 
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-public class HookItem extends Item implements HookProperties {
+public class HookItem extends Item implements HookProperties, ICurioItem {
     private final HookProperties properties;
     
     public HookItem(HookProperties properties) {
@@ -48,5 +51,10 @@ public class HookItem extends Item implements HookProperties {
     @Override
     public int Cooldown() {
         return properties.Cooldown();
+    }
+
+    @Override
+    public void curioTick(SlotContext slotContext, ItemStack stack) {
+        // todo: implement hook logic
     }
 }
