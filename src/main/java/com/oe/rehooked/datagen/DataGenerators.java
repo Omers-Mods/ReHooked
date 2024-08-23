@@ -16,7 +16,7 @@ public class DataGenerators {
         PackOutput packOutput = generator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         
-        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput));
-        generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
+        generator.addProvider(event.includeServer(), new ReHookedRecipeProvider(packOutput));
+        generator.addProvider(event.includeClient(), new ReHookedItemModelProvider(packOutput, existingFileHelper));
     }
 }
