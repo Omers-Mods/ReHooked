@@ -1,6 +1,7 @@
 package com.oe.rehooked;
 
 import com.mojang.logging.LogUtils;
+import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.food.FoodProperties;
@@ -40,6 +41,9 @@ public class ReHookedMod
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        // Register mod items
+        ReHookedItems.register(modEventBus);
+        
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
@@ -60,6 +64,8 @@ public class ReHookedMod
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event)
     {
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES)
+            ReHookedItems.HOOK_ITEMS.forEach(event::accept);
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
