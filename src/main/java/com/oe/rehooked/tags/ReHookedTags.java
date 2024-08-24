@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 
 public class ReHookedTags {
     public class Items {
-        public static final TagKey<Item> HOOK = tag("hook");
+        public static final TagKey<Item> HOOK = curiosTag("hook");
         
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(ReHookedMod.MOD_ID, name));
@@ -16,6 +16,10 @@ public class ReHookedTags {
 
         private static TagKey<Item> forgeTag(String name) {
             return ItemTags.create(new ResourceLocation("forge", name));
+        }
+        
+        private static TagKey<Item> curiosTag(String name) {
+            return ItemTags.create(new ResourceLocation("curios", name));
         }
     }
 }
