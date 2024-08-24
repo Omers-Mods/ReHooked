@@ -13,5 +13,8 @@
   "tooltip.rehooked:red_hook.info": "Creative flight within the volume defined by the hooks",
   "tooltip.rehooked:ender_hook.info": "Fast. Very, very fast.",
   
-  "curios.identifier.hook": "Hook"
+  "curios.identifier.hook": "Hook",
+  
+  "key.categories.rehooked": "ReHooked",
+  "key.rehooked.fire_hook_key": "Fire Hook"
 }
