@@ -11,5 +11,7 @@
   "tooltip.rehooked:iron_hook.info": "Allows floating midair by firing two hooks at opposing points",
   "tooltip.rehooked:diamond_hook.info": "Plenty of hooks, plenty of speed.",
   "tooltip.rehooked:red_hook.info": "Creative flight within the volume defined by the hooks",
-  "tooltip.rehooked:ender_hook.info": "Fast. Very, very fast."
+  "tooltip.rehooked:ender_hook.info": "Fast. Very, very fast.",
+  
+  "curios.identifier.hook": "Hook"
 }
