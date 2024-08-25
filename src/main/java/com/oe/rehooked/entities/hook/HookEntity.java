@@ -61,7 +61,7 @@ public class HookEntity extends Projectile {
             float speed = data.speed();
             float adjustedSpeed = speed / 20.0f;
             Vec3 lookAngle = pShooter.getLookAngle();
-            this.moveTo(pShooter.position().add(lookAngle));
+            this.moveTo(pShooter.getEyePosition().add(lookAngle));
             Vec3 moveVector = lookAngle.scale(adjustedSpeed);
             this.entityData.set(DIRECTION, moveVector.toVector3f());
 
@@ -92,7 +92,7 @@ public class HookEntity extends Projectile {
     @Override
     public void tick() {
         super.tick();
-
+        
         Vector3f dV = this.entityData.get(DIRECTION);
         
         if (firstTick && level().isClientSide()) {
@@ -118,7 +118,7 @@ public class HookEntity extends Projectile {
         }
         else if (!level().isClientSide()){
             HookRegistry.getHookData(this.entityData.get(TYPE)).ifPresent(data -> {
-                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, new Vec3(dV.x, dV.y, dV.z), dV.length());
+                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, new Vec3(dV.x, dV.y, dV.z).normalize(), dV.length());
                 onHitBlock(hitResult);
             });
         }
