@@ -1,8 +1,13 @@
 package com.oe.rehooked;
 
 import com.mojang.logging.LogUtils;
+import com.oe.rehooked.entities.ReHookedEntities;
+import com.oe.rehooked.entities.hook.HookEntityRenderer;
+import com.oe.rehooked.item.ReHookedItemProperties;
 import com.oe.rehooked.item.ReHookedItems;
 import com.oe.rehooked.tabs.ReHookedCreativeModeTab;
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -24,6 +29,8 @@ public class ReHookedMod {
     public ReHookedMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
+        // Register mod entities
+        ReHookedEntities.register(modEventBus);
         // Register mod creative tab
         ReHookedCreativeModeTab.register(modEventBus);
         // Register mod items
@@ -52,6 +59,11 @@ public class ReHookedMod {
     public static class ClientModEvents {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
+            event.enqueueWork(() -> {
+                ReHookedItemProperties.addCustomItemProperties();
+            });
+            
+            EntityRenderers.register(ReHookedEntities.HOOK_PROJECTILE.get(), HookEntityRenderer::new);
         }
     }
 }

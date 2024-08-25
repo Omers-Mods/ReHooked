@@ -19,13 +19,19 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.List;
 
-public abstract class BaseHookItem extends Item implements HookProperties, ICurioItem {
-    private final HookProperties properties;
+public abstract class BaseHookItem extends Item implements ICurioItem {
+    private final String displayName;
+    private final int count;
+    private final double range;
+    private final double speed;
+    private final double pullSpeed;
+    private final double length;
 
-    public BaseHookItem(HookProperties properties) {
-        super(properties.ItemProperties());
-        this.properties = properties;
+    public BaseHookItem() {
+        super(new Item.Properties().defaultDurability(0).stacksTo(1));
     }
+    
+    public BaseHookItem()
 
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {

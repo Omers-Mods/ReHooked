@@ -24,10 +24,7 @@ public class ClientForgeHandler {
             // if player has hook in curios slot
             CuriosApi.getCuriosInventory(player).resolve()
                     .flatMap(curiosInventory -> curiosInventory.getStacksHandler("hook"))
-                    .ifPresent(hook -> {
-                        player.displayClientMessage(Component.literal("Key Pressed " + KeyBindings.FIRE_HOOK_KEY.getName()), true);
-                        PacketHandler.sendToServer(new SFireHookPacket());
-                    });
+                    .ifPresent(hook -> PacketHandler.sendToServer(new SFireHookPacket()));
         }
     }
 }
