@@ -32,7 +32,7 @@ public class VectorHelper {
     public static BlockHitResult getFromEntityAndAngle(Entity entity, Vec3 angle, ClipContext.Fluid rayTraceFluid, double range) {
         Level world = entity.level();
 
-        Vec3 end = new Vec3(entity.getX() + angle.x * range, entity.getY() + angle.y * range, entity.getZ() + angle.z * range);
+        Vec3 end = entity.getEyePosition().add(angle.scale(range));
         ClipContext context = new ClipContext(entity.position(), end, ClipContext.Block.COLLIDER, rayTraceFluid, entity);
         return world.clip(context);
     }
