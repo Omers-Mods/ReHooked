@@ -1,13 +1,9 @@
 package com.oe.rehooked.network;
 
-import com.oe.rehooked.client.KeyBindings;
 import com.oe.rehooked.entities.hook.HookEntity;
-import com.oe.rehooked.item.hooks.def.BaseHookItem;
+import com.oe.rehooked.item.hook.HookItem;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.OutgoingChatMessage;
-import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -28,10 +24,11 @@ public class SFireHookPacket {
         player.sendSystemMessage(Component.literal("Received Fire Command"));
         // validate that the player has a hook in curio slot
         CuriosApi.getCuriosInventory(player).resolve()
-                .flatMap(curiosInventory -> curiosInventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof BaseHookItem))
+                .flatMap(curiosInventory -> curiosInventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof HookItem))
                         .ifPresent(slotResult -> {
                             HookEntity hookEntity = new HookEntity(player.level(), player);
                             player.level().addFreshEntity(hookEntity);
+                            hookEntity.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 0.0f, 0.0f);
                             // todo: remove debug message
                             player.sendSystemMessage(Component.literal("Fired hook!"));
                         });
