@@ -1,8 +1,9 @@
 package com.oe.rehooked.entities.hook;
 
-import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.capabilities.hooks.PlayerHookCapability;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.item.hook.HookItem;
+import com.oe.rehooked.utils.DistUtil;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -46,8 +47,8 @@ public class HookEntity extends Projectile {
         super(pEntityType, pLevel);
     }
 
-    public HookEntity(Level pLevel, Player player) {
-        super(ReHookedEntities.HOOK_PROJECTILE.get(), pLevel);
+    public HookEntity(Player player) {
+        super(ReHookedEntities.HOOK_PROJECTILE.get(), player.level());
         setOwner(player);
         setNoGravity(false);
         CuriosApi.getCuriosInventory(player).resolve()
@@ -136,7 +137,6 @@ public class HookEntity extends Projectile {
                     if (aabb.move(blockPos).contains(currPos)) {
                         entityData.set(HIT_STATE, Optional.of(blockState));
                         entityData.set(HIT_POS, Optional.of(pResult.getBlockPos()));
-                        ReHookedMod.LOGGER.info("Hit block at: {}", pResult.getBlockPos());
                         break;
                     }
                 }
@@ -164,6 +164,8 @@ public class HookEntity extends Projectile {
     @Override
     public void remove(RemovalReason pReason) {
         super.remove(pReason);
-        ReHookedMod.LOGGER.info("Discarded hook!");
+        if (DistUtil.IsServer())
+            getOwner().getCapability(PlayerHookCapability.HOOK_HANDLER_CAPABILITY)
+                    .ifPresent(handler -> handler.removeHook(this));
     }
 }
