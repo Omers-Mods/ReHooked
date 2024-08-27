@@ -21,7 +21,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     public HookEntityRenderer(EntityRendererProvider.Context pContext) {
         super(pContext);
         model = new HookEntityModel(pContext.bakeLayer(ReHookedModelLayers.HOOK_PROJECTILE_LAYER));
-        this.shadowRadius = 0.25f;
+        this.shadowRadius = 0.1f;
     }
 
     public void render(HookEntity entity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
@@ -30,9 +30,9 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
         pPoseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(pPartialTick, entity.xRotO, entity.getXRot() + 90.0f)));
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(pBuffer, this.model.renderType(this.getTextureLocation(entity)), false, false);
         
-        this.model.renderToBuffer(pPoseStack, vertexConsumer,pPackedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-        pPoseStack.popPose();
+        this.model.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
         super.render(entity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
+        pPoseStack.popPose();
     }
     
     @Override
