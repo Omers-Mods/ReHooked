@@ -34,7 +34,9 @@ public class PlayerHookCapabilityProvider implements ICapabilityProvider, INBTSe
 
     @Override
     public CompoundTag serializeNBT() {
-        return createPlayerHookHandler().serializeNBT();
+        CompoundTag tag = new CompoundTag();
+        createPlayerHookHandler().serializeNBT(tag);
+        return tag;
     }
 
     @Override

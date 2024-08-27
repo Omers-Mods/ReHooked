@@ -1,7 +1,6 @@
 package com.oe.rehooked.item.hook;
 
 import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +13,6 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.List;
-import java.util.logging.Handler;
 
 public class HookItem extends Item implements ICurioItem {
     public static final String HOOK_TYPE_TAG = "hook_type";

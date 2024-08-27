@@ -9,7 +9,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 import java.util.Collection;
 
 @AutoRegisterCapability
-public interface IPlayerHookHandler extends INBTSerializable<CompoundTag> {
+public interface IPlayerHookHandler {
+    void removeHook(int id);
     void removeHook(HookEntity hook);
     void removeAllHooks();
     void shootHook();
@@ -19,4 +20,6 @@ public interface IPlayerHookHandler extends INBTSerializable<CompoundTag> {
     Player getOwner();
     IPlayerHookHandler owner(Player owner);
     void copyFrom(IPlayerHookHandler other);
+    void serializeNBT(CompoundTag tag);
+    void deserializeNBT(CompoundTag nbt);
 }

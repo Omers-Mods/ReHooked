@@ -6,10 +6,7 @@ import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.TagTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
@@ -26,18 +23,28 @@ public class PlayerHookHandler implements IPlayerHookHandler {
         owner = null;
         hookType = "";
     }
-    
+
+    @Override
+    public void removeHook(int id) {
+        if (id < playerHooks.size() && id >= 0) {
+            HookEntity hook = playerHooks.get(id);
+            if (!hook.isRemoved())
+                hook.discard();
+            playerHooks.remove(id);
+        }
+    }
+
     @Override
     public void removeHook(HookEntity hook) {
         if (!hook.isRemoved())
-            hook.remove(Entity.RemovalReason.DISCARDED);
+            hook.discard();
         playerHooks.remove(hook);
     }
     
     @Override
     public void removeAllHooks() {
-        for (HookEntity hook : playerHooks)
-            removeHook(hook);
+        ReHookedMod.LOGGER.debug("Removing all hooks!");
+        for (int i = 0; i < playerHooks.size(); i++) removeHook(i);
     }
     
     @Override
@@ -51,6 +58,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
                 ReHookedMod.LOGGER.debug("Player at max hooks, clearing oldest before shooting!");
                 removeHook(playerHooks.get(0));
             }
+            ReHookedMod.LOGGER.debug("Shooting hook!");
             HookEntity hookEntity = new HookEntity(owner.level(), owner);
             hookEntity.shootFromRotation(owner, owner.getXRot(), owner.getYRot(), 0.0F,
                     hookData.speed(), 0.0f,
@@ -93,18 +101,14 @@ public class PlayerHookHandler implements IPlayerHookHandler {
         this.playerHooks = new ArrayList<>(other.getPlayerHooks());
         this.owner = other.getOwner();
     }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
+    
+    public void serializeNBT(CompoundTag tag) {
         if (owner != null) {
             tag.putUUID("uuid", owner.getUUID());
             tag.putString("hook_type", hookType);
         }
-        return tag;
     }
-
-    @Override
+    
     public void deserializeNBT(CompoundTag nbt) {
         if (nbt.contains("uuid")) {
             UUID playerUUID = nbt.getUUID("uuid");
@@ -120,6 +124,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
                                 entity -> playerUUID.equals(entity.getOwner().getUUID()))
                 ));
             }
+            ReHookedMod.LOGGER.debug("Deserialized " + playerHooks.size() + " hooks");
         }
     }
 }
