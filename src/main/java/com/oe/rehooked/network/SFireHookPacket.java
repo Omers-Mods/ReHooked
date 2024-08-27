@@ -3,6 +3,7 @@ package com.oe.rehooked.network;
 import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
 import com.oe.rehooked.item.hook.HookItem;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -23,8 +24,13 @@ public class SFireHookPacket {
             handler.owner(player);
             CuriosApi.getCuriosInventory(player)
                     .ifPresent(inventory -> inventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof HookItem)
-                            .ifPresent(hook -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                    .shootHook()));
+                            .ifPresent(hook -> {
+                                player.sendSystemMessage(Component.literal("-------------------"));
+                                player.sendSystemMessage(Component.literal("Starting hook shot"));
+                                handler.hookType(((HookItem) hook.stack().getItem()).getHookType()).shootHook();
+                                player.sendSystemMessage(Component.literal("Hook shot ended"));
+                                player.sendSystemMessage(Component.literal("-------------------"));
+                            }));
         });
     }
 }

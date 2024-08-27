@@ -4,14 +4,19 @@ import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
-import net.minecraft.client.Minecraft;
+import com.oe.rehooked.utils.DistUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 public class PlayerHookHandler implements IPlayerHookHandler {
     private List<HookEntity> playerHooks;
@@ -49,26 +54,32 @@ public class PlayerHookHandler implements IPlayerHookHandler {
     
     @Override
     public void shootHook() {
+        if (owner == null) return;
         HookRegistry.getHookData(hookType).ifPresent(hookData -> {
             if (hookData.count() <= 0) {
-                ReHookedMod.LOGGER.debug("Can't shoot hook because player doesn't have item!");
+                owner.sendSystemMessage(Component.literal("Can't shoot hook because player doesn't have item!"));
                 return;
             }
             if (playerHooks.size() == hookData.count()) {
-                ReHookedMod.LOGGER.debug("Player at max hooks, clearing oldest before shooting!");
-                removeHook(playerHooks.get(0));
+                owner.sendSystemMessage(Component.literal("Player at max hooks, clearing oldest before shooting!"));
+                removeHook(0);
             }
-            ReHookedMod.LOGGER.debug("Shooting hook!");
-            HookEntity hookEntity = new HookEntity(owner.level(), owner);
+            owner.sendSystemMessage(Component.literal("Shooting hook!"));
+            HookEntity hookEntity = new HookEntity(owner);
             hookEntity.shootFromRotation(owner, owner.getXRot(), owner.getYRot(), 0.0F,
                     hookData.speed(), 0.0f,
                     (int)  (hookData.range() / (hookData.speed() / 20.0f)));
             owner.level().addFreshEntity(hookEntity);
+            playerHooks.add(hookEntity);
         });
+        owner.sendSystemMessage(Component.literal("Player: " + owner.getDisplayName().getString()));
+        owner.sendSystemMessage(Component.literal("Hook Type: " + hookType));
+        owner.sendSystemMessage(Component.literal("Current hooks: " + playerHooks.size()));
     } 
     
     @Override
     public IPlayerHookHandler hookType(String hookType) {
+        if (hookType.equals(this.hookType)) return this;
         this.hookType = hookType;
         removeAllHooks();
         return this;
@@ -91,6 +102,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
 
     @Override
     public IPlayerHookHandler owner(Player owner) {
+        if (owner != null && owner.equals(this.owner)) return this;
         this.owner = owner;
         return this;
     }
@@ -100,10 +112,12 @@ public class PlayerHookHandler implements IPlayerHookHandler {
         this.hookType = other.getHookType();
         this.playerHooks = new ArrayList<>(other.getPlayerHooks());
         this.owner = other.getOwner();
+        if (owner != null) owner.sendSystemMessage(Component.literal("Copied from another capability"));
     }
     
     public void serializeNBT(CompoundTag tag) {
         if (owner != null) {
+            owner.sendSystemMessage(Component.literal("Serializing hook capability"));
             tag.putUUID("uuid", owner.getUUID());
             tag.putString("hook_type", hookType);
         }
@@ -112,19 +126,19 @@ public class PlayerHookHandler implements IPlayerHookHandler {
     public void deserializeNBT(CompoundTag nbt) {
         if (nbt.contains("uuid")) {
             UUID playerUUID = nbt.getUUID("uuid");
-            if (Minecraft.getInstance().level.isClientSide()) return;
-            Iterable<ServerLevel> allLevels = Minecraft.getInstance().player.getServer().getAllLevels();
-            allLevels.forEach(level -> Optional.ofNullable(level.getEntity(playerUUID))
-                    .ifPresent(player -> owner = (Player) player));
+            if (DistUtil.IsClient()) return;
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            owner = server.getPlayerList().getPlayer(playerUUID);
             if (owner != null) {
+                owner.sendSystemMessage(Component.literal("Deserializing hook capability"));
                 hookType = nbt.getString("hook_type");
                 playerHooks = new ArrayList<>();
-                allLevels.forEach(level -> playerHooks.addAll(
+                server.getAllLevels().forEach(level -> playerHooks.addAll(
                         level.getEntitiesOfClass(HookEntity.class, AABB.of(BoundingBox.infinite()),
                                 entity -> playerUUID.equals(entity.getOwner().getUUID()))
                 ));
+                owner.sendSystemMessage(Component.literal("Found " + playerHooks.size() + " hooks"));
             }
-            ReHookedMod.LOGGER.debug("Deserialized " + playerHooks.size() + " hooks");
         }
     }
 }
