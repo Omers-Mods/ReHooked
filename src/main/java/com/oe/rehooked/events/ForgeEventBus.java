@@ -44,4 +44,11 @@ public class ForgeEventBus {
             }
         }
     }
+
+    @SubscribeEvent
+    public static void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
+        event.getEntity()
+                .getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
+                .ifPresent(IPlayerHookHandler::removeAllHooks);
+    }
 }
