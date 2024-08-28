@@ -19,10 +19,16 @@ public class PacketHandler {
     );
     
     public static void register() {
-        INSTANCE.messageBuilder(SFireHookPacket.class, NetworkDirection.PLAY_TO_SERVER.ordinal())
-                .encoder(SFireHookPacket::encode)
-                .decoder(SFireHookPacket::new)
-                .consumerMainThread(SFireHookPacket::handle)
+        INSTANCE.messageBuilder(SHookCapabilityPacket.class, NetworkDirection.PLAY_TO_SERVER.ordinal())
+                .encoder(SHookCapabilityPacket::encode)
+                .decoder(SHookCapabilityPacket::new)
+                .consumerMainThread(SHookCapabilityPacket::handle)
+                .add();
+        
+        INSTANCE.messageBuilder(CPushPlayerPacket.class, NetworkDirection.PLAY_TO_CLIENT.ordinal())
+                .encoder(CPushPlayerPacket::encode)
+                .decoder(CPushPlayerPacket::new)
+                .consumerMainThread(CPushPlayerPacket::handle)
                 .add();
     }
     

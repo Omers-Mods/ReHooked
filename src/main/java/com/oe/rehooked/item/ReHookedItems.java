@@ -26,11 +26,11 @@ public class ReHookedItems {
     
     public static void register(IEventBus eventBus) {
         // define all hook variants
-        HookRegistry.registerHook("wood", new HookData(1, 8, 8, 4));
-        HookRegistry.registerHook("iron", new HookData(2, 16, 16, 8));
-        HookRegistry.registerHook("diamond", new HookData(4, 24, 24, 20));
-        HookRegistry.registerHook("ender", new HookData(1, 64, Float.MAX_VALUE, 45));
-        HookRegistry.registerHook("red", new HookData(4, 24, 24, 0));
+        HookRegistry.registerHook("wood", new HookData(1, 16, 8, 4));
+        HookRegistry.registerHook("iron", new HookData(2, 32, 16, 16));
+        HookRegistry.registerHook("diamond", new HookData(4, 64, 32, 32));
+        HookRegistry.registerHook("ender", new HookData(1, 128, Float.MAX_VALUE, 50));
+        HookRegistry.registerHook("red", new HookData(4, 32, 24, 0));
         // register the objects
         ITEMS.register(eventBus);
     }

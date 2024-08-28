@@ -14,4 +14,11 @@ public class KeyBindings {
             InputConstants.getKey(InputConstants.KEY_C, -1),
             CATEGORY
     );
+    
+    public static final KeyMapping REMOVE_ALL_HOOKS_KEY = new KeyMapping(
+            "key." + ReHookedMod.MOD_ID + ".remove_all_hooks_key",
+            KeyConflictContext.IN_GAME,
+            InputConstants.getKey(InputConstants.KEY_SPACE, -1),
+            CATEGORY
+    );
 }

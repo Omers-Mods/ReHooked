@@ -1,9 +1,9 @@
 package com.oe.rehooked.entities.hook;
 
-import com.oe.rehooked.capabilities.hooks.PlayerHookCapability;
+import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
+import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.item.hook.HookItem;
-import com.oe.rehooked.utils.DistUtil;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
@@ -42,7 +41,9 @@ public class HookEntity extends Projectile {
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_STATE);
     private static final EntityDataAccessor<Optional<BlockPos>> HIT_POS =
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
-
+    private static final EntityDataAccessor<Byte> STATE = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.BYTE);
+    
     public HookEntity(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -71,6 +72,7 @@ public class HookEntity extends Projectile {
         else {
             entityData.set(TICKS_TO_TRAVEL, ticks);
             super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity / 20.0f, pInaccuracy);
+            entityData.set(STATE, State.MOVING);
         }
     }
     
@@ -97,8 +99,14 @@ public class HookEntity extends Projectile {
             // reached max range without hitting solid block, should destroy
             if (!hit)
                 this.discard();
-            else
+            else {
+                if (!level().isClientSide()) {
+                    entityData.set(STATE, State.HIT);
+                    getOwner().getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
+                            .ifPresent(IPlayerHookHandler::update);
+                }
                 return;
+            }
         }
         else if (!level().isClientSide()){
             BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, new Vec3(dV.x, dV.y, dV.z).normalize(), dV.length());
@@ -144,16 +152,17 @@ public class HookEntity extends Projectile {
         }
     }
 
-    @Override
-    protected void onHit(HitResult pResult) {
+    public byte getState() {
+        return entityData.get(STATE);
     }
-
+    
     @Override
     protected void defineSynchedData() {
         entityData.define(TICKS_TO_TRAVEL, 20);
         entityData.define(TYPE, "");
         entityData.define(HIT_POS, Optional.empty());
         entityData.define(HIT_STATE, Optional.empty());
+        entityData.define(STATE, (byte)0);
     }
 
     @Override
@@ -164,8 +173,16 @@ public class HookEntity extends Projectile {
     @Override
     public void remove(RemovalReason pReason) {
         super.remove(pReason);
-        if (DistUtil.IsServer())
-            getOwner().getCapability(PlayerHookCapability.HOOK_HANDLER_CAPABILITY)
+        if (!level().isClientSide())
+            getOwner().getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
                     .ifPresent(handler -> handler.removeHook(this));
     }
+    
+    public class State {
+        public static final byte SHOT = 1;
+        public static final byte MOVING = 2;
+        public static final byte HIT = 4;
+        
+        private State() {}
+    } 
 }

@@ -16,5 +16,6 @@
   "curios.identifier.hook": "Hook",
   
   "key.categories.rehooked": "ReHooked",
-  "key.rehooked.fire_hook_key": "Fire Hook"
+  "key.rehooked.fire_hook_key": "Fire Hook",
+  "key.rehooked.remove_all_hooks_key": "Remove All Hooks"
 }

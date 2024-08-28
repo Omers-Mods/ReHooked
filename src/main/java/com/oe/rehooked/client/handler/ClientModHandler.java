@@ -12,5 +12,6 @@ public class ClientModHandler {
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(KeyBindings.FIRE_HOOK_KEY);
+        event.register(KeyBindings.REMOVE_ALL_HOOKS_KEY);
     }
 }
