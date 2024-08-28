@@ -51,7 +51,7 @@ public class HookEntity extends Projectile {
     public HookEntity(Player player) {
         super(ReHookedEntities.HOOK_PROJECTILE.get(), player.level());
         setOwner(player);
-        setNoGravity(false);
+        setNoGravity(true);
         CuriosApi.getCuriosInventory(player).resolve()
                 .flatMap(curiosInventory -> curiosInventory
                         .findFirstCurio(itemStack ->  itemStack.getItem() instanceof HookItem))
@@ -61,20 +61,43 @@ public class HookEntity extends Projectile {
                     if (hookType.contains(HookItem.HOOK_TYPE_TAG))
                         entityData.set(TYPE, hookType.getString(HookItem.HOOK_TYPE_TAG));
                 });
-        Vec3 move = player.getEyePosition().add(player.getLookAngle().multiply(0.5, 0.5, 0.5));
-        this.moveTo(move.x, move.y, move.z, this.getYRot(), this.getXRot());
+        Vec3 move = player.getLookAngle().multiply(0.5, 0.5, 0.5).add(0, player.getEyeY(), 0);
+        this.moveTo(move.x, move.y, move.z, player.getYHeadRot(), player.getViewXRot(1.0f));
+        entityData.set(STATE, State.SHOT);
     }
     
+    /**
+     * Shoot any non-instant hook
+     */
     public void shootFromRotation(Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy, int ticks) {
-        if (pVelocity == Float.MAX_VALUE) {
-            // todo: handle instantaneous hooks (ender)
+        entityData.set(TICKS_TO_TRAVEL, ticks);
+        super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity / 20.0f, pInaccuracy);
+        entityData.set(STATE, State.MOVING);
+    }
+    
+    /**
+     * Shoot instant hooks
+     */
+    public void shootInstant(Entity pShooter, float range) {
+        BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(
+                pShooter, pShooter.getLookAngle().add(0, pShooter.getEyeY(), 0), range);
+        BlockState blockState = level().getBlockState(hitResult.getBlockPos());
+        if (!blockState.isAir() && blockState.getFluidState().equals(Fluids.EMPTY.defaultFluidState())) {
+            // hit block
+            Vec3 pos = hitResult.getLocation();
+            entityData.set(HIT_POS, Optional.of(hitResult.getBlockPos()));
+            entityData.set(HIT_STATE, Optional.of(blockState));
+            if (!level().isClientSide()) 
+                this.teleportTo(pos.x, pos.y, pos.z);
+            entityData.set(STATE, State.HIT);
         }
         else {
-            entityData.set(TICKS_TO_TRAVEL, ticks);
-            super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity / 20.0f, pInaccuracy);
-            entityData.set(STATE, State.MOVING);
+            // todo: just shoot particles briefly 
+            discard();
         }
     }
+    
+    
     
     @Override
     public void tick() {
@@ -101,7 +124,6 @@ public class HookEntity extends Projectile {
                 this.discard();
             else {
                 if (!level().isClientSide()) {
-                    entityData.set(STATE, State.HIT);
                     getOwner().getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
                             .ifPresent(IPlayerHookHandler::update);
                 }
@@ -130,8 +152,6 @@ public class HookEntity extends Projectile {
         this.setPos(d0, d1, d2);
     }
     
-    
-
     @Override
     protected void onHitBlock(BlockHitResult pResult) {
         BlockPos blockPos = this.blockPosition();
@@ -145,6 +165,7 @@ public class HookEntity extends Projectile {
                     if (aabb.move(blockPos).contains(currPos)) {
                         entityData.set(HIT_STATE, Optional.of(blockState));
                         entityData.set(HIT_POS, Optional.of(pResult.getBlockPos()));
+                        entityData.set(STATE, State.HIT);
                         break;
                     }
                 }

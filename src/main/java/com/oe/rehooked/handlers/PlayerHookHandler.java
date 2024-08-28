@@ -78,9 +78,12 @@ public class PlayerHookHandler implements IPlayerHookHandler {
             }
             owner.sendSystemMessage(Component.literal("Shooting hook!"));
             HookEntity hookEntity = new HookEntity(owner);
-            hookEntity.shootFromRotation(owner, owner.getXRot(), owner.getYRot(), 0.0F,
-                    hookData.speed(), 0.0f,
-                    (int)  (hookData.range() / (hookData.speed() / 20.0f)));
+            if (hookData.speed() == Double.MAX_VALUE)
+                hookEntity.shootInstant(owner, hookData.range());
+            else 
+                hookEntity.shootFromRotation(owner, owner.getXRot(), owner.getYRot(), 0.0F, 
+                        hookData.speed(), 0.0f, 
+                        (int)  (hookData.range() / (hookData.speed() / 20.0f)));
             owner.level().addFreshEntity(hookEntity);
             playerHooks.add(hookEntity);
         });
