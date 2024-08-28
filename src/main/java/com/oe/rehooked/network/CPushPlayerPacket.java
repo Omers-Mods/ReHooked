@@ -31,9 +31,7 @@ public class CPushPlayerPacket {
     
     public void handle(Supplier<NetworkEvent.Context> context) {
         Player player = Minecraft.getInstance().player;
-        if (player != null) {
-            ReHookedMod.LOGGER.debug("Adding deltaV to player {} - {}", pushPower, player.getDisplayName());
-            player.addDeltaMovement(pushPower);
-        }
+        if (player != null) 
+            player.setDeltaMovement(pushPower);
     }
 }

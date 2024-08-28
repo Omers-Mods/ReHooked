@@ -169,16 +169,8 @@ public class HookEntity extends Projectile {
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
-
-    @Override
-    public void remove(RemovalReason pReason) {
-        super.remove(pReason);
-        if (!level().isClientSide())
-            getOwner().getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
-                    .ifPresent(handler -> handler.removeHook(this));
-    }
     
-    public class State {
+    public static class State {
         public static final byte SHOT = 1;
         public static final byte MOVING = 2;
         public static final byte HIT = 4;

@@ -59,10 +59,8 @@ public class ForgeEventBus {
         event.getServer().getPlayerList().getPlayers().forEach(player -> {
             player.getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER).ifPresent(handler -> {
                 if (handler.shouldMoveThisTick()) {
-                    Vec3 pushForce = player.getDeltaMovement().reverse().add(handler.getMoveThisTick());
-                    ReHookedMod.LOGGER.debug("adding deltaV to player {}", pushForce);
-                    player.addDeltaMovement(pushForce);
-                    PacketHandler.sendToPlayer(new CPushPlayerPacket(pushForce), player);
+                    player.setDeltaMovement(handler.getMoveThisTick());
+                    PacketHandler.sendToPlayer(new CPushPlayerPacket(handler.getMoveThisTick()), player);
                 }
             });
         });

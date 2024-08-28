@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class PlayerHookHandler implements IPlayerHookHandler {
+    public static final double THRESHOLD = 0.5; 
+    
     private List<HookEntity> playerHooks;
     private Player owner;
     private String hookType;
@@ -202,6 +204,8 @@ public class PlayerHookHandler implements IPlayerHookHandler {
 
     @Override
     public boolean shouldMoveThisTick() {
-        return moveVector != null && !moveVector.equals(Vec3.ZERO);
+        return moveVector != null && 
+                !moveVector.equals(Vec3.ZERO) && 
+                moveVector.scale(ticksToCoverDistance).length() > THRESHOLD;
     }
 }
