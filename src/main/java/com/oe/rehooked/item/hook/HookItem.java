@@ -35,11 +35,10 @@ public class HookItem extends Item implements ICurioItem {
     @Override
     public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
         LivingEntity maybePlayer = slotContext.entity();
+        if (maybePlayer.level().isClientSide()) return;
         if (maybePlayer instanceof Player) {
-            maybePlayer.getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER).ifPresent(Handler -> {
-                Handler.hookType("");
-                Handler.removeAllHooks();
-            });
+            maybePlayer.getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
+                    .ifPresent(handler -> handler.hookType(""));
         }
     }
 
