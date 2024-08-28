@@ -1,8 +1,8 @@
-package com.oe.rehooked.events.client;
+package com.oe.rehooked.events.subscribers.client;
 
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.client.KeyBindings;
-import com.oe.rehooked.events.custom.PlayerPushEvent;
+import com.oe.rehooked.events.definition.player.PlayerPushEvent;
 import com.oe.rehooked.network.PacketHandler;
 import com.oe.rehooked.network.SHookCapabilityPacket;
 import net.minecraft.client.Minecraft;

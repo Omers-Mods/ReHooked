@@ -1,4 +1,4 @@
-package com.oe.rehooked.events.common;
+package com.oe.rehooked.events.subscribers.common;
 
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;

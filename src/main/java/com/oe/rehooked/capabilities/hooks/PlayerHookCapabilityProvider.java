@@ -1,6 +1,6 @@
 package com.oe.rehooked.capabilities.hooks;
 
-import com.oe.rehooked.handlers.PlayerHookHandler;
+import com.oe.rehooked.handlers.hook.PlayerHookHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.Capability;

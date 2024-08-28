@@ -1,4 +1,4 @@
-package com.oe.rehooked.events.custom;
+package com.oe.rehooked.events.definition.player;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

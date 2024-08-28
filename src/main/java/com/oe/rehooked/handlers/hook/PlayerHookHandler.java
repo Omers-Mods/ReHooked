@@ -1,4 +1,4 @@
-package com.oe.rehooked.handlers;
+package com.oe.rehooked.handlers.hook;
 
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
