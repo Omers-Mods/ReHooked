@@ -1,6 +1,5 @@
-package com.oe.rehooked.network;
+package com.oe.rehooked.network.packets.client;
 
-import com.oe.rehooked.ReHookedMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;

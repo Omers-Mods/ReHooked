@@ -1,4 +1,4 @@
-package com.oe.rehooked.network;
+package com.oe.rehooked.network.packets.server;
 
 import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
 import com.oe.rehooked.item.hook.HookItem;

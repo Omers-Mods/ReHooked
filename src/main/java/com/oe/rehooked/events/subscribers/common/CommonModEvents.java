@@ -3,7 +3,7 @@ package com.oe.rehooked.events.subscribers.common;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.entities.hook.HookEntityModel;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
-import com.oe.rehooked.network.PacketHandler;
+import com.oe.rehooked.network.handlers.PacketHandler;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

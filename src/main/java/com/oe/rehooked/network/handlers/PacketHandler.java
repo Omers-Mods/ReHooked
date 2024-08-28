@@ -1,6 +1,8 @@
-package com.oe.rehooked.network;
+package com.oe.rehooked.network.handlers;
 
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.network.packets.client.CPushPlayerPacket;
+import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
