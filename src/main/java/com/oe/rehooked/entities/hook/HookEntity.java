@@ -33,14 +33,10 @@ import java.util.UUID;
 public class HookEntity extends Entity {
     private static final Logger LOGGER = LogUtils.getLogger();
     
-    private static final EntityDataAccessor<Integer> TICKS_TO_TRAVEL = 
-            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<String> TYPE =
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<BlockPos> GOAL_BLOCK = 
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.BLOCK_POS);
-    private static final EntityDataAccessor<Optional<BlockState>> HIT_STATE = 
-            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_STATE);
     private static final EntityDataAccessor<Optional<BlockPos>> HIT_POS =
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
     private static final EntityDataAccessor<Integer> STATE = 
@@ -52,6 +48,8 @@ public class HookEntity extends Entity {
 
     protected int ticksInState;
     protected boolean firstTickInState;
+    protected double distanceTraveled;
+    protected Vec3 destLookAt;
     
     public HookEntity(EntityType<? extends Entity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -64,16 +62,23 @@ public class HookEntity extends Entity {
         setHookType(hookType);
         setState(State.IDLE.ordinal());
         setPos(player.getEyePosition());
-        // set goal
-        HookRegistry.getHookData(getHookType()).ifPresent(hookData -> {
-            setGoalBlock(VectorHelper.getLookingAt(player, hookData.range()).getBlockPos());
-        });
     }
     
     public void onInit() {
         ticksInState = 0;
-        this.lookAt(EntityAnchorArgument.Anchor.EYES, getGoalBlock().getCenter());
-        this.setState(State.SHOT.ordinal());
+        if (level().isClientSide() && getOwnerUUID().equals(Minecraft.getInstance().player.getUUID())) {
+            IPlayerHookHandler.FromPlayer(Minecraft.getInstance().player).ifPresent(handler -> {
+                handler.getPlayerHooks().add(this);
+            });
+            LOGGER.debug("Player setting hook angle and destination!");
+            lookAt(EntityAnchorArgument.Anchor.EYES, Minecraft.getInstance().player.getLookAngle());
+            // set goal
+            HookRegistry.getHookData(getHookType()).ifPresent(hookData -> {
+                setGoalBlock(VectorHelper.getLookingAt(Minecraft.getInstance().player, hookData.range()).getBlockPos());
+            });
+            setState(State.SHOT.ordinal());
+        }
+        distanceTraveled = 0;
     }
     
     @Override
@@ -89,25 +94,38 @@ public class HookEntity extends Entity {
     }
     
     protected void tickShot() {
+        if (firstTickInState) {
+            destLookAt = position().vectorTo(getGoalBlock().getCenter()).normalize();
+            LOGGER.debug("Hook is aiming for {}", destLookAt);
+        }
         // move the hook in the goal direction, checking for hits in the process
         HookRegistry.getHookData(getHookType()).ifPresent(hookData -> {
+            if (distanceTraveled > hookData.range()) {
+                setState(State.RETRACTING.ordinal());
+                return;
+            }
             // check if there is a collision in the next immediate move
-            Vec3 lookAngle = position().vectorTo(getGoalBlock().getCenter()).normalize();
-            double range = hookData.speed() == Double.MAX_VALUE ? hookData.range() : hookData.speed() / 20.0;
-            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, lookAngle, range);
+            double adjustedVelocity = hookData.speed() / 20.0;
+            // set the actual range to check collisions in this tick
+            double range;
+            if (hookData.speed() == Float.MAX_VALUE) {
+                range = hookData.range();
+            }
+            else range = Math.min(adjustedVelocity, hookData.range() - distanceTraveled);
+            
+            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, destLookAt, range);
             BlockState hitState = level().getBlockState(hitResult.getBlockPos());
-            Vec3 moveAmount = Vec3.ZERO;
+            Vec3 moveAmount;
             if (!hitState.isAir() && hitState.getFluidState().equals(Fluids.EMPTY.defaultFluidState())) {
                 // there is a collision with solid block
-                moveAmount = hitResult.getBlockPos().getCenter().add(lookAngle.scale(-0.5)).subtract(position());
+                moveAmount = hitResult.getBlockPos().getCenter().add(destLookAt.scale(-0.5)).subtract(position());
                 setState(State.PULLING.ordinal());
                 setHitPos(hitResult.getBlockPos());
-                setHitState(hitState);
             }
             else {
                 // no collision with solid block
-                moveAmount = lookAngle.scale(hookData.speed() / 20.0);
-                move(MoverType.SELF, lookAngle.scale(hookData.speed() / 20.0));
+                moveAmount = destLookAt.scale(adjustedVelocity);
+                move(MoverType.SELF, destLookAt.scale(adjustedVelocity));
             }
             move(MoverType.SELF, moveAmount);
         });
@@ -135,7 +153,10 @@ public class HookEntity extends Entity {
                         .scale(hookData.pullSpeed() / 20.0);
                 player.addDeltaMovement(deltaV);
             }
-            // todo: add a check for hit block breaking -> retract hook
+            getHitPos().ifPresent(hitPos -> {
+                if (level().getBlockState(hitPos).isAir())
+                    setState(State.RETRACTING.ordinal());
+            });
         });
     }
     
@@ -148,12 +169,24 @@ public class HookEntity extends Entity {
     }
     
     protected void tickRetracting() {
-        if (firstTickInState) {
-            // send update to handler
-            getOwner().ifPresent(owner -> IPlayerHookHandler.FromPlayer(owner).ifPresent(IPlayerHookHandler::update));
+        Player owner = null;
+        if (!level().isClientSide()) {
+            owner = getOwner().orElse(null);
+        }
+        else if (getOwnerUUID().equals(Minecraft.getInstance().player.getUUID())) {
+            owner = Minecraft.getInstance().player;
+        }
+        // send update to handler
+        if (owner != null) {
+            IPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
+                handler.removeHook(this);
+                handler.update();
+            });
         }
         // todo: retract to player before discarding maybe
-        discard();
+        if (!level().isClientSide()) {
+            discard();
+        }
     }
     
     protected void trackTicksInState() {
@@ -203,14 +236,6 @@ public class HookEntity extends Entity {
         return entityData.get(STATE);
     }
     
-    protected void setHitState(BlockState hitState) {
-        entityData.set(HIT_STATE, Optional.ofNullable(hitState));
-    }
-    
-    public Optional<BlockState> getHitState() {
-        return entityData.get(HIT_STATE);
-    }
-    
     protected void setHitPos(BlockPos hitPos) {
         entityData.set(HIT_POS, Optional.ofNullable(hitPos));
     }
@@ -225,14 +250,6 @@ public class HookEntity extends Entity {
     
     public String getHookType() {
         return entityData.get(TYPE);
-    }
-    
-    protected void setTicksToTravel(int ticksToTravel) {
-        entityData.set(TICKS_TO_TRAVEL, ticksToTravel);
-    }
-    
-    public int getTicksToTravel() {
-        return entityData.get(TICKS_TO_TRAVEL);
     }
     
     protected void setGoalBlock(BlockPos goalBlock) {
@@ -254,10 +271,8 @@ public class HookEntity extends Entity {
     @Override
     protected void defineSynchedData() {
         entityData.define(GOAL_BLOCK, blockPosition());
-        entityData.define(TICKS_TO_TRAVEL, 20);
         entityData.define(TYPE, "");
         entityData.define(HIT_POS, Optional.empty());
-        entityData.define(HIT_STATE, Optional.empty());
         entityData.define(STATE, State.IDLE.ordinal());
         entityData.define(PREV_STATE, State.IDLE.ordinal());
         entityData.define(OWNER_UUID, Optional.empty());
