@@ -4,12 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class CPushPlayerPacket {
-    private Vec3 pushPower;
+    private final Vec3 pushPower;
     
     public CPushPlayerPacket(Vec3 pushPower) {
         this.pushPower = pushPower;
@@ -29,8 +31,11 @@ public class CPushPlayerPacket {
     }
     
     public void handle(Supplier<NetworkEvent.Context> context) {
-        Player player = Minecraft.getInstance().player;
-        if (player != null) 
-            player.setDeltaMovement(pushPower);
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
+            Player player = Minecraft.getInstance().player;
+            if (player != null)
+                player.setDeltaMovement(pushPower);
+        });
+        context.get().setPacketHandled(true);
     }
 }

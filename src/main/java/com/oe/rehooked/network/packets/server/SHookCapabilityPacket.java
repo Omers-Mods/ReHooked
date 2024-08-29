@@ -1,25 +1,21 @@
 package com.oe.rehooked.network.packets.server;
 
+import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
 import com.oe.rehooked.item.hook.HookItem;
+import com.oe.rehooked.network.packets.common.HookCapabilityPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.function.Supplier;
 
-public class SHookCapabilityPacket {
-    public static final byte SHOOT = 1;
-    public static final byte RETRACT = 2;
-    public static final byte ALL = 4;
-    
-    private byte packetType;
-    private int additional;
-    
+public class SHookCapabilityPacket extends HookCapabilityPacket {
     public SHookCapabilityPacket(byte packetType, int additional) {
-        this.packetType = packetType;
-        this.additional = additional;
+        super(packetType, additional);
     }
     
     public SHookCapabilityPacket(byte packetType) {
@@ -27,19 +23,14 @@ public class SHookCapabilityPacket {
     }
 
     public SHookCapabilityPacket(FriendlyByteBuf buffer) {
-        this.packetType = buffer.readByte();
-        this.additional = buffer.readInt();
+        super(buffer.readByte(), buffer.readInt());
     }
 
-    public void encode(FriendlyByteBuf buffer) {
-        buffer.writeByte(packetType);
-        buffer.writeInt(additional);
-    }
-
+    @Override
     public void handle(Supplier<NetworkEvent.Context> context) {
         ServerPlayer player = context.get().getSender();
         if (player == null || player.level().isClientSide()) return;
-        player.getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER).ifPresent(handler -> {
+        IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
             handler.owner(player);
             CuriosApi.getCuriosInventory(player)
                     .ifPresent(inventory -> inventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof HookItem)

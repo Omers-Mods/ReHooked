@@ -1,5 +1,6 @@
 package com.oe.rehooked.handlers.hook;
 
+import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.data.HookRegistry;
@@ -12,14 +13,13 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerHookHandler implements IPlayerHookHandler {
-    public static final double THRESHOLD = 0.5; 
+    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final double THRESHOLD = 0.5;
     
     private List<HookEntity> playerHooks;
     private Player owner;
@@ -37,59 +37,41 @@ public class PlayerHookHandler implements IPlayerHookHandler {
 
     @Override
     public void removeHook(int id) {
+        LOGGER.debug("Removing single hook by id");
         if (id < playerHooks.size() && id >= 0) {
             HookEntity hook = playerHooks.get(id);
-            boolean update = hook.getState() == HookEntity.State.HIT;
-            if (!hook.isRemoved()) {
-                hook.discard();
-            }
+            if (!hook.isRemoved()) hook.setState(HookEntity.State.RETRACTING.ordinal());
             playerHooks.remove(id);
-            if (update)
-                update();
         }
     }
 
     @Override
     public void removeHook(HookEntity hook) {
-        if (hook.getState() == HookEntity.State.HIT)
-            update();
-        if (!hook.isRemoved())
-            hook.discard();
+        LOGGER.debug("Removing single hook by entity");
+        if (!hook.isRemoved()) hook.setState(HookEntity.State.RETRACTING.ordinal());
         playerHooks.remove(hook);
     }
     
     @Override
     public void removeAllHooks() {
-        ReHookedMod.LOGGER.debug("Removing all hooks!");
-        for (int i = 0; i < playerHooks.size(); i++) removeHook(i);
+        LOGGER.debug("Removing all hooks!");
+        for (int i = playerHooks.size() - 1; i >= 0; i--) removeHook(i);
     }
     
     @Override
     public void shootHook() {
         if (owner == null) return;
+        LOGGER.debug("Shooting hook");
         HookRegistry.getHookData(hookType).ifPresent(hookData -> {
-            if (hookData.count() <= 0) {
-                owner.sendSystemMessage(Component.literal("Can't shoot hook because player doesn't have item!"));
-                return;
-            }
-            if (playerHooks.size() == hookData.count()) {
-                owner.sendSystemMessage(Component.literal("Player at max hooks, clearing oldest before shooting!"));
-                removeHook(0);
-            }
-            owner.sendSystemMessage(Component.literal("Shooting hook!"));
-            HookEntity hookEntity = new HookEntity(owner);
-            if (hookData.speed() == Double.MAX_VALUE)
-                hookEntity.shootInstant(owner, hookData.range());
-            else 
-                hookEntity.shootFromRotation(owner, owner.getXRot(), owner.getYRot(), 0.0F, 
-                        hookData.speed(), 0.0f, 
-                        (int)  (hookData.range() / (hookData.speed() / 20.0f)));
+            // doesn't have hook capacity at all
+            if (hookData.count() <= 0) return;
+            // else if just doesn't have more room for hooks, delete oldest and continue
+            if (playerHooks.size() == hookData.count()) removeHook(0);
+            // spawn and add new hook
+            HookEntity hookEntity = new HookEntity(owner, hookType);
             owner.level().addFreshEntity(hookEntity);
             playerHooks.add(hookEntity);
         });
-        owner.sendSystemMessage(Component.literal("Player: " + owner.getDisplayName().getString()));
-        owner.sendSystemMessage(Component.literal("Hook Type: " + hookType));
-        owner.sendSystemMessage(Component.literal("Current hooks: " + playerHooks.size()));
     } 
     
     @Override
@@ -160,7 +142,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
                 playerHooks = new ArrayList<>();
                 server.getAllLevels().forEach(level -> playerHooks.addAll(
                         level.getEntitiesOfClass(HookEntity.class, AABB.of(BoundingBox.infinite()),
-                                entity -> playerUUID.equals(entity.getOwner().getUUID()))
+                                entity -> entity.getOwner().flatMap(player -> Optional.of(player.getUUID().equals(playerUUID))).orElse(false))
                 ));
                 owner.sendSystemMessage(Component.literal("Found " + playerHooks.size() + " hooks"));
             }
@@ -176,7 +158,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
         double z = 0;
         int count = 0;
         for (HookEntity hook : playerHooks) {
-            if (hook.getState() == HookEntity.State.HIT) {
+            if (hook.getState() == HookEntity.State.PULLING.ordinal()) {
                 count++;
                 x += hook.getX();
                 y += hook.getY();

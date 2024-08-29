@@ -1,5 +1,6 @@
 package com.oe.rehooked.item.hook;
 
+import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,10 +37,8 @@ public class HookItem extends Item implements ICurioItem {
     public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
         LivingEntity maybePlayer = slotContext.entity();
         if (maybePlayer.level().isClientSide()) return;
-        if (maybePlayer instanceof Player) {
-            maybePlayer.getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
-                    .ifPresent(handler -> handler.hookType(""));
-        }
+        if (maybePlayer instanceof Player)
+            IPlayerHookHandler.FromPlayer((Player) maybePlayer).ifPresent(handler -> handler.hookType(""));
     }
 
     @Override

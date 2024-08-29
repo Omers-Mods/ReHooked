@@ -3,8 +3,8 @@ package com.oe.rehooked.events.subscribers.common;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
-import com.oe.rehooked.network.packets.client.CPushPlayerPacket;
 import com.oe.rehooked.network.handlers.PacketHandler;
+import com.oe.rehooked.network.packets.client.CPushPlayerPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -23,11 +23,11 @@ public class ForgeEventBus {
         // revive old capabilities
         event.getOriginal().reviveCaps();
         // get the provider
-        LazyOptional<IPlayerHookHandler> hookCap = event.getOriginal().getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER);
+        LazyOptional<IPlayerHookHandler> hookCap = IPlayerHookHandler.FromPlayer(event.getOriginal());
         // in case of death copy the old data to the new capability
         if (event.isWasDeath()) {
             hookCap.ifPresent(oldStore ->
-                    event.getEntity().getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
+                    IPlayerHookHandler.FromPlayer(event.getEntity())
                             .ifPresent(newStore -> newStore.copyFrom(oldStore)));
         }
         // invalidate old capabilities
@@ -38,7 +38,7 @@ public class ForgeEventBus {
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject().level().isClientSide()) return;
         if (event.getObject() instanceof Player) {
-            if (!event.getObject().getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER).isPresent()) {
+            if (!IPlayerHookHandler.FromPlayer((Player) event.getObject()).isPresent()) {
                 event.addCapability(new ResourceLocation(ReHookedMod.MOD_ID, "properties"),
                         new PlayerHookCapabilityProvider());
             }
@@ -48,15 +48,13 @@ public class ForgeEventBus {
     @SubscribeEvent
     public static void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity().level().isClientSide()) return;
-        event.getEntity()
-                .getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER)
-                .ifPresent(IPlayerHookHandler::removeAllHooks);
+        IPlayerHookHandler.FromPlayer(event.getEntity()).ifPresent(IPlayerHookHandler::removeAllHooks);
     }
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         event.getServer().getPlayerList().getPlayers().forEach(player -> {
-            player.getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER).ifPresent(handler -> {
+            IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
                 if (handler.shouldMoveThisTick()) {
                     player.setDeltaMovement(handler.getMoveThisTick());
                     PacketHandler.sendToPlayer(new CPushPlayerPacket(handler.getMoveThisTick()), player);

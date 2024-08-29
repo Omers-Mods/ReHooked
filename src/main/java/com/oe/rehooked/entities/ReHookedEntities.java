@@ -18,6 +18,7 @@ public class ReHookedEntities {
                     .sized(0.15f, 0.15f)
                     .clientTrackingRange(50)
                     .updateInterval(2)
+                    .noSave()
                     .build("hook_projectile")
             );
     
