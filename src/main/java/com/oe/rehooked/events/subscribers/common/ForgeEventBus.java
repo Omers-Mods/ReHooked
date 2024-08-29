@@ -28,7 +28,7 @@ public class ForgeEventBus {
         if (event.isWasDeath()) {
             hookCap.ifPresent(oldStore ->
                     IPlayerHookHandler.FromPlayer(event.getEntity())
-                            .ifPresent(newStore -> newStore.copyFrom(oldStore)));
+                            .ifPresent(newStore -> newStore.copyFrom(oldStore).owner(event.getEntity())));
         }
         // invalidate old capabilities
         event.getOriginal().invalidateCaps();
