@@ -28,22 +28,25 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
 
     @Override
     public void handle(Supplier<NetworkEvent.Context> context) {
-        ServerPlayer player = context.get().getSender();
-        if (player == null || player.level().isClientSide()) return;
-        IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
-            handler.owner(player);
-            CuriosApi.getCuriosInventory(player)
-                    .ifPresent(inventory -> inventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof HookItem)
-                            .ifPresent(hook -> {
-                                switch (packetType) {
-                                    case SHOOT -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                            .shootHook();
-                                    case RETRACT -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                            .removeHook(additional);
-                                    case ALL -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                            .removeAllHooks();
-                                }
-                            }));
+        context.get().enqueueWork(() -> {
+            ServerPlayer player = context.get().getSender();
+            if (player == null || player.level().isClientSide()) return;
+            IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
+                handler.owner(player);
+                CuriosApi.getCuriosInventory(player)
+                        .ifPresent(inventory -> inventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof HookItem)
+                                .ifPresent(hook -> {
+                                    switch (packetType) {
+                                        case SHOOT -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
+                                                .shootHook();
+                                        case RETRACT -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
+                                                .removeHook(additional);
+                                        case ALL -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
+                                                .removeAllHooks();
+                                    }
+                                }));
+            });
         });
+        context.get().setPacketHandled(true);
     }
 }
