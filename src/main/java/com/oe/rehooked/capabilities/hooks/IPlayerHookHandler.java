@@ -8,7 +8,6 @@ import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @AutoRegisterCapability
 public interface IPlayerHookHandler {
@@ -21,7 +20,7 @@ public interface IPlayerHookHandler {
     Collection<HookEntity> getPlayerHooks();
     Player getOwner();
     IPlayerHookHandler owner(Player owner);
-    void copyFrom(IPlayerHookHandler other);
+    IPlayerHookHandler copyFrom(IPlayerHookHandler other);
     void serializeNBT(CompoundTag tag);
     void deserializeNBT(CompoundTag nbt);
     void update();

@@ -104,11 +104,12 @@ public class PlayerHookHandler implements IPlayerHookHandler {
     }
 
     @Override
-    public void copyFrom(IPlayerHookHandler other) {
+    public IPlayerHookHandler copyFrom(IPlayerHookHandler other) {
+        LOGGER.debug("Copied from another");
         this.playerHooks = new ArrayList<>();
         owner(other.getOwner());
         hookType(other.getHookType());
-        if (owner != null) owner.sendSystemMessage(Component.literal("Copied from another capability"));
+        return this;
     }
     
     public void serializeNBT(CompoundTag tag) {
@@ -152,29 +153,26 @@ public class PlayerHookHandler implements IPlayerHookHandler {
 
     @Override
     public void update() {
+        LOGGER.debug("Updating handler");
         owner.setNoGravity(false);
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        int count = 0;
-        for (HookEntity hook : playerHooks) {
-            if (hook.getState() == HookEntity.State.PULLING.ordinal()) {
-                count++;
-                x += hook.getX();
-                y += hook.getY();
-                z += hook.getZ();
-            }
-        }
-        if (count == 0) {
-            moveVector = null;
-            return;
-        }
-        owner.setNoGravity(true);
-        // need to move player in the direction of the center of all hooks
-        moveVector = new Vec3(x / count, y / count, z / count).subtract(owner.position());
         HookRegistry.getHookData(hookType).ifPresent(data -> {
+            float vPT = data.pullSpeed() / 20.0f;
+            int count = 0;
+            moveVector = Vec3.ZERO;
+            for (HookEntity hook : playerHooks) {
+                if (hook.getState() == HookEntity.State.PULLING.ordinal()) {
+                    count++;
+                    moveVector = moveVector.add(owner.position().vectorTo(hook.position()));
+                }
+            }
+            if (count == 0) {
+                moveVector = null;
+                return;
+            }
+            moveVector = moveVector.normalize().scale(vPT);
+            
             ticksToCoverDistance = (int) (moveVector.length() / (data.pullSpeed() / 20));
-            moveVector = moveVector.scale(((double) 1) / ((double) ticksToCoverDistance));
+            owner.setNoGravity(true);
         });
     }
 
