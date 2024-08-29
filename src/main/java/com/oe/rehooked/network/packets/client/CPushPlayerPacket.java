@@ -31,7 +31,7 @@ public class CPushPlayerPacket {
     }
     
     public void handle(Supplier<NetworkEvent.Context> context) {
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
+        context.get().enqueueWork(() -> {
             Player player = Minecraft.getInstance().player;
             if (player != null)
                 player.setDeltaMovement(pushPower);
