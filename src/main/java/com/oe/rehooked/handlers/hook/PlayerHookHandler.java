@@ -1,7 +1,6 @@
 package com.oe.rehooked.handlers.hook;
 
 import com.mojang.logging.LogUtils;
-import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
@@ -114,7 +113,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
     
     public void serializeNBT(CompoundTag tag) {
         if (owner != null) {
-            owner.sendSystemMessage(Component.literal("Serializing hook capability"));
+            LOGGER.debug("Serializing hook capability");
             tag.putUUID("uuid", owner.getUUID());
             tag.putString("hook_type", hookType);
             tag.putInt("ticks", ticksToCoverDistance);
@@ -137,7 +136,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             owner = server.getPlayerList().getPlayer(playerUUID);
             if (owner != null) {
-                owner.sendSystemMessage(Component.literal("Deserializing hook capability"));
+                LOGGER.debug("Deserializing hook capability");
                 hookType = nbt.getString("hook_type");
                 playerHooks = new ArrayList<>();
                 server.getAllLevels().forEach(level -> playerHooks.addAll(
@@ -153,6 +152,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
 
     @Override
     public void update() {
+        owner.setNoGravity(false);
         double x = 0;
         double y = 0;
         double z = 0;
@@ -169,6 +169,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
             moveVector = null;
             return;
         }
+        owner.setNoGravity(true);
         // need to move player in the direction of the center of all hooks
         moveVector = new Vec3(x / count, y / count, z / count).subtract(owner.position());
         HookRegistry.getHookData(hookType).ifPresent(data -> {
