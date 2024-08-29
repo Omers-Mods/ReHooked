@@ -1,13 +1,10 @@
 package com.oe.rehooked.network.packets.server;
 
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
-import com.oe.rehooked.capabilities.hooks.PlayerHookCapabilityProvider;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.network.packets.common.HookCapabilityPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 
