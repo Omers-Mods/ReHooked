@@ -44,7 +44,7 @@ public class ClientForgeEvents {
                     .flatMap(curiosInventory -> curiosInventory.getStacksHandler("hook"))
                     .ifPresent(hook -> PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.SHOOT)));
         }
-        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && player != null) {
+        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick()) {
             LOGGER.debug("Player pressed remove all hooks key");
             CuriosApi.getCuriosInventory(player).resolve()
                     .flatMap(curiosInventory -> curiosInventory.getStacksHandler("hook"))
