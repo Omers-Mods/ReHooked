@@ -34,9 +34,17 @@ public class HookItem extends Item implements ICurioItem {
     }
 
     @Override
+    public void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
+        LivingEntity maybePlayer = slotContext.entity();
+        if (maybePlayer instanceof Player)
+            IPlayerHookHandler.FromPlayer((Player) maybePlayer).ifPresent(handler -> 
+                    handler.owner((Player) maybePlayer).hookType(((HookItem) stack.getItem()).hookType)
+            );
+    }
+
+    @Override
     public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
         LivingEntity maybePlayer = slotContext.entity();
-        if (maybePlayer.level().isClientSide()) return;
         if (maybePlayer instanceof Player)
             IPlayerHookHandler.FromPlayer((Player) maybePlayer).ifPresent(handler -> handler.hookType(""));
     }
