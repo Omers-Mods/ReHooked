@@ -9,6 +9,7 @@ import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -21,12 +22,22 @@ public class ClientForgeEvents {
     private static final Logger LOGGER = LogUtils.getLogger();
     
     private static long ticksSinceShot = 0;
+    private static Vec3 hookMovement = null;
     
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        ticksSinceShot++;
         LocalPlayer player = Minecraft.getInstance().player;
-        if (KeyBindings.FIRE_HOOK_KEY.consumeClick() && player != null && ticksSinceShot > 5) {
+        if (player == null) return;
+        if (event.phase == TickEvent.Phase.START) {
+            hookMovement = null;
+        }
+        else if (hookMovement != null) {
+            player.resetPos();
+            if (hookMovement.length() > 0.5)
+                Minecraft.getInstance().player.setDeltaMovement(hookMovement);
+        }
+        ticksSinceShot++;
+        if (KeyBindings.FIRE_HOOK_KEY.consumeClick() && ticksSinceShot > 5) {
             ticksSinceShot = 0;
             LOGGER.debug("Player pressed shoot key");
             CuriosApi.getCuriosInventory(player).resolve()
@@ -46,6 +57,6 @@ public class ClientForgeEvents {
     
     @SubscribeEvent
     public static void onPlayerPush(PlayerPushEvent event) {
-        event.getEntity().setDeltaMovement(event.getPushPower());
+        hookMovement = event.getPushPower();
     }
 }
