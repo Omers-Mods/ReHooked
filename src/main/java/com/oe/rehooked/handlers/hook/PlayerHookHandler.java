@@ -39,7 +39,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
         LOGGER.debug("Removing single hook by id");
         if (id < playerHooks.size() && id >= 0) {
             HookEntity hook = playerHooks.get(id);
-            if (!hook.isRemoved()) hook.setState(HookEntity.State.RETRACTING.ordinal());
+            if (!hook.isRemoved()) hook.setState(HookEntity.State.RETRACTING);
             playerHooks.remove(id);
         }
     }
@@ -47,7 +47,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
     @Override
     public void removeHook(HookEntity hook) {
         LOGGER.debug("Removing single hook by entity");
-        if (!hook.isRemoved()) hook.setState(HookEntity.State.RETRACTING.ordinal());
+        if (!hook.isRemoved()) hook.setState(HookEntity.State.RETRACTING);
         playerHooks.remove(hook);
     }
     
@@ -58,7 +58,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
     }
     
     @Override
-    public void shootHook() {
+    public void shootHook(float xRot, float yRot) {
         if (owner == null) return;
         LOGGER.debug("Shooting hook");
         HookRegistry.getHookData(hookType).ifPresent(hookData -> {
@@ -142,7 +142,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
                 playerHooks = new ArrayList<>();
                 server.getAllLevels().forEach(level -> playerHooks.addAll(
                         level.getEntitiesOfClass(HookEntity.class, AABB.of(BoundingBox.infinite()),
-                                entity -> entity.getOwner().flatMap(player -> Optional.of(player.getUUID().equals(playerUUID))).orElse(false))
+                                entity -> entity.getOwner() instanceof Player && entity.getOwner().getUUID().equals(playerUUID))
                 ));
                 owner.sendSystemMessage(Component.literal("Found " + playerHooks.size() + " hooks"));
             }
@@ -160,7 +160,7 @@ public class PlayerHookHandler implements IPlayerHookHandler {
             int count = 0;
             moveVector = Vec3.ZERO;
             for (HookEntity hook : playerHooks) {
-                if (hook.getState() == HookEntity.State.PULLING.ordinal()) {
+                if (hook.getState().equals(HookEntity.State.PULLING)) {
                     count++;
                     moveVector = moveVector.add(owner.position().vectorTo(hook.position()));
                 }

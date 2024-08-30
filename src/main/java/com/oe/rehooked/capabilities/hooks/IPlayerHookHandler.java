@@ -14,7 +14,7 @@ public interface IPlayerHookHandler {
     void removeHook(int id);
     void removeHook(HookEntity hook);
     void removeAllHooks();
-    void shootHook();
+    void shootHook(float xRot, float yRot);
     IPlayerHookHandler hookType(String hookType);
     String getHookType();
     Collection<HookEntity> getPlayerHooks();
