@@ -11,16 +11,30 @@ import top.theillusivec4.curios.api.CuriosApi;
 import java.util.function.Supplier;
 
 public class SHookCapabilityPacket extends HookCapabilityPacket {
-    public SHookCapabilityPacket(byte packetType, int additional) {
+    private float xRot;
+    private float yRot;
+    
+    public SHookCapabilityPacket(byte packetType, int additional, float xRot, float yRot) {
         super(packetType, additional);
+        this.xRot = xRot;
+        this.yRot = yRot;
     }
     
     public SHookCapabilityPacket(byte packetType) {
-        this(packetType, 0);
+        this(packetType, 0, 0, 0);
+    }
+
+    @Override
+    public void encode(FriendlyByteBuf buf) {
+        super.encode(buf);
+        buf.writeFloat(xRot);
+        buf.writeFloat(yRot);
     }
 
     public SHookCapabilityPacket(FriendlyByteBuf buffer) {
         super(buffer.readByte(), buffer.readInt());
+        xRot = buffer.readFloat();
+        yRot = buffer.readFloat();
     }
 
     @Override
@@ -34,8 +48,12 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
                         .ifPresent(inventory -> inventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof HookItem)
                                 .ifPresent(hook -> {
                                     switch (packetType) {
-                                        case SHOOT -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                                .shootHook();
+                                        case SHOOT -> {
+                                            player.setXRot(xRot);
+                                            player.setYRot(yRot);
+                                            handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
+                                                    .shootHook();
+                                        }
                                         case RETRACT -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
                                                 .removeHook(additional);
                                         case ALL -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())

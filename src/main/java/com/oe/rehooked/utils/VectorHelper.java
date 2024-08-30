@@ -14,11 +14,8 @@ public class VectorHelper {
     
     public static BlockHitResult getLookingAt(Entity entity, ClipContext.Fluid rayTraceFluid, double range) {
         Level world = entity.level();
-
-        Vec3 look = entity.getLookAngle();
-        Vec3 start = new Vec3(entity.getX(), entity.getY() + entity.getEyeHeight(), entity.getZ());
-
-        Vec3 end = new Vec3(entity.getX() + look.x * range, entity.getY() + entity.getEyeHeight() + look.y * range, entity.getZ() + look.z * range);
+        Vec3 start = entity.getEyePosition();
+        Vec3 end = entity.getEyePosition().add(entity.getLookAngle().scale(range));
         ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, rayTraceFluid, entity);
         return world.clip(context);
     }
@@ -29,9 +26,8 @@ public class VectorHelper {
     
     public static BlockHitResult getFromEntityAndAngle(Entity entity, Vec3 angle, ClipContext.Fluid rayTraceFluid, double range) {
         Level world = entity.level();
-
         Vec3 end = entity.getEyePosition().add(angle.scale(range));
-        ClipContext context = new ClipContext(entity.position(), end, ClipContext.Block.COLLIDER, rayTraceFluid, entity);
+        ClipContext context = new ClipContext(entity.getEyePosition(), end, ClipContext.Block.COLLIDER, rayTraceFluid, entity);
         return world.clip(context);
     }
 }

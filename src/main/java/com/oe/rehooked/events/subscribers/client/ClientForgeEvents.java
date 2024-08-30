@@ -4,12 +4,10 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.client.KeyBindings;
-import com.oe.rehooked.events.definition.player.PlayerPushEvent;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,19 +20,18 @@ public class ClientForgeEvents {
     private static final Logger LOGGER = LogUtils.getLogger();
     
     private static long ticksSinceShot = 0;
-    private static Vec3 hookMovement = null;
     
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         if (event.phase == TickEvent.Phase.START) {
-            hookMovement = null;
-        }
-        else if (hookMovement != null) {
-            player.resetPos();
-            if (hookMovement.length() > 0.5)
-                Minecraft.getInstance().player.setDeltaMovement(hookMovement);
+            IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
+                handler.update();
+                if (handler.shouldMoveThisTick()) {
+                    player.setDeltaMovement(handler.getMoveThisTick());
+                }
+            });
         }
         ticksSinceShot++;
         if (KeyBindings.FIRE_HOOK_KEY.consumeClick() && ticksSinceShot > 5) {
@@ -53,10 +50,5 @@ public class ClientForgeEvents {
                         IPlayerHookHandler.FromPlayer(player).ifPresent(IPlayerHookHandler::removeAllHooks);
                     });
         }
-    }
-    
-    @SubscribeEvent
-    public static void onPlayerPush(PlayerPushEvent event) {
-        hookMovement = event.getPushPower();
     }
 }

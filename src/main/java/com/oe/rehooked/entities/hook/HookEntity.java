@@ -2,6 +2,7 @@ package com.oe.rehooked.entities.hook;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
+import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.utils.VectorHelper;
@@ -35,8 +36,8 @@ public class HookEntity extends Entity {
     
     private static final EntityDataAccessor<String> TYPE =
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.STRING);
-    private static final EntityDataAccessor<BlockPos> GOAL_BLOCK = 
-            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.BLOCK_POS);
+    private static final EntityDataAccessor<Optional<BlockPos>> GOAL_BLOCK = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
     private static final EntityDataAccessor<Optional<BlockPos>> HIT_POS =
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
     private static final EntityDataAccessor<Integer> STATE = 
@@ -49,7 +50,7 @@ public class HookEntity extends Entity {
     protected int ticksInState;
     protected boolean firstTickInState;
     protected double distanceTraveled;
-    protected Vec3 destLookAt;
+    protected Vec3 destLookAt = null;
     
     public HookEntity(EntityType<? extends Entity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -66,18 +67,21 @@ public class HookEntity extends Entity {
     
     public void onInit() {
         ticksInState = 0;
-        if (level().isClientSide() && getOwnerUUID().equals(Minecraft.getInstance().player.getUUID())) {
-            IPlayerHookHandler.FromPlayer(Minecraft.getInstance().player).ifPresent(handler -> {
-                handler.getPlayerHooks().add(this);
-            });
-            LOGGER.debug("Player setting hook angle and destination!");
-            lookAt(EntityAnchorArgument.Anchor.EYES, Minecraft.getInstance().player.getLookAngle());
-            // set goal
-            HookRegistry.getHookData(getHookType()).ifPresent(hookData -> {
-                setGoalBlock(VectorHelper.getLookingAt(Minecraft.getInstance().player, hookData.range()).getBlockPos());
-            });
-            setState(State.SHOT.ordinal());
-        }
+        getOwner().ifPresent(owner -> {
+            IPlayerHookHandler.FromPlayer(owner)
+                    .ifPresent(handler -> {
+                        handler.getPlayerHooks().add(this);
+                        if (level().isClientSide()) {
+                            lookAt(EntityAnchorArgument.Anchor.EYES, owner.getLookAngle());
+                        }
+                        else {
+                            HookRegistry.getHookData(getHookType()).ifPresent(hookData -> {
+                                setGoalBlock(VectorHelper.getLookingAt(owner, hookData.range()).getBlockPos());
+                            });
+                            setState(State.SHOT.ordinal());
+                        }
+                    });
+        });
         distanceTraveled = 0;
     }
     
@@ -94,13 +98,18 @@ public class HookEntity extends Entity {
     }
     
     protected void tickShot() {
-        if (firstTickInState) {
-            destLookAt = position().vectorTo(getGoalBlock().getCenter()).normalize();
-            LOGGER.debug("Hook is aiming for {}", destLookAt);
+        if (firstTickInState || destLookAt == null) {
+            getGoalBlock().ifPresentOrElse(goalBlock -> {
+                destLookAt = position().vectorTo(goalBlock.getCenter()).normalize();
+                LOGGER.debug("Hook is aiming for {}", destLookAt);
+            }, this::discard);
+            if (destLookAt == null) return;
         }
         // move the hook in the goal direction, checking for hits in the process
-        HookRegistry.getHookData(getHookType()).ifPresent(hookData -> {
-            if (distanceTraveled > hookData.range()) {
+        Optional<HookData> optHookData = HookRegistry.getHookData(getHookType());
+        if (optHookData.isPresent()) {
+            HookData hookData = optHookData.get();
+            if (Math.abs(distanceTraveled) + 0.1 > hookData.range()) {
                 setState(State.RETRACTING.ordinal());
                 return;
             }
@@ -112,51 +121,38 @@ public class HookEntity extends Entity {
                 range = hookData.range();
             }
             else range = Math.min(adjustedVelocity, hookData.range() - distanceTraveled);
-            
-            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, destLookAt, range);
-            BlockState hitState = level().getBlockState(hitResult.getBlockPos());
-            Vec3 moveAmount;
-            if (!hitState.isAir() && hitState.getFluidState().equals(Fluids.EMPTY.defaultFluidState())) {
-                // there is a collision with solid block
-                moveAmount = hitResult.getBlockPos().getCenter().add(destLookAt.scale(-0.5)).subtract(position());
-                setState(State.PULLING.ordinal());
-                setHitPos(hitResult.getBlockPos());
+
+            if (!level().isClientSide()) {
+                // calculate hits and such on server
+                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, destLookAt, range);
+                BlockState hitState = level().getBlockState(hitResult.getBlockPos());
+                Vec3 moveAmount;
+                if (!hitState.isAir() && hitState.getFluidState().equals(Fluids.EMPTY.defaultFluidState())) {
+                    // there is a collision with solid block
+                    moveAmount = hitResult.getBlockPos().getCenter().add(destLookAt.scale(-0.5)).subtract(position());
+                    setState(State.PULLING.ordinal());
+                    setHitPos(hitResult.getBlockPos());
+                }
+                else {
+                    // no collision with solid block
+                    moveAmount = destLookAt.scale(range);
+                }
+                distanceTraveled += range;
+                move(MoverType.SELF, moveAmount);
             }
-            else {
-                // no collision with solid block
-                moveAmount = destLookAt.scale(adjustedVelocity);
-                move(MoverType.SELF, destLookAt.scale(adjustedVelocity));
-            }
-            move(MoverType.SELF, moveAmount);
-        });
+        }
     }
     
     protected void tickPulling() {
         if (firstTickInState) {
+            // stop moving
+            if (level().isClientSide()) setDeltaMovement(Vec3.ZERO);
             // send update to handler
             getOwner().ifPresent(owner -> IPlayerHookHandler.FromPlayer(owner).ifPresent(IPlayerHookHandler::update));
         }
-        HookRegistry.getHookData(getHookType()).ifPresent(hookData -> {
-            Player player = null;
-            if (level().isClientSide()) {
-                // client side movement
-                player = Minecraft.getInstance().player;
-            } else {
-                // server side movement
-                player = getOwner().orElse(null);
-            }
-            if (player != null && player.position().distanceTo(position()) > 0.2) {
-                Vec3 deltaV = player
-                        .position()
-                        .vectorTo(position())
-                        .normalize()
-                        .scale(hookData.pullSpeed() / 20.0);
-                player.addDeltaMovement(deltaV);
-            }
-            getHitPos().ifPresent(hitPos -> {
-                if (level().getBlockState(hitPos).isAir())
-                    setState(State.RETRACTING.ordinal());
-            });
+        getHitPos().ifPresent(hitPos -> {
+            if (level().getBlockState(hitPos).isAir())
+                setState(State.RETRACTING.ordinal());
         });
     }
     
@@ -223,7 +219,9 @@ public class HookEntity extends Entity {
         return entityData.get(OWNER_UUID).flatMap(uuid -> {
             if (level() instanceof ServerLevel)
                 return Optional.of((Player) ((ServerLevel) level()).getEntity(uuid));
-            else 
+            else if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getUUID().equals(getOwnerUUID()))
+                return Optional.of(Minecraft.getInstance().player);
+            else
                 return Optional.empty();
         });
     }
@@ -253,10 +251,10 @@ public class HookEntity extends Entity {
     }
     
     protected void setGoalBlock(BlockPos goalBlock) {
-        entityData.set(GOAL_BLOCK, goalBlock);
+        entityData.set(GOAL_BLOCK, Optional.ofNullable(goalBlock));
     }
     
-    public BlockPos getGoalBlock() {
+    public Optional<BlockPos> getGoalBlock() {
         return entityData.get(GOAL_BLOCK);
     }
     
@@ -270,7 +268,7 @@ public class HookEntity extends Entity {
     
     @Override
     protected void defineSynchedData() {
-        entityData.define(GOAL_BLOCK, blockPosition());
+        entityData.define(GOAL_BLOCK, Optional.empty());
         entityData.define(TYPE, "");
         entityData.define(HIT_POS, Optional.empty());
         entityData.define(STATE, State.IDLE.ordinal());
