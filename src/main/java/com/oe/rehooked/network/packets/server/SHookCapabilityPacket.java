@@ -1,18 +1,22 @@
 package com.oe.rehooked.network.packets.server;
 
+import com.mojang.logging.LogUtils;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.network.packets.common.HookCapabilityPacket;
+import com.oe.rehooked.utils.CurioUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import top.theillusivec4.curios.api.CuriosApi;
+import org.slf4j.Logger;
 
 import java.util.function.Supplier;
 
 public class SHookCapabilityPacket extends HookCapabilityPacket {
-    private float xRot;
-    private float yRot;
+    private static Logger LOGGER = LogUtils.getLogger();
+    
+    private final float xRot;
+    private final float yRot;
     
     public SHookCapabilityPacket(byte packetType, int additional, float xRot, float yRot) {
         super(packetType, additional);
@@ -44,22 +48,14 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
             if (player == null || player.level().isClientSide()) return;
             IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
                 handler.owner(player);
-                CuriosApi.getCuriosInventory(player)
-                        .ifPresent(inventory -> inventory.findFirstCurio(itemStack -> itemStack.getItem() instanceof HookItem)
-                                .ifPresent(hook -> {
-                                    switch (packetType) {
-                                        case SHOOT -> {
-                                            player.setXRot(xRot);
-                                            player.setYRot(yRot);
-                                            handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                                    .shootHook();
-                                        }
-                                        case RETRACT -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                                .removeHook(additional);
-                                        case ALL -> handler.hookType(((HookItem) hook.stack().getItem()).getHookType())
-                                                .removeAllHooks();
-                                    }
-                                }));
+                CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
+                    HookItem hookItem = (HookItem) hookStack.getItem();
+                    switch (packetType) {
+                        case SHOOT -> handler.hookType(hookItem.getHookType()).shootHook(xRot, yRot);
+                        case RETRACT -> handler.hookType(hookItem.getHookType()).removeHook(additional);
+                        case ALL -> handler.hookType(hookItem.getHookType()).removeAllHooks();
+                    }
+                });
             });
         });
         context.get().setPacketHandled(true);
