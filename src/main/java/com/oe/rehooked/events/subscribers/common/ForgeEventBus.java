@@ -37,8 +37,8 @@ public class ForgeEventBus {
     @SubscribeEvent
     public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject().level().isClientSide()) return;
-        if (event.getObject() instanceof Player) {
-            if (!IPlayerHookHandler.FromPlayer((Player) event.getObject()).isPresent()) {
+        if (event.getObject() instanceof Player player) {
+            if (!IPlayerHookHandler.FromPlayer(player).isPresent()) {
                 event.addCapability(new ResourceLocation(ReHookedMod.MOD_ID, "properties"),
                         new PlayerHookCapabilityProvider());
             }
