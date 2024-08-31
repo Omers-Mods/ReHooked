@@ -36,7 +36,7 @@ public class PlayerHookCapabilityProvider implements ICapabilityProvider {
     }
     
     private ICommonPlayerHookHandler serverHandler = null;
-    private final LazyOptional<ICommonPlayerHookHandler> serverHandlerOptional = LazyOptional.of(this::createServerHookHandler)
+    private final LazyOptional<ICommonPlayerHookHandler> serverHandlerOptional = LazyOptional.of(this::createServerHookHandler);
     private ICommonPlayerHookHandler createServerHookHandler() {
         if (this.serverHandler == null) this.serverHandler = new SPlayerHookHandler();
         return this.serverHandler;
