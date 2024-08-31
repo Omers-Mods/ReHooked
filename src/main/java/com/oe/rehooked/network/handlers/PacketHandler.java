@@ -14,25 +14,35 @@ import net.minecraftforge.network.simple.SimpleChannel;
 public class PacketHandler {
     private static final String PROTOCOL_VERSION = "1";
     
-    private static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(ReHookedMod.MOD_ID, "main"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
+    private static SimpleChannel INSTANCE;
     
     public static void register() {
+        ReHookedMod.LOGGER.debug("Packet handler register started...");
+        
+        INSTANCE = NetworkRegistry.newSimpleChannel(
+                new ResourceLocation(ReHookedMod.MOD_ID, "main"),
+                () -> PROTOCOL_VERSION,
+                PROTOCOL_VERSION::equals,
+                PROTOCOL_VERSION::equals
+        );
+
+        ReHookedMod.LOGGER.debug("Created SimpleChannel");
+        
         INSTANCE.messageBuilder(SHookCapabilityPacket.class, NetworkDirection.PLAY_TO_SERVER.ordinal())
                 .encoder(SHookCapabilityPacket::encode)
                 .decoder(SHookCapabilityPacket::new)
                 .consumerMainThread(SHookCapabilityPacket::handle)
                 .add();
+
+        ReHookedMod.LOGGER.debug("Registered ServerHookPacket");
         
         INSTANCE.messageBuilder(CHookCapabilityPacket.class, NetworkDirection.PLAY_TO_CLIENT.ordinal())
                 .encoder(CHookCapabilityPacket::encode)
                 .decoder(CHookCapabilityPacket::new)
                 .consumerMainThread(CHookCapabilityPacket::handle)
                 .add();
+
+        ReHookedMod.LOGGER.debug("Registered ClientHookPacket");
         
         INSTANCE.messageBuilder(CPushPlayerPacket.class, NetworkDirection.PLAY_TO_CLIENT.ordinal())
                 .encoder(CPushPlayerPacket::encode)
