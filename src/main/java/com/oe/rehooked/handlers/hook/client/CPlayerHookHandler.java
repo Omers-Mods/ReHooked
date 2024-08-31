@@ -21,9 +21,12 @@ public class CPlayerHookHandler implements ICommonPlayerHookHandler {
     private final List<HookEntity> hooks;
     private Optional<Player> owner;
     
+    private Vec3 moveVector; 
+    
     public CPlayerHookHandler() {
         hooks = new ArrayList<>();
         owner = Optional.empty();
+        moveVector = null;
     }
     
     @Override
@@ -93,23 +96,41 @@ public class CPlayerHookHandler implements ICommonPlayerHookHandler {
     }
 
     @Override
-    public ICommonPlayerHookHandler copyOnDeath(ICommonPlayerHookHandler other) {
-        // todo: delete from api
-        return null;
-    }
-
-    @Override
     public void update() {
-        
+        moveVector = null;
+        getOwner().ifPresent(owner -> {
+            owner.setNoGravity(false);
+            getHookData().ifPresent(hookData -> {
+                float vPT = hookData.pullSpeed() / 20f;
+                int count = 0;
+                double x = 0, y = 0, z = 0;
+                for (HookEntity hookEntity : hooks) {
+                    if (hookEntity.getState().equals(HookEntity.State.PULLING)) {
+                        count++;
+                        Vec3 vectorTo = owner.position().vectorTo(hookEntity.position());
+                        // todo: maybe scale the vector down based on how close the player is to the hook
+                        // todo: if the player is closer the hooks pull should be less strong
+                        x += vectorTo.x;
+                        y += vectorTo.y;
+                        z += vectorTo.z;
+                    }
+                }
+                if (count == 0) return;
+                owner.setNoGravity(true);
+                Vec3 baseVector = new Vec3(x, y, z);
+                if (baseVector.length() < THRESHOLD) return;
+                moveVector = baseVector.normalize().scale(vPT * count);
+            });
+        });
     }
 
     @Override
     public boolean shouldMoveThisTick() {
-        return false;
+        return moveVector != null;
     }
 
     @Override
     public Vec3 getDeltaVThisTick() {
-        return null;
+        return moveVector;
     }
 }

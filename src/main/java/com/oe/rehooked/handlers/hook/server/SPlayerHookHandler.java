@@ -21,10 +21,12 @@ import java.util.Optional;
 public class SPlayerHookHandler implements ICommonPlayerHookHandler {
     private final List<HookEntity> hooks;
     private Optional<Player> owner;
+    private Vec3 moveVector;
     
     public SPlayerHookHandler() {
         hooks = new ArrayList<>();
         owner = Optional.empty();
+        moveVector = null;
     }
 
     @Override
@@ -82,7 +84,13 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
-        // todo:
+        // this is a response to a client request
+        getOwner().ifPresent(owner -> {
+            HookEntity hookEntity = new HookEntity(owner);
+            addHook(hookEntity);
+            getHookData().ifPresent(hookData -> 
+                    hookEntity.shootFromRotation(owner, xRot, yRot, 0, hookData.speed() / 20f, 0));
+        });
     }
 
     @Override
@@ -107,26 +115,41 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
     }
 
     @Override
-    public ICommonPlayerHookHandler copyOnDeath(ICommonPlayerHookHandler other) {
-        // todo: make sure I don't need this and delete it
-        // I'm 99.9% sure this won't be needed
-        return this;
-    }
-
-    @Override
     public void update() {
-        // todo:
+        moveVector = null;
+        getOwner().ifPresent(owner -> {
+            owner.setNoGravity(false);
+            getHookData().ifPresent(hookData -> {
+                float vPT = hookData.pullSpeed() / 20f;
+                int count = 0;
+                double x = 0, y = 0, z = 0;
+                for (HookEntity hookEntity : hooks) {
+                    if (hookEntity.getState().equals(HookEntity.State.PULLING)) {
+                        count++;
+                        Vec3 vectorTo = owner.position().vectorTo(hookEntity.position());
+                        // todo: maybe scale the vector down based on how close the player is to the hook
+                        // todo: if the player is closer the hooks pull should be less strong
+                        x += vectorTo.x;
+                        y += vectorTo.y;
+                        z += vectorTo.z;
+                    }
+                }
+                if (count == 0) return;
+                owner.setNoGravity(true);
+                Vec3 baseVector = new Vec3(x, y, z);
+                if (baseVector.length() < THRESHOLD) return;
+                moveVector = baseVector.normalize().scale(vPT * count);
+            });
+        });
     }
 
     @Override
     public boolean shouldMoveThisTick() {
-        // todo:
-        return false;
+        return moveVector != null;
     }
 
     @Override
     public Vec3 getDeltaVThisTick() {
-        // todo:
-        return null;
+        return moveVector;
     }
 }
