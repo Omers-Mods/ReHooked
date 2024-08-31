@@ -1,6 +1,7 @@
 package com.oe.rehooked.network.handlers;
 
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
 import com.oe.rehooked.network.packets.client.CPushPlayerPacket;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,12 @@ public class PacketHandler {
                 .encoder(SHookCapabilityPacket::encode)
                 .decoder(SHookCapabilityPacket::new)
                 .consumerMainThread(SHookCapabilityPacket::handle)
+                .add();
+        
+        INSTANCE.messageBuilder(CHookCapabilityPacket.class, NetworkDirection.PLAY_TO_CLIENT.ordinal())
+                .encoder(CHookCapabilityPacket::encode)
+                .decoder(CHookCapabilityPacket::new)
+                .consumerMainThread(CHookCapabilityPacket::handle)
                 .add();
         
         INSTANCE.messageBuilder(CPushPlayerPacket.class, NetworkDirection.PLAY_TO_CLIENT.ordinal())
