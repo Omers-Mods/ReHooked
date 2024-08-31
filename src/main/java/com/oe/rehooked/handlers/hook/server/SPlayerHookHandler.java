@@ -1,9 +1,11 @@
 package com.oe.rehooked.handlers.hook.server;
 
+import com.mojang.logging.LogUtils;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
@@ -13,12 +15,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class SPlayerHookHandler implements ICommonPlayerHookHandler {
+public class SPlayerHookHandler implements IServerPlayerHookHandler {
+    private static final Logger LOGGER = LogUtils.getLogger(); 
+    
     private final List<HookEntity> hooks;
     private Optional<Player> owner;
     private Vec3 moveVector;
@@ -31,6 +36,7 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void addHook(int id) {
+        LOGGER.debug("Adding new hook by id: {}", id);
         // hooks will always be added on the server first
         getOwner().map(Player::level).map(level -> level.getEntity(id)).map(entity -> {
             if (entity instanceof HookEntity hookEntity) {
@@ -45,6 +51,7 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void addHook(HookEntity hookEntity) {
+        LOGGER.debug("Adding new hook by entity with id: {}", hookEntity.getId());
         // hooks will always be added on the server first
         hooks.add(hookEntity);
         getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
@@ -54,6 +61,7 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void removeHook(int id) {
+        LOGGER.debug("Removing hook by id: {}", id);
         // this is a response to a request from the client
         if (hooks.removeIf(hookEntity -> hookEntity.getId() == id)) {
             // discard removed entity
@@ -63,6 +71,7 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void removeHook(HookEntity hookEntity) {
+        LOGGER.debug("Removing hook by entity with id: {}", hookEntity);
         // this is a response to a request from the hook
         if (hooks.remove(hookEntity)) {
             // discard removed entity
@@ -77,6 +86,7 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void removeAllHooks() {
+        LOGGER.debug("Removing all hooks ({})", hooks.size());
         // this is a response to a request from the client
         hooks.forEach(Entity::discard);
         hooks.clear();
@@ -84,11 +94,13 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
+        LOGGER.debug("Shooting from rotation: {}, {}", xRot, yRot);
         // this is a response to a client request
         getOwner().ifPresent(owner -> {
             HookEntity hookEntity = new HookEntity(owner);
+            owner.level().addFreshEntity(hookEntity);
             addHook(hookEntity);
-            getHookData().ifPresent(hookData -> 
+            getHookData().ifPresent(hookData ->
                     hookEntity.shootFromRotation(owner, xRot, yRot, 0, hookData.speed() / 20f, 0));
         });
     }

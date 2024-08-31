@@ -1,8 +1,10 @@
 package com.oe.rehooked.handlers.hook.client;
 
+import com.mojang.logging.LogUtils;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
+import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.network.handlers.PacketHandler;
@@ -12,12 +14,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CPlayerHookHandler implements ICommonPlayerHookHandler {
+public class CPlayerHookHandler implements IClientPlayerHookHandler {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    
     private final List<HookEntity> hooks;
     private Optional<Player> owner;
     
@@ -71,6 +76,7 @@ public class CPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
+        LOGGER.debug("Shooting from rotation: {}, {}", xRot, yRot);
         PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.SHOOT, 0, xRot, yRot));
     }
 
