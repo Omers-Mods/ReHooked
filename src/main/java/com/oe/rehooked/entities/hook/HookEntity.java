@@ -6,6 +6,7 @@ import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
+import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -14,10 +15,10 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -31,8 +32,6 @@ import java.util.Optional;
 public class HookEntity extends Projectile {
     private static final Logger LOGGER = LogUtils.getLogger();
     
-    private static final EntityDataAccessor<String> TYPE =
-            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Optional<BlockPos>> HIT_POS =
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
     private static final EntityDataAccessor<Integer> STATE = 
@@ -47,21 +46,10 @@ public class HookEntity extends Projectile {
         super(pEntityType, pLevel);
     }
     
-    public HookEntity(HookItem hookItem, Player owner) {
-        super(ReHookedEntities.HOOK_PROJECTILE.get(), owner.level());
-        setOwner(owner);
-        setNoGravity(true);
-        setPos(owner.getX(), owner.getEyeY() - 0.2, owner.getZ());
-        setState(State.IDLE);
-        setHookType(hookItem.getHookType());
-    }
-    
-    public HookEntity(Player player, String hookType) {
+    public HookEntity(Player player) {
         super(ReHookedEntities.HOOK_PROJECTILE.get(), player.level());
         setNoGravity(true);
         setOwner(player);
-        setHookType(hookType);
-        setState(State.IDLE);
         setPos(player.getX(), player.getEyeY() - 0.25, player.getZ());
     }
     
@@ -83,7 +71,6 @@ public class HookEntity extends Projectile {
             case SHOT -> tickShot();
             case PULLING -> tickPulling();
             case RETRACTING -> tickRetracting();
-            case IDLE -> tickIdle();
         }
         // update position
         if (getState().equals(State.SHOT)) {
@@ -101,20 +88,10 @@ public class HookEntity extends Projectile {
         if (level().isClientSide()) return;
         LOGGER.debug("Not client");
         // move the hook in the goal direction, checking for hits in the process
-        Optional<HookData> optHookData = HookRegistry.getHookData(getHookType());
+        Optional<HookData> optHookData = getHookType().flatMap(HookRegistry::getHookData);
         if (optHookData.isPresent()) {
             LOGGER.debug("Hook data found");
             HookData hookData = optHookData.get();
-            // shoot - first tick only
-            if (firstTickInState) {
-                LOGGER.debug("First tick");
-                float adjustedVelocity = hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed() / 20.0f;
-                LOGGER.debug("Adjusted velocity {}", adjustedVelocity);
-                Entity owner = getOwner();
-                assert owner != null;
-                LOGGER.debug("Shooting from rotation");
-                shootFromRotation(owner, owner.getXRot(), owner.getYRot(), 0.0f, adjustedVelocity, 0.0f);
-            }
             // check if hit anything
             BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
             BlockState hitState = level().getBlockState(hitResult.getBlockPos());
@@ -149,25 +126,12 @@ public class HookEntity extends Projectile {
         });
     }
     
-    protected void tickIdle() {
-        // run onInit on both client and server
-        if (firstTickInState) {
-            setState(State.SHOT);
-        }
-        // discard after 20 ticks
-        if (ticksInState >= 20) discard();
-        else ticksInState++;
-    }
-    
     protected void tickRetracting() {
         LOGGER.debug("Ticking retract");
         // send update to handler
         if (!level().isClientSide()) {
             if (getOwner() instanceof Player owner) {
-                ICommonPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
-                    handler.removeHook(this);
-                    handler.update();
-                });
+                ICommonPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
             }
         }
     }
@@ -210,12 +174,12 @@ public class HookEntity extends Projectile {
         return entityData.get(HIT_POS);
     }
     
-    protected void setHookType(String hookType) {
-        entityData.set(TYPE, hookType);
-    }
-    
-    public String getHookType() {
-        return entityData.get(TYPE);
+    public Optional<String> getHookType() {
+        return Optional.ofNullable(getOwner()).flatMap(owner -> CurioUtils.GetCuriosOfType(HookItem.class, (Player) owner))
+                .flatMap(CurioUtils::GetIfUnique)
+                .map(ItemStack::getItem)
+                .map(item -> (HookItem) item)
+                .map(HookItem::getHookType);
     }
     
     protected void setPrevState(State state) {
@@ -228,10 +192,9 @@ public class HookEntity extends Projectile {
     
     @Override
     protected void defineSynchedData() {
-        entityData.define(TYPE, "");
         entityData.define(HIT_POS, Optional.empty());
-        entityData.define(STATE, State.IDLE.ordinal());
-        entityData.define(PREV_STATE, State.IDLE.ordinal());
+        entityData.define(STATE, State.SHOT.ordinal());
+        entityData.define(PREV_STATE, State.SHOT.ordinal());
     }
 
     @Override
@@ -243,6 +206,5 @@ public class HookEntity extends Projectile {
         SHOT,
         PULLING,
         RETRACTING,
-        IDLE
     }
 }
