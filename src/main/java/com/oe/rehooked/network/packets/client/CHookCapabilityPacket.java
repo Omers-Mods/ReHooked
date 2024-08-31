@@ -1,5 +1,6 @@
 package com.oe.rehooked.network.packets.client;
 
+import com.oe.rehooked.handlers.hook.client.CPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.network.packets.common.HookCapabilityPacket;
 import net.minecraft.client.Minecraft;
@@ -11,12 +12,12 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class CHookCapabilityPacket extends HookCapabilityPacket {
-    public CHookCapabilityPacket(byte packetType, int additional) {
-        super(packetType, additional);
+    public CHookCapabilityPacket(State packetType, int additional) {
+        super(packetType.ordinal(), additional);
     }
 
-    public CHookCapabilityPacket(byte packetType) {
-        super(packetType);
+    public CHookCapabilityPacket(State packetType) {
+        this(packetType, 0);
     }
 
     public CHookCapabilityPacket(FriendlyByteBuf buf) {
@@ -28,7 +29,8 @@ public class CHookCapabilityPacket extends HookCapabilityPacket {
         context.get().enqueueWork(() -> {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player == null) return;
-            LazyOptional<ICommonPlayerHookHandler> lazyHandler = ICommonPlayerHookHandler.FromPlayer(player);
+            LazyOptional<CPlayerHookHandler> lazyHandler = ICommonPlayerHookHandler.FromPlayer(player)
+                    .lazyMap(handler -> (CPlayerHookHandler) handler);
             switch (State.Get(packetType)) {
                 case ADD_HOOK -> lazyHandler.ifPresent(handler -> handler.addHook(additional));
                 case RETRACT_HOOK -> lazyHandler.ifPresent(handler -> handler.removeHook(additional));

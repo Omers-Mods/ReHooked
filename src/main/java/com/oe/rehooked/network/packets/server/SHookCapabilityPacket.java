@@ -2,6 +2,7 @@ package com.oe.rehooked.network.packets.server;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.server.SPlayerHookHandler;
 import com.oe.rehooked.network.packets.common.HookCapabilityPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,8 +23,12 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
         this.yRot = yRot;
     }
     
+    public SHookCapabilityPacket(State packetType, int additional) {
+        this(packetType, additional, 0, 0);
+    }
+    
     public SHookCapabilityPacket(State packetType) {
-        this(packetType, 0, 0, 0);
+        this(packetType, 0);
     }
 
     @Override
@@ -44,12 +49,13 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
         context.get().enqueueWork(() -> {
             ServerPlayer player = context.get().getSender();
             if (player == null || player.level().isClientSide()) return;
-            ICommonPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
+            ICommonPlayerHookHandler.FromPlayer(player).lazyMap(handler -> (SPlayerHookHandler) handler).ifPresent(handler -> {
                 handler.setOwner(player);
                 switch (State.Get(packetType)) {
                     case SHOOT -> handler.shootFromRotation(xRot, yRot);
                     case RETRACT_HOOK -> handler.removeHook(additional);
                     case RETRACT_ALL_HOOKS -> handler.removeAllHooks();
+                    case FORCE_UPDATE -> handler.update();
                 }
             });
         });
@@ -59,7 +65,8 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
     public enum State {
         SHOOT,
         RETRACT_HOOK,
-        RETRACT_ALL_HOOKS;
+        RETRACT_ALL_HOOKS,
+        FORCE_UPDATE;
         
         public static State Get(int ordinal) {
             return State.values()[ordinal];

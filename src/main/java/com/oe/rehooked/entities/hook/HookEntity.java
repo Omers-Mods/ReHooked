@@ -69,8 +69,8 @@ public class HookEntity extends Projectile {
     public void tick() {
         if (!(getOwner() instanceof Player)) {
             if (!level().isClientSide()) {
-                LOGGER.debug("Owner not found, discarding");
-                discard();
+                LOGGER.debug("Owner not found, retracting");
+                setState(State.RETRACTING);
                 return;
             }
         }
@@ -165,12 +165,10 @@ public class HookEntity extends Projectile {
         if (!level().isClientSide()) {
             if (getOwner() instanceof Player owner) {
                 ICommonPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
-                    handler.removeHook(getId());
+                    handler.removeHook(this);
                     handler.update();
                 });
             }
-            // todo: retract to player before discarding maybe
-            discard();
         }
     }
     
