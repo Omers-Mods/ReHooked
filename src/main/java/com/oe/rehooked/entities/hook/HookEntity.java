@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
-import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.VectorHelper;
@@ -15,6 +15,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -82,7 +83,13 @@ public class HookEntity extends Projectile {
         // keep track of how many ticks in current state (also update prev state)
         trackTicksInState();
     }
-    
+
+    @Override
+    public void shootFromRotation(Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
+        LOGGER.debug("Shooting!");
+        super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity, pInaccuracy);
+    }
+
     protected void tickShot() {
         LOGGER.debug("Ticking shot");
         if (level().isClientSide()) return;
@@ -131,7 +138,7 @@ public class HookEntity extends Projectile {
         // send update to handler
         if (!level().isClientSide()) {
             if (getOwner() instanceof Player owner) {
-                ICommonPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
+                IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
             }
         }
     }
