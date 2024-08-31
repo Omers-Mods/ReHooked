@@ -1,6 +1,6 @@
 package com.oe.rehooked.item.hook;
 
-import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -8,13 +8,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import java.util.List;
-import java.util.Optional;
 
 public class HookItem extends Item implements ICurioItem {
     public static final String HOOK_TYPE_TAG = "hook_type";
@@ -38,16 +36,14 @@ public class HookItem extends Item implements ICurioItem {
     public void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
         LivingEntity maybePlayer = slotContext.entity();
         if (maybePlayer instanceof Player player)
-            IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> 
-                    handler.owner(player).hookType(((HookItem) stack.getItem()).hookType)
-            );
+            ICommonPlayerHookHandler.FromPlayer(player).ifPresent(handler -> handler.setOwner(player).update());
     }
 
     @Override
     public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
         LivingEntity maybePlayer = slotContext.entity();
         if (maybePlayer instanceof Player player)
-            IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> handler.hookType(""));
+            ICommonPlayerHookHandler.FromPlayer(player).ifPresent(ICommonPlayerHookHandler::update);
     }
 
     @Override
@@ -56,13 +52,5 @@ public class HookItem extends Item implements ICurioItem {
         pTooltipComponents.add(Component.translatable("tooltip.rehooked:" + ((HookItem) pStack.getItem())
                 .hookType + "_hook.info"));
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
-    }
-    
-    public Optional<IPlayerHookHandler> getHandler(Player player) {
-        LazyOptional<IPlayerHookHandler> handlerLazy = IPlayerHookHandler.FromPlayer(player);
-        if (handlerLazy.isPresent()) {
-            return handlerLazy.resolve().flatMap(handler -> Optional.of(handler.hookType(hookType)));
-        }
-        return Optional.empty();
     }
 }
