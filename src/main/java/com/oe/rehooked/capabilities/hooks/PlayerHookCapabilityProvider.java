@@ -1,6 +1,5 @@
 package com.oe.rehooked.capabilities.hooks;
 
-import com.oe.rehooked.handlers.hook.PlayerHookHandler;
 import com.oe.rehooked.handlers.hook.client.CPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.server.SPlayerHookHandler;

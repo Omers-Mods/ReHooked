@@ -2,7 +2,6 @@ package com.oe.rehooked.events.subscribers.client;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
-import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.client.KeyBindings;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
