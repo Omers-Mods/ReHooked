@@ -6,10 +6,6 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public abstract class HookCapabilityPacket {
-    public static final byte SHOOT = 1;
-    public static final byte RETRACT = 2;
-    public static final byte ALL = 4;
-    
     protected final byte packetType;
     protected final int additional;
     
