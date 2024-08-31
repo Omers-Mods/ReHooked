@@ -14,6 +14,8 @@ import java.util.Optional;
 
 @AutoRegisterCapability
 public interface ICommonPlayerHookHandler {
+    double THRESHOLD = 0.5;
+    
     void addHook(int id);
     void addHook(HookEntity hookEntity);
     void removeHook(int id);
@@ -23,7 +25,6 @@ public interface ICommonPlayerHookHandler {
     ICommonPlayerHookHandler setOwner(Player owner);
     Optional<Player> getOwner();
     Optional<HookData> getHookData();
-    ICommonPlayerHookHandler copyOnDeath(ICommonPlayerHookHandler other);
     void update();
     boolean shouldMoveThisTick();
     Vec3 getDeltaVThisTick();
