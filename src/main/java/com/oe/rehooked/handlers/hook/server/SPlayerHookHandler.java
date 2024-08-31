@@ -1,21 +1,41 @@
 package com.oe.rehooked.handlers.hook.server;
 
-import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.data.HookData;
+import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
-import com.oe.rehooked.item.hook.HookItem;
-import com.oe.rehooked.utils.CurioUtils;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class SPlayerHookHandler implements ICommonPlayerHookHandler {
+    private final List<HookEntity> hooks;
+    private Optional<Player> owner;
+    private String hookType;
+    
+    public SPlayerHookHandler() {
+        hooks = new ArrayList<>();
+        owner = Optional.empty();
+        hookType = "";
+    }
+
+    @Override
+    public void addHook(int id) {
+        
+    }
+
+    @Override
+    public void addHook(HookEntity hookEntity) {
+
+    }
+
     @Override
     public void removeHook(int id) {
+        if (hooks.removeIf(hookId -> hookId.equals(id))) {
+        }
     }
 
     @Override
@@ -25,56 +45,54 @@ public class SPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void removeAllHooks() {
-
+        hooks.forEach(hook -> {
+            hook.discard();
+            // todo: send to client to remove
+            hook.getId();
+        });
     }
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
-
+        // todo:
     }
 
     @Override
-    public IPlayerHookHandler setOwner(Player owner) {
-        return null;
+    public ICommonPlayerHookHandler setOwner(Player owner) {
+        this.owner = Optional.of(owner);
+        return this;
     }
 
     @Override
     public Optional<Player> getOwner() {
-        return Optional.empty();
+        return owner;
     }
 
     @Override
     public Optional<HookData> getHookData() {
-        return Optional.empty();
+        return HookRegistry.getHookData(hookType);
     }
 
     @Override
-    public IPlayerHookHandler copyOnDeath(IPlayerHookHandler other) {
-        return null;
+    public ICommonPlayerHookHandler copyOnDeath(ICommonPlayerHookHandler other) {
+        // todo:
+        return this;
     }
 
     @Override
     public void update() {
-
+        // todo:
     }
 
     @Override
     public boolean shouldMoveThisTick() {
+        // todo:
         return false;
     }
 
     @Override
     public Vec3 getDeltaVThisTick() {
+        // todo:
         return null;
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        return null;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-
     }
 }

@@ -1,16 +1,24 @@
 package com.oe.rehooked.handlers.hook.client;
 
-import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
 public class CPlayerHookHandler implements ICommonPlayerHookHandler {
+    @Override
+    public void addHook(int id) {
+        
+    }
+
+    @Override
+    public void addHook(HookEntity hookEntity) {
+
+    }
+
     @Override
     public void removeHook(int id) {
         
@@ -32,7 +40,7 @@ public class CPlayerHookHandler implements ICommonPlayerHookHandler {
     }
 
     @Override
-    public IPlayerHookHandler setOwner(Player owner) {
+    public ICommonPlayerHookHandler setOwner(Player owner) {
         return null;
     }
 
@@ -47,7 +55,7 @@ public class CPlayerHookHandler implements ICommonPlayerHookHandler {
     }
 
     @Override
-    public IPlayerHookHandler copyOnDeath(IPlayerHookHandler other) {
+    public ICommonPlayerHookHandler copyOnDeath(ICommonPlayerHookHandler other) {
         return null;
     }
 
@@ -64,15 +72,5 @@ public class CPlayerHookHandler implements ICommonPlayerHookHandler {
     @Override
     public Vec3 getDeltaVThisTick() {
         return null;
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        return null;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-
     }
 }
