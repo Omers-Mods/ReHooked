@@ -26,7 +26,4 @@ public interface IPlayerHookHandler {
     void update();
     Vec3 getMoveThisTick();
     boolean shouldMoveThisTick();
-    static LazyOptional<IPlayerHookHandler> FromPlayer(Player player) {
-        return player.getCapability(PlayerHookCapabilityProvider.PLAYER_HOOK_HANDLER);
-    }
 }

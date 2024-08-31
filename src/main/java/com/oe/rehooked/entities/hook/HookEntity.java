@@ -1,10 +1,10 @@
 package com.oe.rehooked.entities.hook;
 
 import com.mojang.logging.LogUtils;
-import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
@@ -67,18 +67,12 @@ public class HookEntity extends Projectile {
     
     @Override
     public void tick() {
-        if (!(getOwner() instanceof Player owner)) {
+        if (!(getOwner() instanceof Player)) {
             if (!level().isClientSide()) {
                 LOGGER.debug("Owner not found, discarding");
                 discard();
                 return;
             }
-            
-        }
-        else if (firstTick) {
-            // add to owner hooks and server hooks for owner player
-            IPlayerHookHandler.FromPlayer(owner)
-                    .ifPresent(handler -> handler.getPlayerHooks().add(this));
         }
 
         // run the super class tick method
@@ -147,12 +141,7 @@ public class HookEntity extends Projectile {
         LOGGER.debug("Ticking pull");
         if (firstTickInState) {
             // stop moving
-            if (level().isClientSide()) setDeltaMovement(Vec3.ZERO);
-            // send update to handler
-            Entity maybePlayer = getOwner();
-            if (maybePlayer instanceof Player owner) {
-                IPlayerHookHandler.FromPlayer(owner).ifPresent(IPlayerHookHandler::update);
-            }
+            setDeltaMovement(Vec3.ZERO);
         }
         getHitPos().ifPresent(hitPos -> {
             if (level().getBlockState(hitPos).isAir())
@@ -172,16 +161,15 @@ public class HookEntity extends Projectile {
     
     protected void tickRetracting() {
         LOGGER.debug("Ticking retract");
-        Entity maybeOwner = getOwner();
         // send update to handler
-        if (maybeOwner instanceof Player owner) {
-            IPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
-                handler.removeHook(this);
-                handler.update();
-            });
-        }
-        // todo: retract to player before discarding maybe
         if (!level().isClientSide()) {
+            if (getOwner() instanceof Player owner) {
+                ICommonPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
+                    handler.removeHook(getId());
+                    handler.update();
+                });
+            }
+            // todo: retract to player before discarding maybe
             discard();
         }
     }

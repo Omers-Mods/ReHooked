@@ -7,10 +7,12 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.Optional;
 
+@AutoRegisterCapability
 public interface ICommonPlayerHookHandler {
     void addHook(int id);
     void addHook(HookEntity hookEntity);

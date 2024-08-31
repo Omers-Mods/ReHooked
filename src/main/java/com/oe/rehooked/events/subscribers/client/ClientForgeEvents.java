@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
 import com.oe.rehooked.client.KeyBindings;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
@@ -32,16 +33,16 @@ public class ClientForgeEvents {
             ticksSinceShot = 0;
             LOGGER.debug("Player pressed shoot key");
             CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookItem -> {
-                Entity playerCamera = Minecraft.getInstance().getCameraEntity();
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.SHOOT, 0,
-                        playerCamera.getXRot(), playerCamera.getYRot()));
+                Entity camera = Minecraft.getInstance().getCameraEntity();
+                ICommonPlayerHookHandler.FromPlayer(player)
+                        .ifPresent(handler -> handler.shootFromRotation(camera.getXRot(), camera.getYRot()));
             });
         }
         if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick()) {
             LOGGER.debug("Player pressed remove all hooks key");
             CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookItem -> {
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.ALL));
-                IPlayerHookHandler.FromPlayer(player).ifPresent(IPlayerHookHandler::removeAllHooks);
+                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS));
+                ICommonPlayerHookHandler.FromPlayer(player).ifPresent(ICommonPlayerHookHandler::removeAllHooks);
             });
         }
     }
@@ -51,10 +52,10 @@ public class ClientForgeEvents {
         Player player = event.player;
         if (player == null) return;
         if (event.phase.equals(TickEvent.Phase.END)) {
-            IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
+            ICommonPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
                 handler.update();
                 if (handler.shouldMoveThisTick()) {
-                    player.setDeltaMovement(handler.getMoveThisTick());
+                    player.setDeltaMovement(handler.getDeltaVThisTick());
                 }
             });
         }

@@ -3,6 +3,8 @@ package com.oe.rehooked.handlers.hook.client;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
+import com.oe.rehooked.network.handlers.PacketHandler;
+import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -36,7 +38,7 @@ public class CPlayerHookHandler implements ICommonPlayerHookHandler {
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
-
+        PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.SHOOT, 0, xRot, yRot));
     }
 
     @Override

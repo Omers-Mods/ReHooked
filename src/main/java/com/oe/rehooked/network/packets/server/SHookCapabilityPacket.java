@@ -1,10 +1,8 @@
 package com.oe.rehooked.network.packets.server;
 
 import com.mojang.logging.LogUtils;
-import com.oe.rehooked.capabilities.hooks.IPlayerHookHandler;
-import com.oe.rehooked.item.hook.HookItem;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.network.packets.common.HookCapabilityPacket;
-import com.oe.rehooked.utils.CurioUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -18,13 +16,13 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
     private final float xRot;
     private final float yRot;
     
-    public SHookCapabilityPacket(byte packetType, int additional, float xRot, float yRot) {
-        super(packetType, additional);
+    public SHookCapabilityPacket(State packetType, int additional, float xRot, float yRot) {
+        super(packetType.ordinal(), additional);
         this.xRot = xRot;
         this.yRot = yRot;
     }
     
-    public SHookCapabilityPacket(byte packetType) {
+    public SHookCapabilityPacket(State packetType) {
         this(packetType, 0, 0, 0);
     }
 
@@ -36,7 +34,7 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
     }
 
     public SHookCapabilityPacket(FriendlyByteBuf buffer) {
-        super(buffer.readByte(), buffer.readInt());
+        super(buffer.readInt(), buffer.readInt());
         xRot = buffer.readFloat();
         yRot = buffer.readFloat();
     }
@@ -46,16 +44,13 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
         context.get().enqueueWork(() -> {
             ServerPlayer player = context.get().getSender();
             if (player == null || player.level().isClientSide()) return;
-            IPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
-                handler.owner(player);
-                CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
-                    HookItem hookItem = (HookItem) hookStack.getItem();
-                    switch (State.Get(packetType)) {
-                        case SHOOT -> handler.hookType(hookItem.getHookType()).shootHook(xRot, yRot);
-                        case RETRACT_HOOK -> handler.hookType(hookItem.getHookType()).removeHook(additional);
-                        case RETRACT_ALL_HOOKS -> handler.hookType(hookItem.getHookType()).removeAllHooks();
-                    }
-                });
+            ICommonPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
+                handler.setOwner(player);
+                switch (State.Get(packetType)) {
+                    case SHOOT -> handler.shootFromRotation(xRot, yRot);
+                    case RETRACT_HOOK -> handler.removeHook(additional);
+                    case RETRACT_ALL_HOOKS -> handler.removeAllHooks();
+                }
             });
         });
         context.get().setPacketHandled(true);
