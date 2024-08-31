@@ -6,23 +6,23 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public abstract class HookCapabilityPacket {
-    protected final byte packetType;
+    protected final int packetType;
     protected final int additional;
     
-    public HookCapabilityPacket(byte packetType, int additional) {
+    public HookCapabilityPacket(int packetType, int additional) {
         this.packetType = packetType;
         this.additional = additional;
     }
     
-    public HookCapabilityPacket(byte packetType) {this(packetType, 0);}
+    public HookCapabilityPacket(int packetType) {this(packetType, 0);}
     
     public HookCapabilityPacket(FriendlyByteBuf buf) {
-        this.packetType = buf.readByte();
+        this.packetType = buf.readInt();
         this.additional = buf.readInt();
     }
     
     public void encode(FriendlyByteBuf buf) {
-        buf.writeByte(packetType);
+        buf.writeInt(packetType);
         buf.writeInt(additional);
     }
     

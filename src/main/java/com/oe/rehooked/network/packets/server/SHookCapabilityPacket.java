@@ -13,10 +13,6 @@ import org.slf4j.Logger;
 import java.util.function.Supplier;
 
 public class SHookCapabilityPacket extends HookCapabilityPacket {
-    public static final byte SHOOT = 1;
-    public static final byte RETRACT = 2;
-    public static final byte ALL = 4;
-    
     private static Logger LOGGER = LogUtils.getLogger();
     
     private final float xRot;
@@ -54,14 +50,24 @@ public class SHookCapabilityPacket extends HookCapabilityPacket {
                 handler.owner(player);
                 CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
                     HookItem hookItem = (HookItem) hookStack.getItem();
-                    switch (packetType) {
+                    switch (State.Get(packetType)) {
                         case SHOOT -> handler.hookType(hookItem.getHookType()).shootHook(xRot, yRot);
-                        case RETRACT -> handler.hookType(hookItem.getHookType()).removeHook(additional);
-                        case ALL -> handler.hookType(hookItem.getHookType()).removeAllHooks();
+                        case RETRACT_HOOK -> handler.hookType(hookItem.getHookType()).removeHook(additional);
+                        case RETRACT_ALL_HOOKS -> handler.hookType(hookItem.getHookType()).removeAllHooks();
                     }
                 });
             });
         });
         context.get().setPacketHandled(true);
+    }
+    
+    public enum State {
+        SHOOT,
+        RETRACT_HOOK,
+        RETRACT_ALL_HOOKS;
+        
+        public static State Get(int ordinal) {
+            return State.values()[ordinal];
+        }
     }
 }
