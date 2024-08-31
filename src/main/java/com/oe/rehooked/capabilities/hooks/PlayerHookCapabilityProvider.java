@@ -14,19 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerHookCapabilityProvider implements ICapabilityProvider {
-    public static final Capability<IPlayerHookHandler> PLAYER_HOOK_HANDLER = 
-            CapabilityManager.get(new CapabilityToken<>() {});
     public static final Capability<ICommonPlayerHookHandler> CLIENT_HOOK_HANDLER =
             CapabilityManager.get(new CapabilityToken<>() {});
     public static final Capability<ICommonPlayerHookHandler> SERVER_HOOK_HANDLER =
             CapabilityManager.get(new CapabilityToken<>() {});
-    
-    private IPlayerHookHandler handler = null;
-    private final LazyOptional<IPlayerHookHandler> optional = LazyOptional.of(this::createPlayerHookHandler);
-    private IPlayerHookHandler createPlayerHookHandler() {
-        if (this.handler == null) this.handler = new PlayerHookHandler();
-        return this.handler;
-    }
     
     private ICommonPlayerHookHandler clientHandler = null;
     private final LazyOptional<ICommonPlayerHookHandler> clientHandlerOptional = LazyOptional.of(this::createClientHookHandler);
@@ -44,9 +35,7 @@ public class PlayerHookCapabilityProvider implements ICapabilityProvider {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap.equals(PLAYER_HOOK_HANDLER))
-            return optional.cast();
-        else if (cap.equals(CLIENT_HOOK_HANDLER))
+        if (cap.equals(CLIENT_HOOK_HANDLER))
             return clientHandlerOptional.cast();
         else if (cap.equals(SERVER_HOOK_HANDLER))
             return serverHandlerOptional.cast();
