@@ -97,11 +97,15 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         LOGGER.debug("Shooting from rotation: {}, {}", xRot, yRot);
         // this is a response to a client request
         getOwner().ifPresent(owner -> {
-            HookEntity hookEntity = new HookEntity(owner);
-            owner.level().addFreshEntity(hookEntity);
-            addHook(hookEntity);
-            getHookData().ifPresent(hookData ->
-                    hookEntity.shootFromRotation(owner, xRot, yRot, 0, hookData.speed() / 20f, 0));
+            getHookData().ifPresent(hookData -> {
+                if (hooks.size() + 1 > hookData.count())
+                    removeHook(hooks.get(0));
+                HookEntity hookEntity = new HookEntity(owner);
+                owner.level().addFreshEntity(hookEntity);
+                addHook(hookEntity);
+                hookEntity.shootFromRotation(owner, xRot, yRot, 0,
+                        hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed() / 20f, 0);
+            });
         });
     }
 
@@ -135,22 +139,25 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 float vPT = hookData.pullSpeed() / 20f;
                 int count = 0;
                 double x = 0, y = 0, z = 0;
+                double range = hookData.range();
+                Vec3 adjustedOwnerPosition = owner.getEyePosition().subtract(0, 0.25, 0);
                 for (HookEntity hookEntity : hooks) {
                     if (hookEntity.getState().equals(HookEntity.State.PULLING)) {
                         count++;
-                        Vec3 vectorTo = owner.position().vectorTo(hookEntity.position());
-                        // todo: maybe scale the vector down based on how close the player is to the hook
-                        // todo: if the player is closer the hooks pull should be less strong
-                        x += vectorTo.x;
-                        y += vectorTo.y;
-                        z += vectorTo.z;
+                        Vec3 vectorTo = adjustedOwnerPosition.vectorTo(hookEntity.getHitPos().get().getCenter());
+                        if (vectorTo.length() > THRESHOLD) {
+                            vectorTo = vectorTo.normalize().scale(vPT);
+                            x += vectorTo.x;
+                            y += vectorTo.y;
+                            z += vectorTo.z;
+                        }
                     }
                 }
                 if (count == 0) return;
                 owner.setNoGravity(true);
-                Vec3 baseVector = new Vec3(x, y, z);
-                if (baseVector.length() < THRESHOLD) return;
-                moveVector = baseVector.normalize().scale(vPT * count);
+                owner.resetFallDistance();
+                owner.setOnGround(true);
+                moveVector = new Vec3(x, y, z);
             });
         });
     }

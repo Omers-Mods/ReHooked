@@ -88,27 +88,25 @@ public class HookEntity extends Projectile {
     public void shootFromRotation(Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
         LOGGER.debug("Shooting!");
         super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity, pInaccuracy);
+        setDeltaMovement(getDeltaMovement());
     }
 
     protected void tickShot() {
-        LOGGER.debug("Ticking shot");
         if (level().isClientSide()) return;
-        LOGGER.debug("Not client");
         // move the hook in the goal direction, checking for hits in the process
         Optional<HookData> optHookData = getHookType().flatMap(HookRegistry::getHookData);
         if (optHookData.isPresent()) {
-            LOGGER.debug("Hook data found");
             HookData hookData = optHookData.get();
             // check if hit anything
             BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
             BlockState hitState = level().getBlockState(hitResult.getBlockPos());
             if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
                 LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
-                setHitPos(hitResult.getBlockPos());
                 setState(State.PULLING);
                 Vec3 hitCenter = hitResult.getBlockPos().getCenter();
                 setDeltaMovement(position().vectorTo(hitCenter)
                         .subtract(hitCenter.vectorTo(position()).normalize().scale(0.75)));
+                setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
             }
             else {
                  setDeltaMovement(getDeltaMovement());
@@ -122,7 +120,6 @@ public class HookEntity extends Projectile {
     }
     
     protected void tickPulling() {
-        LOGGER.debug("Ticking pull");
         if (firstTickInState) {
             // stop moving
             setDeltaMovement(Vec3.ZERO);
@@ -134,7 +131,6 @@ public class HookEntity extends Projectile {
     }
     
     protected void tickRetracting() {
-        LOGGER.debug("Ticking retract");
         // send update to handler
         if (!level().isClientSide()) {
             if (getOwner() instanceof Player owner) {

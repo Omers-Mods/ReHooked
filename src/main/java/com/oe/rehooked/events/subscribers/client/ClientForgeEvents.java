@@ -27,43 +27,28 @@ public class ClientForgeEvents {
     
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.side.isServer()) LOGGER.debug("This event runs on the server too");
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
         ticksSinceShot++;
+        Optional<IClientPlayerHookHandler> optHandler = IClientPlayerHookHandler.FromPlayer(player).resolve();
+        if (optHandler.isEmpty()) {
+            LOGGER.debug("Player hook handler not found!");
+            return;
+        }
+        IClientPlayerHookHandler handler = optHandler.get();
         if (KeyBindings.FIRE_HOOK_KEY.consumeClick() && ticksSinceShot > 5) {
             ticksSinceShot = 0;
             CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
-                Optional<IClientPlayerHookHandler> optHandler = IClientPlayerHookHandler.FromPlayer(player).resolve();
-                if (optHandler.isPresent()) {
-                    IClientPlayerHookHandler handler = optHandler.get();
-                    Entity camera = Minecraft.getInstance().getCameraEntity();
-                    handler.shootFromRotation(camera.getXRot(), camera.getYRot());
-                } else {
-                    LOGGER.debug("Missing handler capability");
-                }
+                Entity camera = Minecraft.getInstance().getCameraEntity();
+                handler.shootFromRotation(camera.getXRot(), camera.getYRot());
             });
         }
         if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick()) {
-            LOGGER.debug("Player pressed remove all hooks key");
-            CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookItem -> {
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS));
-                IClientPlayerHookHandler.FromPlayer(player).ifPresent(IClientPlayerHookHandler::removeAllHooks);
-            });
+            handler.removeAllHooks();
         }
-    }
-    
-    @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        Player player = event.player;
-        if (player == null) return;
-        if (event.phase.equals(TickEvent.Phase.END)) {
-            IClientPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
-                handler.update();
-                if (handler.shouldMoveThisTick()) {
-                    player.setDeltaMovement(handler.getDeltaVThisTick());
-                }
-            });
+        handler.setOwner(player).update();
+        if (handler.shouldMoveThisTick()) {
+            player.setDeltaMovement(handler.getDeltaVThisTick());
         }
     }
 }

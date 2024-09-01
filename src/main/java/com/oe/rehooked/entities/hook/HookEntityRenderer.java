@@ -26,14 +26,14 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
 
     public void render(HookEntity entity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         pPoseStack.pushPose();
-        pPoseStack.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
+        pPoseStack.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
         pPoseStack.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
         pPoseStack.translate(0, -1.5, 0);
         VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(pBuffer, this.model.renderType(this.getTextureLocation(entity)), false, false);
         
         this.model.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-        super.render(entity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
         pPoseStack.popPose();
+        super.render(entity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
     }
     
     @Override
