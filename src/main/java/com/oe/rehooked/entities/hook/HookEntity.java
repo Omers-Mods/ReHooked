@@ -56,16 +56,12 @@ public class HookEntity extends Projectile {
     
     @Override
     public void tick() {
-        if (!(getOwner() instanceof Player)) {
+        if (!getState().equals(State.RETRACTING) && !(getOwner() instanceof Player)) {
             if (!level().isClientSide()) {
                 LOGGER.debug("Owner not found, retracting");
                 setState(State.RETRACTING);
-                return;
             }
         }
-
-        // run the super class tick method
-        super.tick();
         
         // "state machine"
         switch (getState()) {
@@ -82,6 +78,9 @@ public class HookEntity extends Projectile {
         }
         // keep track of how many ticks in current state (also update prev state)
         trackTicksInState();
+
+        // run the super class tick method
+        super.tick();
     }
 
     @Override
@@ -91,12 +90,23 @@ public class HookEntity extends Projectile {
         setDeltaMovement(getDeltaMovement());
     }
 
+    @Override
+    public boolean shouldRenderAtSqrDistance(double pDistance) {
+        return super.shouldRenderAtSqrDistance(pDistance);
+    }
+
     protected void tickShot() {
         if (level().isClientSide()) return;
         // move the hook in the goal direction, checking for hits in the process
         Optional<HookData> optHookData = getHookType().flatMap(HookRegistry::getHookData);
         if (optHookData.isPresent()) {
             HookData hookData = optHookData.get();
+            // check if needs to destroy instant hook
+            if (!firstTickInState && hookData.speed() == Float.MAX_VALUE) {
+                setState(State.RETRACTING);
+                setDeltaMovement(Vec3.ZERO);
+                return;
+            }
             // check if hit anything
             BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
             BlockState hitState = level().getBlockState(hitResult.getBlockPos());
@@ -131,11 +141,15 @@ public class HookEntity extends Projectile {
     }
     
     protected void tickRetracting() {
-        // send update to handler
-        if (!level().isClientSide()) {
-            if (getOwner() instanceof Player owner) {
+        if (getOwner() instanceof Player owner) {
+            // send update to handler
+            if (!level().isClientSide()) {
                 IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
             }
+        }
+        else {
+            // if owner not found discard after 10 seconds
+            if (ticksInState > 200) discard();
         }
     }
     

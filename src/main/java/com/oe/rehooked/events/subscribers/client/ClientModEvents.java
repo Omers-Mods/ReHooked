@@ -3,9 +3,11 @@ package com.oe.rehooked.events.subscribers.client;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.client.KeyBindings;
 import com.oe.rehooked.entities.ReHookedEntities;
-import com.oe.rehooked.entities.hook.HookEntityModel;
 import com.oe.rehooked.entities.hook.HookEntityRenderer;
+import com.oe.rehooked.entities.hook.THookEntityModel;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
+import com.oe.rehooked.entities.test.TestCubeModel;
+import com.oe.rehooked.entities.test.TestCubeRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -22,11 +24,13 @@ public class ClientModEvents {
 
     @SubscribeEvent
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(ReHookedModelLayers.HOOK_PROJECTILE_LAYER, HookEntityModel::createBodyLayer);
+        event.registerLayerDefinition(ReHookedModelLayers.HOOK_PROJECTILE_LAYER, THookEntityModel::createBodyLayer);
+        event.registerLayerDefinition(ReHookedModelLayers.TEST_CUBE_LAYER, TestCubeModel::createBodyLayer);
     }
     
     @SubscribeEvent
     public static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ReHookedEntities.HOOK_PROJECTILE.get(), HookEntityRenderer::new);
+        event.registerEntityRenderer(ReHookedEntities.DIRECTION_CUBE.get(), TestCubeRenderer::new);
     }
 }

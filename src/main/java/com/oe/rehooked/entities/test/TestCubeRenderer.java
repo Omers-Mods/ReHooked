@@ -1,10 +1,9 @@
-package com.oe.rehooked.entities.hook;
+package com.oe.rehooked.entities.test;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
-import com.oe.rehooked.entities.test.TestCubeEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
@@ -15,50 +14,49 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-public class HookEntityRenderer extends EntityRenderer<HookEntity> {
+public class TestCubeRenderer extends EntityRenderer<TestCubeEntity> {
     public static final ResourceLocation TEXTURE =
-                new ResourceLocation(ReHookedMod.MOD_ID, "textures/hook/terraria_hook/terraria_hook.png");
-    protected EntityModel<? extends HookEntity> model;
+            new ResourceLocation(ReHookedMod.MOD_ID, "textures/test/direction_cube/test_cube.png");
     protected EntityRendererProvider.Context pContext;
-    protected float lastDelta;
-    
-    public HookEntityRenderer(EntityRendererProvider.Context pContext) {
+    protected EntityModel<TestCubeEntity> model;
+    protected float lastDelta = 0;
+
+    public TestCubeRenderer(EntityRendererProvider.Context pContext) {
         super(pContext);
-        model = new THookEntityModel<>(pContext.bakeLayer(ReHookedModelLayers.HOOK_PROJECTILE_LAYER));
-        this.pContext = pContext;
-        lastDelta = 0;
+        this.pContext = pContext; 
+        model = new TestCubeModel(pContext.bakeLayer(ReHookedModelLayers.TEST_CUBE_LAYER));
     }
 
     @Override
-    public boolean shouldRender(HookEntity pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
-        return true;
+    public void render(TestCubeEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
+        handleCube(pEntity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
+        handleChain(pEntity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
+        super.render(pEntity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
     }
 
-    @Override
-    public void render(HookEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
-        handleHook(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
-        if (pEntity.getOwner() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
-        super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
-    }
-
-    private void handleHook(HookEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
+    private void handleCube(TestCubeEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         pPoseStack.pushPose();
-        pPoseStack.mulPose(Axis.YP.rotationDegrees(pEntity.getYRot() - 90f));
-        pPoseStack.mulPose(Axis.ZP.rotationDegrees(pEntity.getXRot()));
+        pPoseStack.mulPose(Axis.YP.rotationDegrees(-Minecraft.getInstance().player.getYHeadRot() + 90f));
+        pPoseStack.mulPose(Axis.ZP.rotationDegrees(Minecraft.getInstance().player.getXRot()));
+        pPoseStack.translate(0, -0.5, 0);
         this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(model.renderType(getTextureLocation(pEntity))), pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         pPoseStack.popPose();
     }
-    
-    private void handleChain(HookEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
+
+    @Override
+    public boolean shouldRender(TestCubeEntity pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
+        return true;
+    }
+
+    private void handleChain(TestCubeEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         pPoseStack.pushPose();
+        LocalPlayer player = Minecraft.getInstance().player;
         // get relevant positions
-        Entity owner = pEntity.getOwner();
-        Vec3 waistPos = owner.position().add(0, owner.getEyeHeight() / 1.5, 0);
+        Vec3 waistPos = player.position().add(0, player.getEyeHeight() / 1.5, 0);
         Vec3 cubePos = pEntity.position();
         Vec3 playerToCube = waistPos.vectorTo(cubePos);
         Vec3 normal = playerToCube.normalize();
@@ -83,7 +81,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     }
     
     @Override
-    public ResourceLocation getTextureLocation(HookEntity pEntity) {
+    public ResourceLocation getTextureLocation(TestCubeEntity pEntity) {
         return TEXTURE;
     }
 }
