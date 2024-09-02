@@ -30,7 +30,7 @@ public class ReHookedItems {
         HookRegistry.registerHook("wood", new HookData(1, 16, 12, 6, getHookTexture("wood")));
         HookRegistry.registerHook("iron", new HookData(2, 32, 24, 12, getHookTexture("iron")));
         HookRegistry.registerHook("diamond", new HookData(4, 64, 48, 24, getHookTexture("diamond")));
-        HookRegistry.registerHook("ender", new HookData(1, 128, Float.MAX_VALUE, 64, getHookTexture("ender")));
+        HookRegistry.registerHook("ender", new HookData(1, 96, Float.MAX_VALUE, 32, getHookTexture("ender")));
         HookRegistry.registerHook("red", new HookData(4, 32, 24, 0, getHookTexture("red")));
         // register the objects
         ITEMS.register(eventBus);

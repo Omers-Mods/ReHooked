@@ -92,7 +92,7 @@ public class HookEntity extends Projectile {
         trackTicksInState();
 
         // create offset on first tick
-        if (firstTick && getOwner() instanceof Player owner) {
+        if (offset == null && getOwner() instanceof Player owner) {
             offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() / 1.5, 0)).normalize();
         }
         
@@ -129,7 +129,7 @@ public class HookEntity extends Projectile {
                 return;
             }
             // check if hit anything
-            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
+            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length() + 2.5);
             BlockState hitState = level().getBlockState(hitResult.getBlockPos());
             if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
                 LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
@@ -152,7 +152,10 @@ public class HookEntity extends Projectile {
             setDeltaMovement(Vec3.ZERO);
             if (level().isClientSide()){
                 // move client pos to hit
-                getHitPos().map(BlockPos::getCenter).ifPresent(pos -> setPos(pos.add(offset.scale(0.5))));
+                getHitPos().map(BlockPos::getCenter).ifPresent(pos -> {
+                    if (offset != null) setPos(pos.add(offset.scale(0.5)));
+                    else setPos(pos);
+                });
             }
         }
         getHitPos().ifPresent(hitPos -> {
