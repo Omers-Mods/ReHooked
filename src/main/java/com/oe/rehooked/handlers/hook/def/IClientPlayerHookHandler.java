@@ -7,6 +7,8 @@ import net.minecraftforge.common.util.LazyOptional;
 
 @AutoRegisterCapability
 public interface IClientPlayerHookHandler extends ICommonPlayerHookHandler {
+    double getMaxHookDistance();
+    
     static LazyOptional<IClientPlayerHookHandler> FromPlayer(Player player) {
         return player.getCapability(ClientHookCapabilityProvider.CLIENT_HOOK_HANDLER);
     }

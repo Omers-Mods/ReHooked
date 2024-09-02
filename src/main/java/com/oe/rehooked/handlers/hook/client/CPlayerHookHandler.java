@@ -165,4 +165,21 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     public Vec3 getDeltaVThisTick() {
         return moveVector;
     }
+
+    @Override
+    public double getMaxHookDistance() {
+        if (hooks.isEmpty() || getOwner().isEmpty()) return 0;
+      
+        Player owner = getOwner().get();
+        Vec3 adjustedOwnerPosition = owner.position().add(0, owner.getEyeHeight() / 1.5, 0);
+
+        double maxDistance = 0;
+
+        for (HookEntity hookEntity : hooks) {
+            double distance = hookEntity.position().distanceTo(adjustedOwnerPosition);
+            if (distance > maxDistance) maxDistance = distance;
+        }
+        
+        return maxDistance + THRESHOLD;
+    }
 }
