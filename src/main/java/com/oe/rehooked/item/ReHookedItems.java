@@ -4,6 +4,7 @@ import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.item.hook.HookItem;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -26,12 +27,16 @@ public class ReHookedItems {
     
     public static void register(IEventBus eventBus) {
         // define all hook variants
-        HookRegistry.registerHook("wood", new HookData(1, 16, 12, 6));
-        HookRegistry.registerHook("iron", new HookData(2, 32, 24, 12));
-        HookRegistry.registerHook("diamond", new HookData(4, 64, 48, 24));
-        HookRegistry.registerHook("ender", new HookData(1, 128, Float.MAX_VALUE, 64));
-        HookRegistry.registerHook("red", new HookData(4, 32, 24, 0));
+        HookRegistry.registerHook("wood", new HookData(1, 16, 12, 6, getHookTexture("wood")));
+        HookRegistry.registerHook("iron", new HookData(2, 32, 24, 12, getHookTexture("iron")));
+        HookRegistry.registerHook("diamond", new HookData(4, 64, 48, 24, getHookTexture("diamond")));
+        HookRegistry.registerHook("ender", new HookData(1, 128, Float.MAX_VALUE, 64, getHookTexture("ender")));
+        HookRegistry.registerHook("red", new HookData(4, 32, 24, 0, getHookTexture("red")));
         // register the objects
         ITEMS.register(eventBus);
+    }
+    
+    private static ResourceLocation getHookTexture(String name) {
+        return new ResourceLocation(ReHookedMod.MOD_ID, "textures/entity/hook/" + name + "/" + name + ".png");
     }
 }

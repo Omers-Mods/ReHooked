@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.network.NetworkHooks;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -45,9 +46,15 @@ public class HookEntity extends Projectile {
 
     protected int ticksInState = 0;
     protected boolean firstTickInState = true;
+    protected Vec3 offset;
     
     public HookEntity(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    @Override
+    public boolean isPushedByFluid(FluidType type) {
+        return false;
     }
 
     @Override
@@ -59,7 +66,8 @@ public class HookEntity extends Projectile {
         super(ReHookedEntities.HOOK_PROJECTILE.get(), player.level());
         setNoGravity(true);
         setOwner(player);
-        setPos(player.getX(), player.getY() + player.getEyeHeight() / 1.5, player.getZ());
+        Vec3 adjusted = new Vec3(player.getX(), player.getY() + player.getEyeHeight() / 1.5, player.getZ());
+        setPos(adjusted);
     }
     
     @Override
@@ -78,15 +86,16 @@ public class HookEntity extends Projectile {
             case RETRACTING -> tickRetracting();
         }
         // update position
-        if (getState().equals(State.SHOT)) {
-            Vec3 dV = getDeltaMovement();
-            LOGGER.debug("Moved from {}", position());
-            setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
-            LOGGER.debug("Moved to {}", position());
-        }
+        Vec3 dV = getDeltaMovement();
+        setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
         // keep track of how many ticks in current state (also update prev state)
         trackTicksInState();
 
+        // create offset on first tick
+        if (firstTick && getOwner() instanceof Player owner) {
+            offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() / 1.5, 0)).normalize();
+        }
+        
         // run the super class tick method
         super.tick();
     }
@@ -119,21 +128,20 @@ public class HookEntity extends Projectile {
                 setDeltaMovement(Vec3.ZERO);
                 return;
             }
-            if (!level().isClientSide()) {
-                // check if hit anything
-                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
-                BlockState hitState = level().getBlockState(hitResult.getBlockPos());
-                if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
-                    LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
-                    setState(State.PULLING);
-                    setDeltaMovement(position().vectorTo(hitResult.getLocation()));
-                    setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
-                }
-                // check if moved further than the target
-                if (getOwner().position().distanceTo(position()) > hookData.range()) {
-                    LOGGER.debug("Moved further than range from owner");
-                    setState(State.RETRACTING);
-                }
+            // check if hit anything
+            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
+            BlockState hitState = level().getBlockState(hitResult.getBlockPos());
+            if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
+                LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
+                setState(State.PULLING);
+                setDeltaMovement(position().vectorTo(hitResult.getLocation()));
+                setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
+            }
+            // check if moved further than the target
+            if (getOwner() instanceof Player owner && 
+                    owner.position().add(0, owner.getEyeHeight() / 1.5, 0).distanceTo(position()) > hookData.range()) {
+                LOGGER.debug("Moved further than range from owner");
+                setState(State.RETRACTING);
             }
         }
     }
@@ -144,8 +152,7 @@ public class HookEntity extends Projectile {
             setDeltaMovement(Vec3.ZERO);
             if (level().isClientSide()){
                 // move client pos to hit
-                setDeltaMovement(Vec3.ZERO);
-                getHitPos().map(BlockPos::getCenter).ifPresent(this::setPos);
+                getHitPos().map(BlockPos::getCenter).ifPresent(pos -> setPos(pos.add(offset.scale(0.5))));
             }
         }
         getHitPos().ifPresent(hitPos -> {
@@ -156,14 +163,26 @@ public class HookEntity extends Projectile {
     
     protected void tickRetracting() {
         if (getOwner() instanceof Player owner) {
-            // send update to handler
-            if (!level().isClientSide()) {
-                IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
+            // vector to the owner
+            Vec3 vectorToPlayer = position().vectorTo(owner.getEyePosition());
+            // set the delta movement according to speed and distance from player
+            getHookType().flatMap(HookRegistry::getHookData).map(HookData::speed).ifPresent(speed -> {
+                if (vectorToPlayer.length() > speed / 20f) {
+                    setDeltaMovement(vectorToPlayer.normalize().scale(speed / 20f));
+                } else {
+                    setDeltaMovement(vectorToPlayer);
+                }
+            });
+            if (firstTickInState) {
+                // send update to handler
+                if (!level().isClientSide()) {
+                    IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
+                }
             }
-        }
-        else {
-            // if owner not found discard after 10 seconds
-            if (ticksInState > 200) discard();
+            if (vectorToPlayer.length() < 1) discard();
+        } else {
+            // if owner not found discard
+            discard();
         }
     }
     

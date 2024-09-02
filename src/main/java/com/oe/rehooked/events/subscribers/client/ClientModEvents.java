@@ -4,7 +4,7 @@ import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.client.KeyBindings;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.entities.hook.HookEntityRenderer;
-import com.oe.rehooked.entities.hook.THookEntityModel;
+import com.oe.rehooked.entities.hook.HookEntityModel;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
 import com.oe.rehooked.entities.test.TestCubeModel;
 import com.oe.rehooked.entities.test.TestCubeRenderer;
@@ -24,7 +24,7 @@ public class ClientModEvents {
 
     @SubscribeEvent
     public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(ReHookedModelLayers.HOOK_PROJECTILE_LAYER, THookEntityModel::createBodyLayer);
+        event.registerLayerDefinition(ReHookedModelLayers.HOOK_PROJECTILE_LAYER, HookEntityModel::createBodyLayer);
         event.registerLayerDefinition(ReHookedModelLayers.TEST_CUBE_LAYER, TestCubeModel::createBodyLayer);
     }
     

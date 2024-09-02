@@ -3,16 +3,17 @@ package com.oe.rehooked.entities.hook;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.data.HookData;
+import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
-import com.oe.rehooked.entities.test.TestCubeEntity;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -20,16 +21,18 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Optional;
+
 public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     public static final ResourceLocation TEXTURE =
-                new ResourceLocation(ReHookedMod.MOD_ID, "textures/hook/terraria_hook/terraria_hook.png");
-    protected EntityModel<? extends HookEntity> model;
+                new ResourceLocation(ReHookedMod.MOD_ID, "textures/entity/terraria_hook/terraria_hook.png");
+    protected EntityModel<HookEntity> model;
     protected EntityRendererProvider.Context pContext;
     protected float lastDelta;
     
     public HookEntityRenderer(EntityRendererProvider.Context pContext) {
         super(pContext);
-        model = new THookEntityModel<>(pContext.bakeLayer(ReHookedModelLayers.HOOK_PROJECTILE_LAYER));
+        model = new HookEntityModel(pContext.bakeLayer(ReHookedModelLayers.HOOK_PROJECTILE_LAYER));
         this.pContext = pContext;
         lastDelta = 0;
     }
@@ -41,6 +44,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
 
     @Override
     public void render(HookEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
+        if (pEntity.getHookType().isEmpty()) return;
         handleHook(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         if (pEntity.getOwner() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
@@ -48,8 +52,18 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
 
     private void handleHook(HookEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         pPoseStack.pushPose();
-        pPoseStack.mulPose(Axis.YP.rotationDegrees(pEntity.getYRot() - 90f));
-        pPoseStack.mulPose(Axis.ZP.rotationDegrees(pEntity.getXRot()));
+        Vec3 dV = pEntity.getDeltaMovement();
+        if (!dV.equals(Vec3.ZERO)) {
+            pEntity.lookAt(EntityAnchorArgument.Anchor.EYES, pEntity.getEyePosition().add(dV));
+        }
+        else {
+            pEntity.getHitPos()
+                    .ifPresent(blockPos -> pEntity.lookAt(EntityAnchorArgument.Anchor.EYES, blockPos.getCenter()));
+        }
+//        pPoseStack.mulPose(Axis.YP.rotationDegrees(pEntity.getYRot()));
+//        pPoseStack.mulPose(Axis.ZP.rotationDegrees(pEntity.getXRot() + 90f));
+        pPoseStack.scale(0.3f, 0.3f, 0.3f);
+        pPoseStack.translate(0, -1, 0);
         this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(model.renderType(getTextureLocation(pEntity))), pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         pPoseStack.popPose();
     }
@@ -65,7 +79,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
         // rotate
         pPoseStack.mulPose(Axis.YP.rotation(Mth.HALF_PI - (float) Mth.atan2(normal.z, normal.x)));
         pPoseStack.mulPose(Axis.XP.rotation((float) Math.acos(normal.y) - Mth.PI));
-        pPoseStack.translate(-0.5, 0.0, -0.75);
+        pPoseStack.translate(-0.5, 0.0, -0.5);
         // add chains
         float distance = (float) playerToCube.length();
         BlockState chain = Blocks.CHAIN.defaultBlockState();
@@ -84,6 +98,6 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     
     @Override
     public ResourceLocation getTextureLocation(HookEntity pEntity) {
-        return TEXTURE;
+        return pEntity.getHookType().flatMap(HookRegistry::getHookData).map(HookData::texture).orElseGet(null);
     }
 }

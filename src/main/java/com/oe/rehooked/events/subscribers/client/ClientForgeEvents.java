@@ -11,6 +11,7 @@ import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -53,7 +54,9 @@ public class ClientForgeEvents {
         }
         handler.setOwner(player).update();
         if (handler.shouldMoveThisTick()) {
-            player.setDeltaMovement(player.getDeltaMovement().scale(0.1).add(handler.getDeltaVThisTick()));
+            Vec3 deltaVThisTick = handler.getDeltaVThisTick();
+            player.setDeltaMovement(player.getDeltaMovement().scale(0.1).add(deltaVThisTick));
+            LOGGER.debug("Player should move by {} ({})", deltaVThisTick, deltaVThisTick.length());
         }
     }
 }

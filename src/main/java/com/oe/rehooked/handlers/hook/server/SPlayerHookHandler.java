@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,8 +68,13 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         LOGGER.debug("Removing hook by id: {}", id);
         // this is a response to a request from the client
         if (hooks.removeIf(hookEntity -> hookEntity.getId() == id)) {
-            // discard removed entity
-            getOwner().map(Player::level).map(level -> level.getEntity(id)).ifPresent(Entity::discard);
+            // update the hook to retract
+            getOwner()
+                    .map(Player::level)
+                    .map(level -> level.getEntity(id))
+                    .ifPresent(entity -> {
+                        if (entity instanceof HookEntity hookEntity) hookEntity.setState(HookEntity.State.RETRACTING);
+                    });
         }
     }
 
@@ -77,9 +83,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         LOGGER.debug("Removing hook by entity with id: {}", hookEntity);
         // this is a response to a request from the hook
         if (hooks.remove(hookEntity)) {
-            // discard removed entity
-            if (!hookEntity.isRemoved())
-                hookEntity.discard();
+            hookEntity.setState(HookEntity.State.RETRACTING);
             // notify client player
             getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
                     new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()), 
@@ -91,7 +95,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public void removeAllHooks() {
         LOGGER.debug("Removing all hooks ({})", hooks.size());
         // this is a response to a request from the client
-        hooks.forEach(Entity::discard);
+        hooks.forEach(hookEntity -> hookEntity.setState(HookEntity.State.RETRACTING));
         hooks.clear();
     }
 

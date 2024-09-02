@@ -1,4 +1,6 @@
 package com.oe.rehooked.data;
 
-public record HookData(int count, float range, float speed, float pullSpeed) {
+import net.minecraft.resources.ResourceLocation;
+
+public record HookData(int count, float range, float speed, float pullSpeed, ResourceLocation texture) {
 }

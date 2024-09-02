@@ -8,7 +8,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Optional;
 
 public interface ICommonPlayerHookHandler {
-    double THRESHOLD = 1;
+    double THRESHOLD = 0.2;
     
     void addHook(int id);
     void addHook(HookEntity hookEntity);
