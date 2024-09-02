@@ -26,6 +26,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.Optional;
@@ -39,6 +40,8 @@ public class HookEntity extends Projectile {
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> PREV_STATE = 
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Vector3f> DELTA_MOVEMENT = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.VECTOR3);
 
     protected int ticksInState = 0;
     protected boolean firstTickInState = true;
@@ -46,12 +49,17 @@ public class HookEntity extends Projectile {
     public HookEntity(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
-    
+
+    @Override
+    protected boolean canHitEntity(Entity pTarget) {
+        return false;
+    }
+
     public HookEntity(Player player) {
         super(ReHookedEntities.HOOK_PROJECTILE.get(), player.level());
         setNoGravity(true);
         setOwner(player);
-        setPos(player.getX(), player.getEyeY() - 0.25, player.getZ());
+        setPos(player.getX(), player.getY() + player.getEyeHeight() / 1.5, player.getZ());
     }
     
     @Override
@@ -84,19 +92,23 @@ public class HookEntity extends Projectile {
     }
 
     @Override
-    public void shootFromRotation(Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
-        LOGGER.debug("Shooting!");
-        super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity, pInaccuracy);
-        setDeltaMovement(getDeltaMovement());
+    public void setDeltaMovement(Vec3 pDeltaMovement) {
+        setSharedDeltaV(pDeltaMovement.toVector3f());
+        super.setDeltaMovement(pDeltaMovement);
     }
 
     @Override
-    public boolean shouldRenderAtSqrDistance(double pDistance) {
-        return super.shouldRenderAtSqrDistance(pDistance);
+    public Vec3 getDeltaMovement() {
+        return new Vec3(getSharedDeltaV());
+    }
+
+    @Override
+    public void shootFromRotation(Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
+        LOGGER.debug("Shooting!");
+        super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity, pInaccuracy);
     }
 
     protected void tickShot() {
-        if (level().isClientSide()) return;
         // move the hook in the goal direction, checking for hits in the process
         Optional<HookData> optHookData = getHookType().flatMap(HookRegistry::getHookData);
         if (optHookData.isPresent()) {
@@ -107,24 +119,21 @@ public class HookEntity extends Projectile {
                 setDeltaMovement(Vec3.ZERO);
                 return;
             }
-            // check if hit anything
-            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
-            BlockState hitState = level().getBlockState(hitResult.getBlockPos());
-            if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
-                LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
-                setState(State.PULLING);
-                Vec3 hitCenter = hitResult.getBlockPos().getCenter();
-                setDeltaMovement(position().vectorTo(hitCenter)
-                        .subtract(hitCenter.vectorTo(position()).normalize().scale(0.75)));
-                setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
-            }
-            else {
-                 setDeltaMovement(getDeltaMovement());
-            }
-            // check if moved further than the target
-            if (getOwner().position().distanceTo(position()) > hookData.range()) {
-                LOGGER.debug("Moved further than range from owner");
-                setState(State.RETRACTING);
+            if (!level().isClientSide()) {
+                // check if hit anything
+                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length());
+                BlockState hitState = level().getBlockState(hitResult.getBlockPos());
+                if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
+                    LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
+                    setState(State.PULLING);
+                    setDeltaMovement(position().vectorTo(hitResult.getLocation()));
+                    setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
+                }
+                // check if moved further than the target
+                if (getOwner().position().distanceTo(position()) > hookData.range()) {
+                    LOGGER.debug("Moved further than range from owner");
+                    setState(State.RETRACTING);
+                }
             }
         }
     }
@@ -133,9 +142,14 @@ public class HookEntity extends Projectile {
         if (firstTickInState) {
             // stop moving
             setDeltaMovement(Vec3.ZERO);
+            if (level().isClientSide()){
+                // move client pos to hit
+                setDeltaMovement(Vec3.ZERO);
+                getHitPos().map(BlockPos::getCenter).ifPresent(this::setPos);
+            }
         }
         getHitPos().ifPresent(hitPos -> {
-            if (level().getBlockState(hitPos).isAir())
+            if (!level().isClientSide() && level().getBlockState(hitPos).isAir())
                 setState(State.RETRACTING);
         });
     }
@@ -207,11 +221,20 @@ public class HookEntity extends Projectile {
         return State.values()[entityData.get(PREV_STATE)];
     }
     
+    protected void setSharedDeltaV(Vector3f deltaV) {
+        entityData.set(DELTA_MOVEMENT, deltaV);
+    }
+    
+    public Vector3f getSharedDeltaV() {
+        return entityData.get(DELTA_MOVEMENT);
+    }
+    
     @Override
     protected void defineSynchedData() {
         entityData.define(HIT_POS, Optional.empty());
         entityData.define(STATE, State.SHOT.ordinal());
         entityData.define(PREV_STATE, State.SHOT.ordinal());
+        entityData.define(DELTA_MOVEMENT, new Vector3f(0, 0, 0));
     }
 
     @Override

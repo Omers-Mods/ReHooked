@@ -10,10 +10,13 @@ import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
 import com.oe.rehooked.utils.CurioUtils;
+import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
@@ -139,8 +142,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 float vPT = hookData.pullSpeed() / 20f;
                 int count = 0;
                 double x = 0, y = 0, z = 0;
-                double range = hookData.range();
-                Vec3 adjustedOwnerPosition = owner.getEyePosition().subtract(0, 0.25, 0);
+                Vec3 adjustedOwnerPosition = owner.position().add(0, owner.getEyeHeight() / 1.5, 0);
                 for (HookEntity hookEntity : hooks) {
                     if (hookEntity.getState().equals(HookEntity.State.PULLING)) {
                         count++;
@@ -155,8 +157,20 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 }
                 if (count == 0) return;
                 owner.setNoGravity(true);
-                owner.resetFallDistance();
                 owner.setOnGround(true);
+                // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
+                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(1, 0, 0), x);
+                if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
+                    x = hitResult.getLocation().distanceTo(adjustedOwnerPosition);
+                }
+                hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 1, 0), y);
+                if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
+                    y = hitResult.getLocation().distanceTo(adjustedOwnerPosition);
+                }
+                hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 0, 1), z);
+                if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
+                    z = hitResult.getLocation().distanceTo(adjustedOwnerPosition);
+                }
                 moveVector = new Vec3(x, y, z);
             });
         });

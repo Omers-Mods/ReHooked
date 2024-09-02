@@ -48,7 +48,7 @@ public class ClientForgeEvents {
         }
         handler.setOwner(player).update();
         if (handler.shouldMoveThisTick()) {
-            player.setDeltaMovement(handler.getDeltaVThisTick());
+            player.setDeltaMovement(player.getDeltaMovement().scale(0.1).add(handler.getDeltaVThisTick()));
         }
     }
 }
