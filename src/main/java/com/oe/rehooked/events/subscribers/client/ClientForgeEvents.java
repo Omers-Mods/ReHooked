@@ -3,11 +3,11 @@ package com.oe.rehooked.events.subscribers.client;
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.client.KeyBindings;
+import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
-import com.oe.rehooked.network.handlers.PacketHandler;
-import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import com.oe.rehooked.utils.CurioUtils;
+import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -36,12 +36,17 @@ public class ClientForgeEvents {
             return;
         }
         IClientPlayerHookHandler handler = optHandler.get();
-        if (KeyBindings.FIRE_HOOK_KEY.consumeClick() && ticksSinceShot > 5) {
-            ticksSinceShot = 0;
-            CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
-                Entity camera = Minecraft.getInstance().getCameraEntity();
-                handler.shootFromRotation(camera.getXRot(), camera.getYRot());
-            });
+        if (KeyBindings.FIRE_HOOK_KEY.consumeClick()) {
+            if (player.isShiftKeyDown()) {
+                Optional<HookEntity> target = VectorHelper.acquireLookTarget(HookEntity.class, player, 0.2);
+                target.ifPresent(handler::removeHook);
+            } else if (ticksSinceShot > 5) {
+                ticksSinceShot = 0;
+                CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
+                    Entity camera = Minecraft.getInstance().getCameraEntity();
+                    handler.shootFromRotation(camera.getXRot(), camera.getYRot());
+                });
+            }
         }
         if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick()) {
             handler.removeAllHooks();
