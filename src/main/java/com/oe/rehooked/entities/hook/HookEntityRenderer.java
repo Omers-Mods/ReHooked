@@ -21,8 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class HookEntityRenderer extends EntityRenderer<HookEntity> {
-    public static final ResourceLocation TEXTURE =
-                new ResourceLocation(ReHookedMod.MOD_ID, "textures/entity/terraria_hook/terraria_hook.png");
     protected EntityModel<HookEntity> model;
     protected EntityRendererProvider.Context pContext;
     protected float lastDelta;
