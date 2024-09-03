@@ -88,8 +88,9 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
             pPoseStack.translate(0, 1, 0);
         }
         float delta = distance - (int) distance;
-        if (lastDelta - delta > 0.5f || lastDelta == 0) lastDelta = delta;
-        delta = Mth.lerp(pPartialTick, lastDelta, delta);
+        if (lastDelta == 0) lastDelta = delta;
+        if (Math.abs(delta - lastDelta) < 0.3f) delta = lastDelta;
+        ReHookedMod.LOGGER.debug("Renderer delta: last {}, current {}", lastDelta, delta);
         pPoseStack.scale(1, delta, 1);
         lastDelta = delta;
         pContext.getBlockRenderDispatcher().renderSingleBlock(chain, pPoseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY);
