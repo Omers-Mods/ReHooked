@@ -85,9 +85,12 @@ public class HookEntity extends Projectile {
             case PULLING -> tickPulling();
             case RETRACTING -> tickRetracting();
         }
+        
         // update position
-        Vec3 dV = getDeltaMovement();
-        setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
+        if (getPrevState().equals(State.SHOT) || getPrevState().equals(State.RETRACTING)) {
+            Vec3 dV = getDeltaMovement();
+            setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
+        }
         // keep track of how many ticks in current state (also update prev state)
         trackTicksInState();
 
@@ -145,7 +148,7 @@ public class HookEntity extends Projectile {
                     setDeltaMovement(position().vectorTo(hitResult.getLocation()));
                     if (!level().isClientSide()) {
                         setState(State.PULLING);
-                        setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
+                        setHitPos(hitResult.getBlockPos());
                     }
                 }
             }
@@ -165,7 +168,7 @@ public class HookEntity extends Projectile {
             }
         }
         getHitPos().ifPresent(hitPos -> {
-            if (!level().isClientSide() && level().getBlockState(hitPos).isAir())
+            if (level().getBlockState(hitPos).isAir())
                 setState(State.RETRACTING);
         });
     }
@@ -176,10 +179,10 @@ public class HookEntity extends Projectile {
             Vec3 vectorToPlayer = position().vectorTo(owner.getEyePosition());
             // set the delta movement according to speed and distance from player
             getHookType().flatMap(HookRegistry::getHookData).map(HookData::speed).ifPresent(speed -> {
-                if (vectorToPlayer.length() > speed / 20f) {
-                    setDeltaMovement(vectorToPlayer.normalize().scale(speed / 20f));
+                if (vectorToPlayer.length() > speed / 10f) {
+                    setDeltaMovement(vectorToPlayer.normalize().scale(speed / 10f).add(owner.getDeltaMovement()));
                 } else {
-                    setDeltaMovement(vectorToPlayer);
+                    setDeltaMovement(vectorToPlayer.add(owner.getDeltaMovement()));
                 }
             });
             if (firstTickInState) {
@@ -188,8 +191,8 @@ public class HookEntity extends Projectile {
                     IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
                 }
             }
-            if (vectorToPlayer.length() < 1) discard();
-        } else {
+            if (vectorToPlayer.length() < 5) discard();
+        } else if (!level().isClientSide()){
             // if owner not found discard
             discard();
         }

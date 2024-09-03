@@ -60,8 +60,8 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
             pEntity.getHitPos()
                     .ifPresent(blockPos -> pEntity.lookAt(EntityAnchorArgument.Anchor.EYES, blockPos.getCenter()));
         }
-//        pPoseStack.mulPose(Axis.YP.rotationDegrees(pEntity.getYRot()));
-//        pPoseStack.mulPose(Axis.ZP.rotationDegrees(pEntity.getXRot() + 90f));
+        pPoseStack.mulPose(Axis.YP.rotationDegrees(90f - pEntity.getYRot()));
+        pPoseStack.mulPose(Axis.ZP.rotationDegrees(90f - pEntity.getXRot()));
         pPoseStack.scale(0.4f, 0.4f, 0.4f);
         pPoseStack.translate(0, -1, 0);
         this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(model.renderType(getTextureLocation(pEntity))), pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);

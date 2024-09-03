@@ -79,12 +79,10 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         LOGGER.debug("Removing all hooks {}", hooks.size());
         // this is a response to a key press from the player
         // notify the server
-//        getOwner().ifPresent(owner -> 
-//                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS)));
-        getOwner().ifPresent(owner -> hooks.forEach(hookEntity -> 
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()))));
+        getOwner().ifPresent(owner -> 
+                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS)));
         // clear hooks
-//        hooks.clear();
+        hooks.clear();
     }
 
     @Override
