@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
 
 public class CPlayerHookHandler implements IClientPlayerHookHandler {
     private static final Logger LOGGER = LogUtils.getLogger();

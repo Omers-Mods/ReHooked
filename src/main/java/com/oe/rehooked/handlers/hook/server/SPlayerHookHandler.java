@@ -12,7 +12,6 @@ import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
@@ -21,7 +20,6 @@ import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
