@@ -28,6 +28,7 @@ public class ClientForgeEvents {
     
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase.equals(TickEvent.Phase.END)) return;
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
         ticksSinceShot++;

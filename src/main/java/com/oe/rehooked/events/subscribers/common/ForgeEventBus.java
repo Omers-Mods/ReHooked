@@ -45,6 +45,7 @@ public class ForgeEventBus {
     
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase.equals(TickEvent.Phase.END)) return;
         event.getServer().getPlayerList().getPlayers().forEach(player -> 
                 IServerPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
                     handler.setOwner(player).update();
