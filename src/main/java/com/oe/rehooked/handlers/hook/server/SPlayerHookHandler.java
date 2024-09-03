@@ -1,25 +1,18 @@
 package com.oe.rehooked.handlers.hook.server;
 
 import com.mojang.logging.LogUtils;
-import com.oe.rehooked.data.HookData;
-import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
-import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
-import com.oe.rehooked.utils.CurioUtils;
-import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +30,8 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         hooks = new ArrayList<>();
         owner = Optional.empty();
         moveVector = null;
+        hookFlightActive = false;
+        externalFlight = false;
     }
 
     @Override
@@ -143,49 +138,33 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     @Override
     public void update() {
         moveVector = null;
+        updateCreativeFlight();
         getOwner().ifPresent(owner -> {
             owner.setNoGravity(false);
+            owner.getAbilities().flying = false;
             getHookData().ifPresent(hookData -> {
-                float vPT = hookData.pullSpeed() / 20f;
-                int count = 0;
-                double x = 0, y = 0, z = 0;
-                Vec3 adjustedOwnerPosition = owner.position().add(0, owner.getEyeHeight() / 1.5, 0);
-                for (HookEntity hookEntity : hooks) {
-                    if (hookEntity.getState().equals(HookEntity.State.PULLING)) {
-                        count++;
-                        Vec3 center = hookEntity.getHitPos().get().getCenter();
-                        x += center.x;
-                        y += center.y;
-                        z += center.z;
-                    }
-                }
-                if (count == 0) return;
-                x = (x / (double) count) - owner.getX();
-                y = (y / (double) count) - owner.getY();
-                z = (z / (double) count) - owner.getZ();
-                owner.setNoGravity(true);
+                if (countPulling() == 0) return;
                 owner.resetFallDistance();
                 owner.setOnGround(true);
-                // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
-                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(1, 0, 0), x);
-                if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
-                    x = hitResult.getLocation().distanceTo(adjustedOwnerPosition) * Math.signum(x);
-                    if (Math.abs(x) <= 1) x = 0;
+                
+                float vPT = hookData.pullSpeed() / 20f;
+                Vec3 ownerWaistPos = getOwnerWaist().get();
+                if (hookData.isCreative()) {
+                    owner.getAbilities().flying = true;
                 }
-                hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 1, 0), y);
-                if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
-                    y = hitResult.getLocation().distanceTo(adjustedOwnerPosition) * Math.signum(y);
-                    if (Math.abs(y) <= 1.5) y = 0;
+                else {
+                    owner.setNoGravity(true);
+                    Vec3 pullCenter = getPullCenter();
+                    double x = pullCenter.x - ownerWaistPos.x;
+                    double y = pullCenter.y - ownerWaistPos.y;
+                    double z = pullCenter.z - ownerWaistPos.z;
+                    // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
+                    moveVector = reduceCollisions(x, y, z);
+                    if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
+                    if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
                 }
-                hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 0, 1), z);
-                if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
-                    z = hitResult.getLocation().distanceTo(adjustedOwnerPosition) * Math.signum(z);
-                    if (Math.abs(z) <= 1) z = 0;
-                }
-                moveVector = new Vec3(x, y, z);
-                if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
-                if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
+            owner.onUpdateAbilities();
         });
     }
 
@@ -197,5 +176,10 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     @Override
     public Vec3 getDeltaVThisTick() {
         return moveVector;
+    }
+
+    @Override
+    public Collection<HookEntity> getHooks() {
+        return hooks;
     }
 }
