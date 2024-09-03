@@ -55,8 +55,7 @@ public class ClientForgeEvents {
         handler.setOwner(player).update();
         if (handler.shouldMoveThisTick()) {
             Vec3 deltaVThisTick = handler.getDeltaVThisTick();
-            player.setDeltaMovement(player.getDeltaMovement().scale(0.1).add(deltaVThisTick));
-            LOGGER.debug("Player should move by {} ({})", deltaVThisTick, deltaVThisTick.length());
+            player.setDeltaMovement(deltaVThisTick);
         }
     }
 }
