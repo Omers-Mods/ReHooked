@@ -77,12 +77,14 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     public void removeAllHooks() {
         if (hooks.isEmpty()) return;
         LOGGER.debug("Removing all hooks {}", hooks.size());
-        // this is a response to a request from the player
+        // this is a response to a key press from the player
         // notify the server
-        getOwner().ifPresent(owner -> 
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS)));
+//        getOwner().ifPresent(owner -> 
+//                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS)));
+        getOwner().ifPresent(owner -> hooks.forEach(hookEntity -> 
+                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()))));
         // clear hooks
-        hooks.clear();
+//        hooks.clear();
     }
 
     @Override
@@ -124,11 +126,14 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                 Vec3 adjustedOwnerPosition = owner.position().add(0, owner.getEyeHeight() / 1.5, 0);
                 for (HookEntity hookEntity : hooks) {
                     if (hookEntity.getState().equals(HookEntity.State.PULLING)) {
-                        count++;
-                        Vec3 center = hookEntity.getHitPos().get().getCenter();
-                        x += center.x;
-                        y += center.y;
-                        z += center.z;
+                        if (hookEntity.getHitPos().isPresent()) {
+                            hookEntity.setPos(hookEntity.getHitPos().get().getCenter());
+                            count++;
+                            Vec3 center = hookEntity.getHitPos().get().getCenter();
+                            x += center.x;
+                            y += center.y;
+                            z += center.z;
+                        }
                     }
                 }
                 if (count == 0) return;
@@ -136,6 +141,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                 y = (y / (double) count) - owner.getY();
                 z = (z / (double) count) - owner.getZ();
                 owner.setNoGravity(true);
+                owner.resetFallDistance();
                 owner.setOnGround(true);
                 // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
                 BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(1, 0, 0), x);

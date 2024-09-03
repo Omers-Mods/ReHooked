@@ -66,7 +66,7 @@ public class HookEntity extends Projectile {
         super(ReHookedEntities.HOOK_PROJECTILE.get(), player.level());
         setNoGravity(true);
         setOwner(player);
-        Vec3 adjusted = new Vec3(player.getX(), player.getY() + player.getEyeHeight() / 1.5, player.getZ());
+        Vec3 adjusted = new Vec3(player.getX(), player.getY() + player.getEyeHeight() - 0.1, player.getZ());
         setPos(adjusted);
     }
     
@@ -93,7 +93,7 @@ public class HookEntity extends Projectile {
 
         // create offset on first tick
         if (offset == null && getOwner() instanceof Player owner) {
-            offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() / 1.5, 0)).normalize();
+            offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() - 0.1, 0)).normalize();
         }
         
         // run the super class tick method
@@ -123,25 +123,31 @@ public class HookEntity extends Projectile {
         if (optHookData.isPresent()) {
             HookData hookData = optHookData.get();
             // check if needs to destroy instant hook
-            if (!firstTickInState && hookData.speed() == Float.MAX_VALUE) {
+            if (!level().isClientSide() && !firstTickInState && hookData.speed() == Float.MAX_VALUE) {
+                LOGGER.debug("Retracting instant hook on second shot tick");
                 setState(State.RETRACTING);
                 setDeltaMovement(Vec3.ZERO);
                 return;
             }
-            // check if hit anything
-            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length() + 2.5);
-            BlockState hitState = level().getBlockState(hitResult.getBlockPos());
-            if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
-                LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
-                setState(State.PULLING);
-                setDeltaMovement(position().vectorTo(hitResult.getLocation()));
-                setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
-            }
             // check if moved further than the target
-            if (getOwner() instanceof Player owner && 
-                    owner.position().add(0, owner.getEyeHeight() / 1.5, 0).distanceTo(position()) > hookData.range()) {
+            if (!level().isClientSide() &&
+                    getOwner() instanceof Player owner &&
+                    owner.position().add(0, owner.getEyeHeight() - 0.1, 0).distanceTo(position()) > hookData.range()) {
                 LOGGER.debug("Moved further than range from owner");
                 setState(State.RETRACTING);
+            }
+            else {
+                // check if hit anything
+                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length() + 2.5);
+                BlockState hitState = level().getBlockState(hitResult.getBlockPos());
+                if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
+                    LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
+                    setDeltaMovement(position().vectorTo(hitResult.getLocation()));
+                    if (!level().isClientSide()) {
+                        setState(State.PULLING);
+                        setHitPos(BlockPos.containing(position().add(getDeltaMovement())));
+                    }
+                }
             }
         }
     }

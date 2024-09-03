@@ -80,7 +80,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void removeHook(HookEntity hookEntity) {
-        LOGGER.debug("Removing hook by entity with id: {}", hookEntity);
+        LOGGER.debug("Removing hook by entity with id: {}", hookEntity.getId());
         // this is a response to a request from the hook
         if (hooks.remove(hookEntity)) {
             hookEntity.setState(HookEntity.State.RETRACTING);
@@ -161,6 +161,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 y = (y / (double) count) - owner.getY();
                 z = (z / (double) count) - owner.getZ();
                 owner.setNoGravity(true);
+                owner.resetFallDistance();
                 owner.setOnGround(true);
                 // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
                 BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(1, 0, 0), x);
