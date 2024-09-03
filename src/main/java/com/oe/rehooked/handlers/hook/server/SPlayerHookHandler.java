@@ -28,7 +28,10 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     
     private final List<HookEntity> hooks;
     private Optional<Player> owner;
+    
     private Vec3 moveVector;
+    private boolean hookFlightActive;
+    private boolean externalFlight;
     
     public SPlayerHookHandler() {
         hooks = new ArrayList<>();
@@ -125,14 +128,16 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         return owner;
     }
 
-    @Override
-    public Optional<HookData> getHookData() {
-        return getOwner()
-                .flatMap(owner -> CurioUtils.GetCuriosOfType(HookItem.class, owner))
-                .flatMap(CurioUtils::GetIfUnique)
-                .map(ItemStack::getItem)
-                .map(item -> ((HookItem) item).getHookType())
-                .flatMap(HookRegistry::getHookData);
+    private void updateCreativeFlight() {
+        getOwner().ifPresent(owner -> getHookData().ifPresent(hookData -> {
+            if (!hookFlightActive) externalFlight = owner.getAbilities().mayfly || owner.getAbilities().flying;
+            else if (!owner.getAbilities().mayfly && !owner.getAbilities().flying) externalFlight = false;
+            hookFlightActive = hookData.isCreative();
+            boolean old = owner.getAbilities().mayfly;
+            owner.getAbilities().mayfly = externalFlight || hookFlightActive;
+            if (!externalFlight && !hookFlightActive) owner.getAbilities().flying = false;
+            if (old != owner.getAbilities().mayfly) owner.onUpdateAbilities();
+        }));
     }
 
     @Override
