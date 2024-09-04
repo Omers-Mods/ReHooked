@@ -3,6 +3,7 @@ package com.oe.rehooked.events.subscribers.client;
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.client.KeyBindings;
+import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
@@ -50,7 +51,7 @@ public class ClientForgeEvents {
                 });
             }
         }
-        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick()) {
+        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(false)) {
             handler.removeAllHooks();
         }
         handler.setOwner(player).update();
