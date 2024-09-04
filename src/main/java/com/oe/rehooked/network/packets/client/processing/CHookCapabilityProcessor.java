@@ -2,6 +2,7 @@ package com.oe.rehooked.network.packets.client.processing;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
+import com.oe.rehooked.network.handlers.IHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -13,7 +14,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class CHookCapabilityProcessor {
+public class CHookCapabilityProcessor implements IHandler {
     public static final Logger LOGGER = LogUtils.getLogger();
     
     public static void handle(CHookCapabilityPacket packet, Supplier<NetworkEvent.Context> context) {
