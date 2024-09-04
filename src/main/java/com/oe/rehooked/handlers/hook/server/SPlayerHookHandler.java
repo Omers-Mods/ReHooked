@@ -6,6 +6,7 @@ import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
+import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -127,7 +128,11 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         getOwner().ifPresent(owner -> getHookData().ifPresent(hookData -> {
             if (!hookFlightActive) externalFlight = owner.getAbilities().mayfly || owner.getAbilities().flying;
             else if (!owner.getAbilities().mayfly && !owner.getAbilities().flying) externalFlight = false;
-            hookFlightActive = hookData.isCreative();
+            if (owner.isCreative()) externalFlight = true;
+            Vec3 ownerWaistPos = getOwnerWaist().get();
+            VectorHelper.Box box = getBox();
+            hookFlightActive = hookData.isCreative() && countPulling() > 0 && 
+                    (box.isInside(ownerWaistPos) || box.closestPointInCube(ownerWaistPos).distanceTo(ownerWaistPos) < 5);
             boolean old = owner.getAbilities().mayfly;
             owner.getAbilities().mayfly = externalFlight || hookFlightActive;
             if (!externalFlight && !hookFlightActive) owner.getAbilities().flying = false;
@@ -141,7 +146,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         updateCreativeFlight();
         getOwner().ifPresent(owner -> {
             owner.setNoGravity(false);
-            owner.getAbilities().flying = false;
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
@@ -149,10 +153,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 
                 float vPT = hookData.pullSpeed() / 20f;
                 Vec3 ownerWaistPos = getOwnerWaist().get();
-                if (hookData.isCreative()) {
-                    owner.getAbilities().flying = true;
-                }
-                else {
+                if (!hookData.isCreative()) {
                     owner.setNoGravity(true);
                     Vec3 pullCenter = getPullCenter();
                     double x = pullCenter.x - ownerWaistPos.x;

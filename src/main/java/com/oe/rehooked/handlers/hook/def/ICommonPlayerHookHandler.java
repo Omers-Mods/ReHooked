@@ -57,6 +57,12 @@ public interface ICommonPlayerHookHandler {
         }
         return new Vec3(x / pulling, y / pulling, z / pulling);
     }
+    default VectorHelper.Box getBox() {
+        VectorHelper.Box box = new VectorHelper.Box();
+        for (HookEntity hookEntity : getHooks()) 
+            hookEntity.getHitPos().ifPresent(pos -> box.reassignPoints(pos.getCenter()));
+        return box;
+    }
     default Optional<Vec3> getOwnerWaist() {
         return getOwner().map(owner -> owner.position().add(0, owner.getEyeHeight() / 1.5, 0));
     }

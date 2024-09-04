@@ -1,6 +1,7 @@
 package com.oe.rehooked.utils;
 
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -53,5 +54,53 @@ public class VectorHelper {
         }
         
         return Optional.empty();
+    }
+    
+    public static class Box {
+        public double lX;
+        public double lY;
+        public double lZ;
+        public double hX;
+        public double hY;
+        public double hZ;
+        
+        public Box() {
+            lX = Double.POSITIVE_INFINITY;
+            hX = Double.NEGATIVE_INFINITY;
+            lY = Double.POSITIVE_INFINITY;
+            hY = Double.NEGATIVE_INFINITY;
+            lZ = Double.POSITIVE_INFINITY;
+            hZ = Double.NEGATIVE_INFINITY;
+        }
+        
+        public void reassignPoints(Vec3... points) {
+            for (Vec3 point : points) {
+                if (lX > point.x) lX = point.x;
+                if (hX < point.x) hX = point.x;
+                if (lY > point.y) lY = point.y;
+                if (hY < point.y) hY = point.y;
+                if (lZ > point.z) lZ = point.z;
+                if (hZ < point.z) hZ = point.z;
+            }
+        }
+        
+        public boolean isInside(Vec3 pos) {
+            if (pos.x < lX || pos.x > hX) return false;
+            if (pos.y < lY || pos.y > hY) return false;
+            if (pos.z < lZ || pos.z > hZ) return false;
+            return true;
+        }
+        
+        public Vec3 closestPointInCube(Vec3 pos) {
+            double x = Mth.clamp(pos.x, lX, hX);
+            double y = Mth.clamp(pos.y, lY, hX);
+            double z = Mth.clamp(pos.z, lZ, hZ);
+            return new Vec3(x, y, z);
+        }
+
+        @Override
+        public String toString() {
+            return "low: (" + lX + ", " + lY + ", " + lZ + "), high: (" + hX + ", " + hY + ", " + hZ + ")";
+        }
     }
 }

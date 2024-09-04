@@ -6,6 +6,7 @@ import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
+import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -105,11 +106,19 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         getOwner().ifPresent(owner -> {
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
+                owner.setOnGround(true);
                 
-                float vPT = hookData.pullSpeed() / 20f;
                 Vec3 ownerWaistPos = getOwnerWaist().get();
+                float vPT = hookData.pullSpeed() / 20f;
                 if (hookData.isCreative()) {
-                    owner.getAbilities().flying = true;
+                    // if player going out of the box put him back in
+                    VectorHelper.Box box = getBox();
+                    LOGGER.debug("Box {}", box);
+                    if (!box.isInside(ownerWaistPos)) {
+                        moveVector = ownerWaistPos.vectorTo(box.closestPointInCube(ownerWaistPos));
+                    }
+                    else 
+                        return;
                 }
                 else {
                     owner.setNoGravity(true);
@@ -117,11 +126,12 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                     double x = pullCenter.x - ownerWaistPos.x;
                     double y = pullCenter.y - ownerWaistPos.y;
                     double z = pullCenter.z - ownerWaistPos.z;
-                    // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
-                    moveVector = reduceCollisions(x, y, z);
-                    if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
-                    if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
+                    moveVector = new Vec3(x, y, z);
                 }
+                // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
+                moveVector = reduceCollisions(moveVector);
+                if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
+                if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
             owner.onUpdateAbilities();
         });
