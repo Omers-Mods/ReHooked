@@ -133,9 +133,8 @@ public class HookEntity extends Projectile {
                 return;
             }
             // check if moved further than the target
-            if (!level().isClientSide() &&
-                    getOwner() instanceof Player owner &&
-                    owner.position().add(0, owner.getEyeHeight() - 0.1, 0).distanceTo(position()) > hookData.range()) {
+            if (getOwner() instanceof Player owner &&
+                    owner.position().add(0, owner.getEyeHeight() / 1.5, 0).distanceTo(position()) > hookData.range()) {
                 LOGGER.debug("Moved further than range from owner");
                 setState(State.RETRACTING);
             }
