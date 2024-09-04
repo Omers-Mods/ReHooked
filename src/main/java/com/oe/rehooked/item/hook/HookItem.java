@@ -1,7 +1,11 @@
 package com.oe.rehooked.item.hook;
 
+import com.oe.rehooked.client.KeyBindings;
+import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.utils.HandlerHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -33,8 +37,20 @@ public class HookItem extends Item implements ICurioItem {
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         if (!(pStack.getItem() instanceof HookItem)) return;
-        pTooltipComponents.add(Component.translatable("tooltip.rehooked:" + ((HookItem) pStack.getItem())
-                .hookType + "_hook.info"));
+        pTooltipComponents.add(Component.translatable("tooltip.rehooked:" + hookType + "_hook.info"));
+        if (Screen.hasShiftDown()) {
+            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_fire", KeyBindings.FIRE_HOOK_KEY.getKey().getDisplayName()));
+            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract", KeyBindings.FIRE_HOOK_KEY.getKey().getDisplayName()));
+            HookRegistry.getHookData(hookType).ifPresent(hookData -> {
+                if (!hookData.isCreative()) {
+                    pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract_all", KeyBindings.REMOVE_ALL_HOOKS_KEY.getKey().getDisplayName()));
+                }
+            });
+        }
+        else {
+            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_shift_more_info")
+                    .withStyle(ChatFormatting.GRAY));
+        }
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 

@@ -12,6 +12,10 @@
   "tooltip.rehooked:diamond_hook.info": "Plenty of hooks, plenty of speed.",
   "tooltip.rehooked:red_hook.info": "Creative flight within the volume defined by the hooks",
   "tooltip.rehooked:ender_hook.info": "Fast. Very, very fast.",
+  "tooltip.rehooked.press_shift_more_info": "<Press Shift to see controls>",
+  "tooltip.rehooked.press_fire": "Press %1$s to fire",
+  "tooltip.rehooked.press_retract": "Press Shift and %1$s while looking at a hook to retract it",
+  "tooltip.rehooked.press_retract_all": "Press %1$s to retract all hooks",
   
   "curios.identifier.hook": "Hook",
   
