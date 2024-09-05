@@ -109,6 +109,13 @@ public class HookEntity extends Projectile {
                 setPos(getOwner().position());
         }
         
+        // block collision detection while pulling to prevent rendering as black blob
+        if (getState().equals(State.PULLING)) {
+            if (isInWall()) {
+                setPos(position().add(position().vectorTo(getOwner().position()).normalize().scale(0.1)));
+            }
+        }
+        
         // keep track of how many ticks in current state (also update prev state)
         trackTicksInState();
 
