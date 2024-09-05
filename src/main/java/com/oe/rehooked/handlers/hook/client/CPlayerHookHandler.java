@@ -8,6 +8,7 @@ import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -107,6 +108,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.setOnGround(true);
+                if (owner.getPose().equals(Pose.CROUCHING)) owner.setPose(Pose.STANDING);
                 
                 Vec3 ownerWaistPos = getOwnerWaist().get();
                 float vPT = hookData.pullSpeed() / 20f;
