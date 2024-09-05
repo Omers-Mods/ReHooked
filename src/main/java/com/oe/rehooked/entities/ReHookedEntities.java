@@ -16,11 +16,9 @@ public class ReHookedEntities {
     
     public static final RegistryObject<EntityType<HookEntity>> HOOK_PROJECTILE =
             ENTITY_TYPES.register("hook_projectile", () -> EntityType.Builder.<HookEntity>of(HookEntity::new, MobCategory.MISC)
-                    .sized(0.3f, 0.3f)
-                    .clientTrackingRange(20)
-                    .setTrackingRange(20)
+                    .sized(0.5f, 0.5f)
+                    .clientTrackingRange(12)
                     .updateInterval(Integer.MAX_VALUE)
-                    .setShouldReceiveVelocityUpdates(true)
                     .noSave()
                     .build("hook_projectile")
             );

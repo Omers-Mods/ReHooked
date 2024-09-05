@@ -34,7 +34,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
 
     @Override
     public boolean shouldRender(HookEntity pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
-        return true;
+        return super.shouldRender(pLivingEntity, pCamera, pCamX, pCamY, pCamZ);
     }
 
     @Override

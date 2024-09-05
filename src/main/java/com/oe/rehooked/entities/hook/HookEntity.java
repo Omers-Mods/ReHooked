@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
+import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
@@ -66,11 +67,20 @@ public class HookEntity extends Projectile {
     public HookEntity(Player player) {
         super(ReHookedEntities.HOOK_PROJECTILE.get(), player.level());
         setNoGravity(true);
+        noCulling = true;
         setOwner(player);
         Vec3 adjusted = new Vec3(player.getX(), player.getY() + player.getEyeHeight() - 0.1, player.getZ());
         setPos(adjusted);
     }
-    
+
+    @Override
+    public boolean shouldRender(double pX, double pY, double pZ) {
+        if (getOwner() instanceof Player owner)
+            return getOwner().shouldRender(pX, pY, pZ) && 
+                    owner.position().add(0, owner.getEyeHeight() / 1.5, 0).distanceTo(position()) > 0.3;
+        return false;
+    }
+
     @Override
     public void tick() {
         if (!getState().equals(State.RETRACTING) && !(getOwner() instanceof Player)) {
@@ -88,10 +98,17 @@ public class HookEntity extends Projectile {
         }
         
         // update position
-        if (getPrevState().equals(State.SHOT) || getPrevState().equals(State.RETRACTING)) {
-            Vec3 dV = getDeltaMovement();
+        Vec3 dV = getDeltaMovement();
+        if (getPrevState().equals(State.SHOT)) {
             setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
         }
+        else if (getPrevState().equals(State.RETRACTING)) {
+            if (level().isClientSide())
+                setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
+            else
+                setPos(getOwner().position());
+        }
+        
         // keep track of how many ticks in current state (also update prev state)
         trackTicksInState();
 
@@ -178,23 +195,33 @@ public class HookEntity extends Projectile {
     
     protected void tickRetracting() {
         if (getOwner() instanceof Player owner) {
-            // vector to the owner
-            Vec3 vectorToPlayer = position().vectorTo(owner.getEyePosition());
-            // set the delta movement according to speed and distance from player
-            getHookType().flatMap(HookRegistry::getHookData).map(HookData::speed).ifPresent(speed -> {
-                if (vectorToPlayer.length() > speed / 10f) {
-                    setDeltaMovement(vectorToPlayer.normalize().scale(speed / 10f).add(owner.getDeltaMovement()));
-                } else {
-                    setDeltaMovement(vectorToPlayer.add(owner.getDeltaMovement()));
+            if (level().isClientSide()) {
+                // vector to the owner
+                Vec3 vectorToPlayer = position().vectorTo(owner.getEyePosition());
+                if (vectorToPlayer.length() < 5) {
+                    IClientPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
+                        handler.removeHook(this);
+                        this.discard();
+                    });
                 }
-            });
-            if (firstTickInState) {
-                // send update to handler
-                if (!level().isClientSide()) {
+                // set the delta movement according to speed and distance from player
+                getHookType().flatMap(HookRegistry::getHookData).ifPresent(hookData -> {
+                    float speedModifier = hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed();
+                    if (vectorToPlayer.length() > speedModifier / 10f) {
+                        setDeltaMovement(vectorToPlayer.normalize().scale(speedModifier / 10f).add(owner.getDeltaMovement()));
+                    } else {
+                        setDeltaMovement(vectorToPlayer);
+                    }
+                });
+            }
+            // send update to handler
+            if (!level().isClientSide()) {
+                if (firstTickInState) {
                     IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
+                } else if (ticksInState > 40) {
+                    discard();
                 }
             }
-            if (vectorToPlayer.length() < 5) discard();
         } else if (!level().isClientSide()){
             // if owner not found discard
             discard();
