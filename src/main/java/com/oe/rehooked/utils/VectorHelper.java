@@ -93,7 +93,7 @@ public class VectorHelper {
         
         public Vec3 closestPointInCube(Vec3 pos) {
             double x = Mth.clamp(pos.x, lX, hX);
-            double y = Mth.clamp(pos.y, lY, hX);
+            double y = Mth.clamp(pos.y, lY, hY);
             double z = Mth.clamp(pos.z, lZ, hZ);
             return new Vec3(x, y, z);
         }
