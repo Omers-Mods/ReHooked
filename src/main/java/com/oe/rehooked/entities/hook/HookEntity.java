@@ -15,6 +15,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -117,7 +118,10 @@ public class HookEntity extends Projectile {
     @Override
     public void shootFromRotation(Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
         LOGGER.debug("Shooting!");
-        super.shootFromRotation(pShooter, pX, pY, pZ, pVelocity, pInaccuracy);
+        float f = -Mth.sin(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
+        float f1 = -Mth.sin((pX + pZ) * ((float)Math.PI / 180F));
+        float f2 = Mth.cos(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
+        this.shoot(f, f1, f2, pVelocity, pInaccuracy);
     }
 
     protected void tickShot() {
