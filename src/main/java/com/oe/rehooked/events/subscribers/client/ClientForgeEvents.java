@@ -70,7 +70,8 @@ public class ClientForgeEvents {
         if (player != null) {
             IClientPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
                 if (handler.countPulling() > 0) {
-                    player.input.shiftKeyDown = false;
+                    if (!player.getAbilities().mayfly)
+                        player.input.shiftKeyDown = false;
                 }
             });
         }
