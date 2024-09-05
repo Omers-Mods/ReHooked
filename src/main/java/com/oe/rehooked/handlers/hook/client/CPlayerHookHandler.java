@@ -107,7 +107,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         getOwner().ifPresent(owner -> {
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
-                owner.setOnGround(true);
                 if (owner.getPose().equals(Pose.CROUCHING)) owner.setPose(Pose.STANDING);
                 
                 Vec3 ownerWaistPos = getOwnerWaist().get();

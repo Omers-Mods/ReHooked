@@ -150,7 +150,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
-                owner.setOnGround(true);
                 if (owner.getPose().equals(Pose.CROUCHING)) owner.setPose(Pose.STANDING);
                 
                 float vPT = hookData.pullSpeed() / 20f;
