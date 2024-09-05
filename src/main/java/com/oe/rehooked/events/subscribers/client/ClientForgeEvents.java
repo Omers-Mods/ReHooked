@@ -10,10 +10,13 @@ import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -40,7 +43,7 @@ public class ClientForgeEvents {
         }
         IClientPlayerHookHandler handler = optHandler.get();
         if (KeyBindings.FIRE_HOOK_KEY.consumeClick()) {
-            if (player.isShiftKeyDown()) {
+            if (Screen.hasShiftDown()) {
                 Optional<HookEntity> target = VectorHelper.acquireLookTarget(HookEntity.class, player, 0.5);
                 target.ifPresent(handler::removeHook);
             } else if (ticksSinceShot > 5) {
@@ -58,6 +61,18 @@ public class ClientForgeEvents {
         if (handler.shouldMoveThisTick()) {
             Vec3 deltaVThisTick = handler.getDeltaVThisTick();
             player.setDeltaMovement(deltaVThisTick);
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onInputUpdate(MovementInputUpdateEvent event) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null) {
+            IClientPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
+                if (handler.countPulling() > 0) {
+                    player.input.shiftKeyDown = false;
+                }
+            });
         }
     }
 }
