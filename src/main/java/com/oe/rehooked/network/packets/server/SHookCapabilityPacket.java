@@ -75,6 +75,7 @@ public class SHookCapabilityPacket {
         SHOOT,
         RETRACT_HOOK,
         RETRACT_ALL_HOOKS,
+        JUMP,
         FORCE_UPDATE;
         
         public static State Get(int ordinal) {
