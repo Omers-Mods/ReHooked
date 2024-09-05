@@ -41,7 +41,7 @@ public class ClientForgeEvents {
         IClientPlayerHookHandler handler = optHandler.get();
         if (KeyBindings.FIRE_HOOK_KEY.consumeClick()) {
             if (player.isShiftKeyDown()) {
-                Optional<HookEntity> target = VectorHelper.acquireLookTarget(HookEntity.class, player, 0.2);
+                Optional<HookEntity> target = VectorHelper.acquireLookTarget(HookEntity.class, player, 0.5);
                 target.ifPresent(handler::removeHook);
             } else if (ticksSinceShot > 5) {
                 ticksSinceShot = 0;
