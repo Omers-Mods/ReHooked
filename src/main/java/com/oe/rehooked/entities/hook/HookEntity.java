@@ -79,7 +79,7 @@ public class HookEntity extends Projectile {
     public boolean shouldRender(double pX, double pY, double pZ) {
         if (getOwner() instanceof Player owner)
             return getOwner().shouldRender(pX, pY, pZ) && 
-                    owner.position().add(0, owner.getEyeHeight() / 1.5, 0).distanceTo(position()) > 0.3;
+                    PositionHelper.getWaistPosition(owner).distanceTo(position()) > 0.3;
         return false;
     }
 

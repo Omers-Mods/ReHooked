@@ -159,7 +159,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         if (hooks.isEmpty() || getOwner().isEmpty()) return 0;
       
         Player owner = getOwner().get();
-        Vec3 adjustedOwnerPosition = owner.position().add(0, owner.getEyeHeight() / 1.5, 0);
+        Vec3 adjustedOwnerPosition = PositionHelper.getWaistPosition(owner);
 
         double maxDistance = 0;
 
