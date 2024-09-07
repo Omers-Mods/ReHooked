@@ -137,7 +137,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                 // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
                 moveVector = reduceCollisions(moveVector);
                 if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
-                if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
+                if (!hookData.isCreative() && moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
             owner.onUpdateAbilities();
         });
