@@ -2,10 +2,10 @@ package com.oe.rehooked.entities.hook;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -34,7 +34,10 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
 
     @Override
     public boolean shouldRender(HookEntity pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
-        return super.shouldRender(pLivingEntity, pCamera, pCamX, pCamY, pCamZ);
+        boolean superShouldRender = super.shouldRender(pLivingEntity, pCamera, pCamX, pCamY, pCamZ);
+        if (Minecraft.getInstance().player != null && pLivingEntity.getOwner() != null) 
+            superShouldRender |= Minecraft.getInstance().player.getUUID().equals(pLivingEntity.getOwner().getUUID());
+        return superShouldRender;
     }
 
     @Override

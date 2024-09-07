@@ -6,6 +6,7 @@ import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
+import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
@@ -109,7 +110,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                 if (countPulling() == 0) return;
                 owner.setOnGround(false);
                 
-                Vec3 ownerWaistPos = getOwnerWaist().get();
+                Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
                 float vPT = hookData.pullSpeed() / 20f;
                 if (hookData.isCreative()) {
                     // if player going out of the box put him back in
