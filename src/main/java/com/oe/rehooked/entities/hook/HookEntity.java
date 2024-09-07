@@ -8,6 +8,7 @@ import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
+import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -69,8 +70,7 @@ public class HookEntity extends Projectile {
         setNoGravity(true);
         noCulling = true;
         setOwner(player);
-        Vec3 adjusted = new Vec3(player.getX(), player.getY() + player.getEyeHeight() - 0.1, player.getZ());
-        setPos(adjusted);
+        setPos(PositionHelper.getWaistPosition(player));
     }
 
     @Override

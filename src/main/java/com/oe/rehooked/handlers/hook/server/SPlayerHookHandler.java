@@ -6,9 +6,9 @@ import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
+import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -130,7 +130,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             if (!hookFlightActive) externalFlight = owner.getAbilities().mayfly || owner.getAbilities().flying;
             else if (!owner.getAbilities().mayfly && !owner.getAbilities().flying) externalFlight = false;
             if (owner.isCreative()) externalFlight = true;
-            Vec3 ownerWaistPos = getOwnerWaist().get();
+            Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
             VectorHelper.Box box = getBox();
             hookFlightActive = hookData.isCreative() && countPulling() > 0 && 
                     (box.isInside(ownerWaistPos) || box.closestPointInCube(ownerWaistPos).distanceTo(ownerWaistPos) < 5);
@@ -153,7 +153,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 owner.setOnGround(false);
                 
                 float vPT = hookData.pullSpeed() / 20f;
-                Vec3 ownerWaistPos = getOwnerWaist().get();
+                Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
                 if (!hookData.isCreative()) {
                     owner.setNoGravity(true);
                     Vec3 pullCenter = getPullCenter();

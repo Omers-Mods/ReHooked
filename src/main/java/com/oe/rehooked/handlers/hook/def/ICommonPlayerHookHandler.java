@@ -5,6 +5,7 @@ import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
+import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -63,28 +64,25 @@ public interface ICommonPlayerHookHandler {
             hookEntity.getHitPos().ifPresent(pos -> box.reassignPoints(pos.getCenter()));
         return box;
     }
-    default Optional<Vec3> getOwnerWaist() {
-        return getOwner().map(owner -> owner.position().add(0, owner.getEyeHeight() / 1.5, 0));
-    }
     default Vec3 reduceCollisions(Vec3 moveVector) {
         return reduceCollisions(moveVector.x, moveVector.y, moveVector.z);
     }
     default Vec3 reduceCollisions(double dX, double dY, double dZ) {
         return getOwner().map(owner -> {
             double x = dX, y = dY, z = dZ;
-            Vec3 ownerWaistPosition = getOwnerWaist().get();
+            Vec3 ownerWaistPosition = PositionHelper.getWaistPosition(owner);
             // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
-            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(1, 0, 0), x);
+            BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(1, 0, 0), x, PositionHelper::getWaistPosition);
             if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
                 x = hitResult.getLocation().distanceTo(ownerWaistPosition) * Math.signum(x);
                 if (Math.abs(x) <= 1) x = 0;
             }
-            hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 1, 0), y);
+            hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 1, 0), y, PositionHelper::getWaistPosition);
             if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
                 y = hitResult.getLocation().distanceTo(ownerWaistPosition) * Math.signum(y);
                 if (Math.abs(y) <= 1.5) y = 0;
             }
-            hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 0, 1), z);
+            hitResult = VectorHelper.getFromEntityAndAngle(owner, new Vec3(0, 0, 1), z, PositionHelper::getWaistPosition);
             if (hitResult.getType().equals(HitResult.Type.BLOCK) && !owner.level().getBlockState(hitResult.getBlockPos()).isAir()) {
                 z = hitResult.getLocation().distanceTo(ownerWaistPosition) * Math.signum(z);
                 if (Math.abs(z) <= 1) z = 0;
