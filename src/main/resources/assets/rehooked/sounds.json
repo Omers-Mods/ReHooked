@@ -1,0 +1,27 @@
+{
+  "hook_hit": {
+    "subtitle": "sounds.rehooked.hook_hit",
+    "sounds": [
+      "rehooked:chop"
+    ]
+  },
+  "hook_retract": {
+    "subtitle": "sounds.rehooked.hook_retract",
+    "sounds": [
+      "rehooked:metal_click"
+    ]
+  },
+  "hook_shoot": {
+    "subtitle": "sounds.rehooked.hook_shoot",
+    "sounds": [
+      "rehooked:book_place_1"
+    ]
+  },
+  "hook_moving": {
+    "subtitle": "sounds.rehooked.hook_moving",
+    "sounds": [
+      "rehooked:handle_coins_1",
+      "rehooked:handle_coins_2"
+    ]
+  }
+}

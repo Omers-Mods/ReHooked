@@ -21,5 +21,10 @@
   
   "key.categories.rehooked": "ReHooked",
   "key.rehooked.fire_hook_key": "Fire Hook",
-  "key.rehooked.remove_all_hooks_key": "Remove All Hooks"
+  "key.rehooked.remove_all_hooks_key": "Remove All Hooks",
+  
+  "sounds.rehooked.hook_hit": "Hook Hit Surface",
+  "sounds.rehooked.hook_retract": "Hook Retracting",
+  "sounds.rehooked.hook_shoot": "Hook Shot",
+  "sounds.rehooked.hook_moving": "Hook Moving"
 }
