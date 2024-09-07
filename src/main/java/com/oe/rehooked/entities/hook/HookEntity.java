@@ -12,6 +12,8 @@ import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -36,6 +38,7 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class HookEntity extends Projectile {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -128,6 +131,22 @@ public class HookEntity extends Projectile {
         
         // run the super class tick method
         super.tick();
+    }
+
+    public void createParticles() {
+        getHookType().flatMap(HookRegistry::getHookData).map(HookData::particleType).map(Supplier::get).ifPresent(particleType -> {
+            if (getOwner() instanceof Player owner) {
+                Vec3 ownerWaist = PositionHelper.getWaistPosition(owner);
+                Vec3 toOwner = position().vectorTo(ownerWaist).normalize().scale(0.2);
+                for (int i = 1; i < 26; i++) {
+                    level().addParticle(particleType,
+                            Mth.lerp((double) i / 50d, ownerWaist.x, getX()),
+                            Mth.lerp((double) i / 50d, ownerWaist.y, getY()),
+                            Mth.lerp((double) i / 50d, ownerWaist.z, getZ()),
+                            toOwner.x, toOwner.y, toOwner.z);
+                }
+            }
+        });
     }
 
     @Override
@@ -261,6 +280,12 @@ public class HookEntity extends Projectile {
         }
     }
 
+    public boolean hasChain() {
+        return getHookType().flatMap(HookRegistry::getHookData).map(hookData -> {
+            return !(hookData.particleType() != null && hookData.isCreative());
+        }).orElse(false);
+    }
+    
     @Override
     protected void readAdditionalSaveData(CompoundTag pCompound) {
     }

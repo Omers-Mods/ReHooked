@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -45,7 +46,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     public void render(HookEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         if (pEntity.getHookType().isEmpty()) return;
         handleHook(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
-        if (pEntity.getOwner() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
+        if (pEntity.hasChain() && pEntity.getOwner() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
     }
 
@@ -72,27 +73,29 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
         // get relevant positions
         Entity owner = pEntity.getOwner();
         Vec3 waistPos = PositionHelper.getWaistPosition(owner);
-        Vec3 cubePos = pEntity.position();
-        Vec3 playerToCube = waistPos.vectorTo(cubePos);
-        Vec3 normal = playerToCube.normalize();
+        Vec3 hookPos = pEntity.position();
+        Vec3 playerToHook = waistPos.vectorTo(hookPos);
+        Vec3 normal = playerToHook.normalize();
         // rotate
         pPoseStack.mulPose(Axis.YP.rotation(Mth.HALF_PI - (float) Mth.atan2(normal.z, normal.x)));
         pPoseStack.mulPose(Axis.XP.rotation((float) Math.acos(normal.y) - Mth.PI));
         pPoseStack.translate(-0.5, 0.0, -0.5);
         // add chains
-        float distance = (float) playerToCube.length();
-        BlockState chain = Blocks.CHAIN.defaultBlockState();
-        for (int i = 0; i < (int) distance; i++) {
+        float distance = (float) playerToHook.length();
+        pEntity.getHookType().flatMap(HookRegistry::getHookData).ifPresent(hookData -> {
+            BlockState chain = Blocks.CHAIN.defaultBlockState();
+            for (int i = 0; i < (int) distance; i++) {
+                pContext.getBlockRenderDispatcher().renderSingleBlock(chain, pPoseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY);
+                pPoseStack.translate(0, 1, 0);
+            }
+            float delta = distance - (int) distance;
+            if (lastDelta == 0) lastDelta = delta;
+            if (Math.abs(delta - lastDelta) < 0.3f) delta = lastDelta;
+            pPoseStack.scale(1, delta, 1);
+            lastDelta = delta;
             pContext.getBlockRenderDispatcher().renderSingleBlock(chain, pPoseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY);
-            pPoseStack.translate(0, 1, 0);
-        }
-        float delta = distance - (int) distance;
-        if (lastDelta == 0) lastDelta = delta;
-        if (Math.abs(delta - lastDelta) < 0.3f) delta = lastDelta;
-        pPoseStack.scale(1, delta, 1);
-        lastDelta = delta;
-        pContext.getBlockRenderDispatcher().renderSingleBlock(chain, pPoseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY);
-        pPoseStack.popPose();
+            pPoseStack.popPose();
+        });
     }
     
     @Override

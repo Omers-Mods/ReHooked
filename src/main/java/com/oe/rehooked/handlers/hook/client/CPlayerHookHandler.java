@@ -139,6 +139,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
             });
             owner.onUpdateAbilities();
         });
+        handleParticles();
         if (updateCounter % 10 == 0 && moveVector != null && moveVector.length() > 0.5)
             getOwner().ifPresent(owner -> owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f));
         updateCounter++;
@@ -169,5 +170,10 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         }
         
         return maxDistance + THRESHOLD;
+    }
+
+    @Override
+    public void handleParticles() {
+        for (HookEntity hookEntity : getHooks()) hookEntity.createParticles();
     }
 }
