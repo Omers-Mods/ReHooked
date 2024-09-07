@@ -14,16 +14,21 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class VectorHelper {
     public static BlockHitResult getFromEntityAndAngle(Entity entity, Vec3 angle, double range) {
-        return getFromEntityAndAngle(entity, angle, ClipContext.Fluid.NONE, range);
+        return getFromEntityAndAngle(entity, angle, ClipContext.Fluid.NONE, range, Entity::position);
     }
     
-    public static BlockHitResult getFromEntityAndAngle(Entity entity, Vec3 angle, ClipContext.Fluid rayTraceFluid, double range) {
+    public static BlockHitResult getFromEntityAndAngle(Entity entity, Vec3 angle, double range, Function<Entity, Vec3> startPositionGetter) {
+        return getFromEntityAndAngle(entity, angle, ClipContext.Fluid.NONE, range, startPositionGetter);
+    }
+    
+    public static BlockHitResult getFromEntityAndAngle(Entity entity, Vec3 angle, ClipContext.Fluid rayTraceFluid, double range, Function<Entity, Vec3> startPositionGetter) {
         Level world = entity.level();
         Vec3 end = entity.getEyePosition().add(angle.scale(range));
-        ClipContext context = new ClipContext(entity.getEyePosition(), end, ClipContext.Block.COLLIDER, rayTraceFluid, entity);
+        ClipContext context = new ClipContext(startPositionGetter.apply(entity), end, ClipContext.Block.COLLIDER, rayTraceFluid, entity);
         return world.clip(context);
     }
     
