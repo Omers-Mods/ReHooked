@@ -168,7 +168,7 @@ public class HookEntity extends Projectile {
             }
             else {
                 // check if hit anything
-                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement(), this.getDeltaMovement().length() + 2.5);
+                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement().normalize(), this.getDeltaMovement().length());
                 BlockState hitState = level().getBlockState(hitResult.getBlockPos());
                 if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
                     LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());

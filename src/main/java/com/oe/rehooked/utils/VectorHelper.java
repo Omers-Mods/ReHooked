@@ -9,6 +9,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,7 @@ public class VectorHelper {
      * <p> 
      * This method is client-side only!
      */
+    @OnlyIn(Dist.CLIENT)
     public static <T extends Entity> Optional<T> acquireLookTarget(Class<T> clazz, Player seeker, double radius) {
         Vec3 lookAngle = seeker.getLookAngle();
         double targetX = seeker.getX();
