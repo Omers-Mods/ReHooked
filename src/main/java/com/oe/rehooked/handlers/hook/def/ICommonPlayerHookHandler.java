@@ -61,7 +61,7 @@ public interface ICommonPlayerHookHandler {
     default VectorHelper.Box getBox() {
         VectorHelper.Box box = new VectorHelper.Box();
         for (HookEntity hookEntity : getHooks()) 
-            hookEntity.getHitPos().ifPresent(pos -> box.reassignPoints(pos.getCenter()));
+            box.reassignPoints(hookEntity.position());
         return box;
     }
     default Vec3 reduceCollisions(Vec3 moveVector) {
