@@ -6,6 +6,7 @@ import com.oe.rehooked.item.ReHookedItems;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
 import com.oe.rehooked.network.packets.client.processing.CHookCapabilityProcessor;
+import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.tabs.ReHookedCreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +37,8 @@ public class ReHookedMod {
         ReHookedCreativeModeTab.register(modEventBus);
         // Register mod items
         ReHookedItems.register(modEventBus);
+        // register mod sounds
+        ReHookedSounds.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

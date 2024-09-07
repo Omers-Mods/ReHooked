@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
+import com.oe.rehooked.utils.PositionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -70,7 +71,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
         pPoseStack.pushPose();
         // get relevant positions
         Entity owner = pEntity.getOwner();
-        Vec3 waistPos = owner.position().add(0, owner.getEyeHeight() / 1.5, 0);
+        Vec3 waistPos = PositionHelper.getWaistPosition(owner);
         Vec3 cubePos = pEntity.position();
         Vec3 playerToCube = waistPos.vectorTo(cubePos);
         Vec3 normal = playerToCube.normalize();

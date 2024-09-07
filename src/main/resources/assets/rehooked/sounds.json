@@ -2,7 +2,10 @@
   "hook_hit": {
     "subtitle": "sounds.rehooked.hook_hit",
     "sounds": [
-      "rehooked:chop"
+      "minecraft:random/bowhit1",
+      "minecraft:random/bowhit2",
+      "minecraft:random/bowhit3",
+      "minecraft:random/bowhit4"
     ]
   },
   "hook_retract": {

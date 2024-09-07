@@ -15,6 +15,7 @@ public class ReHookedSounds {
     public static final RegistryObject<SoundEvent> HOOK_HIT = createEvent("hook_hit");
     public static final RegistryObject<SoundEvent> HOOK_RETRACT = createEvent("hook_retract");
     public static final RegistryObject<SoundEvent> HOOK_SHOOT = createEvent("hook_shoot");
+    public static final RegistryObject<SoundEvent> HOOK_MOVING = createEvent("hook_moving");
     
     private static RegistryObject<SoundEvent> createEvent(String name) {
         ResourceLocation loc = new ResourceLocation(ReHookedMod.MOD_ID, name);

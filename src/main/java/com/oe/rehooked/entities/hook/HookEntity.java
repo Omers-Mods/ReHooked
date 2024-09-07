@@ -7,6 +7,7 @@ import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
+import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
@@ -17,6 +18,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -146,6 +148,7 @@ public class HookEntity extends Projectile {
         float f1 = -Mth.sin((pX + pZ) * ((float)Math.PI / 180F));
         float f2 = Mth.cos(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
         this.shoot(f, f1, f2, pVelocity, pInaccuracy);
+        level().playSeededSound(null, pX, pY, pZ, ReHookedSounds.HOOK_SHOOT.get(), SoundSource.NEUTRAL, 0.2f, 1f, 0);
     }
 
     protected void tickShot() {
@@ -160,22 +163,29 @@ public class HookEntity extends Projectile {
                 setDeltaMovement(Vec3.ZERO);
                 return;
             }
-            // check if moved further than the target
-            if (getOwner() instanceof Player owner &&
-                    owner.position().add(0, owner.getEyeHeight() / 1.5, 0).distanceTo(position()) > hookData.range()) {
-                LOGGER.debug("Moved further than range from owner");
-                setState(State.RETRACTING);
-            }
-            else {
-                // check if hit anything
-                BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement().normalize(), this.getDeltaMovement().length());
-                BlockState hitState = level().getBlockState(hitResult.getBlockPos());
-                if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
-                    LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
-                    setDeltaMovement(position().vectorTo(hitResult.getLocation()));
-                    if (!level().isClientSide()) {
-                        setState(State.PULLING);
-                        setHitPos(hitResult.getBlockPos());
+            if (getOwner() instanceof Player owner) {
+                // play the chain sound
+                if (ticksInState % 10 == 0) {
+                    level().playSeededSound(null, owner.getX(), owner.getY(), owner.getZ(), ReHookedSounds.HOOK_MOVING.get(), SoundSource.NEUTRAL, 0.2f, 1f, 0);
+                }
+                // check if moved further than the target
+                if (PositionHelper.getWaistPosition(owner).distanceTo(position()) > hookData.range()) {
+                    LOGGER.debug("Moved further than range from owner");
+                    setState(State.RETRACTING);
+                }
+                else {
+                    // check if hit anything
+                    BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement().normalize(), this.getDeltaMovement().length());
+                    BlockState hitState = level().getBlockState(hitResult.getBlockPos());
+                    if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
+                        LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
+                        Vec3 hitLocation = hitResult.getLocation();
+                        setDeltaMovement(position().vectorTo(hitLocation));
+                        if (!level().isClientSide()) {
+                            setState(State.PULLING);
+                            setHitPos(hitResult.getBlockPos());
+                            level().playSeededSound(null, hitLocation.x, hitLocation.y, hitLocation.z, ReHookedSounds.HOOK_HIT.get(), SoundSource.NEUTRAL, 0.2f, 0.2f, 0);
+                        }
                     }
                 }
             }
@@ -211,6 +221,7 @@ public class HookEntity extends Projectile {
                         this.discard();
                     });
                 }
+                else if (ticksInState % 5 == 0) owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f);
                 // set the delta movement according to speed and distance from player
                 getHookType().flatMap(HookRegistry::getHookData).ifPresent(hookData -> {
                     float speedModifier = hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed();
@@ -224,6 +235,7 @@ public class HookEntity extends Projectile {
             // send update to handler
             if (!level().isClientSide()) {
                 if (firstTickInState) {
+                    level().playSeededSound(null, getX(), getY(), getZ(), ReHookedSounds.HOOK_RETRACT.get(), SoundSource.NEUTRAL, 0.2f, 1f, 0);
                     IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
                 } else if (ticksInState > 40) {
                     discard();

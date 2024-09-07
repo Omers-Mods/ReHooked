@@ -6,6 +6,7 @@ import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
+import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.Entity;
@@ -26,6 +27,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     private Optional<Player> owner;
     
     private Vec3 moveVector;
+    private long updateCounter;
     
     public CPlayerHookHandler() {
         hooks = new ArrayList<>();
@@ -137,6 +139,9 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
             });
             owner.onUpdateAbilities();
         });
+        if (updateCounter % 10 == 0 && moveVector != null && moveVector.length() > THRESHOLD)
+            getOwner().ifPresent(owner -> owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f));
+        updateCounter++;
     }
 
     @Override
