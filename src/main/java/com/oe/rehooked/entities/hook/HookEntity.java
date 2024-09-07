@@ -32,6 +32,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.network.NetworkHooks;
 import org.joml.Vector3f;
@@ -133,6 +135,7 @@ public class HookEntity extends Projectile {
         super.tick();
     }
 
+    @OnlyIn(Dist.CLIENT)
     public void createParticles() {
         getHookType().flatMap(HookRegistry::getHookData).map(HookData::particleType).map(Supplier::get).ifPresent(particleType -> {
             if (getOwner() instanceof Player owner) {
