@@ -105,8 +105,8 @@ public class HookEntity extends Projectile {
         else if (getPrevState().equals(State.RETRACTING)) {
             if (level().isClientSide())
                 setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
-            else
-                setPos(getOwner().position());
+            else if (getOwner() instanceof Player owner)
+                setPos(owner.position());
         }
         
         // block collision detection while pulling to prevent rendering as black blob
