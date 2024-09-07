@@ -77,7 +77,7 @@ public class HookEntity extends Projectile {
         setNoGravity(true);
         noCulling = true;
         setOwner(player);
-        setPos(PositionHelper.getWaistPosition(player));
+        setPos(player.getEyePosition());
     }
 
     @Override
