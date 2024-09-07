@@ -160,11 +160,24 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                     double x = pullCenter.x - ownerWaistPos.x;
                     double y = pullCenter.y - ownerWaistPos.y;
                     double z = pullCenter.z - ownerWaistPos.z;
-                    // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
-                    moveVector = reduceCollisions(x, y, z);
-                    if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
-                    if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
+                    moveVector = new Vec3(x, y, z);
                 }
+                else {
+                    // if player going out of the box put him back in
+                    VectorHelper.Box box = getBox();
+                    LOGGER.debug("Box {}", box);
+                    if (!box.isInside(ownerWaistPos)) {
+                        moveVector = ownerWaistPos.vectorTo(box.closestPointInCube(ownerWaistPos));
+                    }
+                    else {
+                        owner.setOnGround(true);
+                        return;
+                    }
+                }
+                // check if player is stuck against collider in a certain direction -> shouldn't pull, it causes glitches
+                moveVector = reduceCollisions(moveVector);
+                if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
+                if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
             owner.onUpdateAbilities();
         });

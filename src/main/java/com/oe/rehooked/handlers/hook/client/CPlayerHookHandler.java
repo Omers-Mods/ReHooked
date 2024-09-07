@@ -121,8 +121,10 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                     if (!box.isInside(ownerWaistPos)) {
                         moveVector = ownerWaistPos.vectorTo(box.closestPointInCube(ownerWaistPos));
                     }
-                    else 
+                    else {
+                        owner.setOnGround(true);
                         return;
+                    }
                 }
                 else {
                     owner.setNoGravity(true);
