@@ -134,10 +134,10 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             VectorHelper.Box box = getBox();
             hookFlightActive = hookData.isCreative() && countPulling() > 0 && 
                     (box.isInside(ownerWaistPos) || box.closestPointInCube(ownerWaistPos).distanceTo(ownerWaistPos) < 5);
-            boolean old = owner.getAbilities().mayfly;
+            boolean old = owner.getAbilities().mayfly || owner.getAbilities().flying;
             owner.getAbilities().mayfly = externalFlight || hookFlightActive;
             if (!externalFlight && !hookFlightActive) owner.getAbilities().flying = false;
-            if (old != owner.getAbilities().mayfly) owner.onUpdateAbilities();
+            if (old != (owner.getAbilities().mayfly || owner.getAbilities().flying)) owner.onUpdateAbilities();
         }));
     }
 
@@ -179,7 +179,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
                 if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
-            owner.onUpdateAbilities();
         });
     }
 
