@@ -5,7 +5,9 @@ import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.ClientHookCapabilityProvider;
 import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
+import com.oe.rehooked.utils.HandlerHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -53,5 +55,14 @@ public class ForgeEventBus {
                         player.setDeltaMovement(handler.getDeltaVThisTick());
                     }
                 }));
+    }
+    
+    @SubscribeEvent
+    public static void fixBreakSpeed(PlayerEvent.BreakSpeed event) {
+        if (!event.getEntity().onGround()) {
+            HandlerHelper.getHookHandler(event.getEntity())
+                    .map(ICommonPlayerHookHandler::getBreakSpeedMultiplier)
+                    .ifPresent(breakSpeedMultiplier -> event.setNewSpeed(event.getNewSpeed() * breakSpeedMultiplier));
+        }
     }
 }
