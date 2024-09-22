@@ -56,15 +56,19 @@ public class HookItem extends Item implements ICurioItem {
 
     @Override
     public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
-        ICurioItem.super.onUnequip(slotContext, newStack, stack);
         if (!(slotContext.entity() instanceof Player owner)) return;
         HandlerHelper.getHookHandler(owner).ifPresent(ICommonPlayerHookHandler::onUnequip);
     }
 
     @Override
     public void onEquip(SlotContext slotContext, ItemStack prevStack, ItemStack stack) {
-        ICurioItem.super.onEquip(slotContext, prevStack, stack);
         if (!(slotContext.entity() instanceof Player owner)) return;
         HandlerHelper.getHookHandler(owner).ifPresent(ICommonPlayerHookHandler::onEquip);
+    }
+
+    @Override
+    public boolean canEquip(SlotContext slotContext, ItemStack stack) {
+        return slotContext.entity() instanceof Player owner && 
+                HandlerHelper.getHookHandler(owner).map(ICommonPlayerHookHandler::getHookData).isEmpty();
     }
 }
