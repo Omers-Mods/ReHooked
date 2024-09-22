@@ -98,4 +98,10 @@ public interface ICommonPlayerHookHandler {
         removeAllHooks();
         update();
     }
+    
+    default float getBreakSpeedMultiplier() {
+        return countPulling() > 0 ? 5 : 1;
+    }
+    
+    void jump();
 }

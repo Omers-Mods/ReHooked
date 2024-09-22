@@ -110,7 +110,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         getOwner().ifPresent(owner -> {
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
-                owner.setOnGround(false);
+                owner.setOnGround(true);
                 
                 Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
                 float vPT = hookData.pullSpeed() / 20f;
@@ -122,12 +122,10 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                         moveVector = ownerWaistPos.vectorTo(box.closestPointInCube(ownerWaistPos));
                     }
                     else {
-                        owner.setOnGround(true);
                         return;
                     }
                 }
                 else {
-                    owner.setNoGravity(true);
                     Vec3 pullCenter = getPullCenter();
                     double x = pullCenter.x - ownerWaistPos.x;
                     double y = pullCenter.y - ownerWaistPos.y;

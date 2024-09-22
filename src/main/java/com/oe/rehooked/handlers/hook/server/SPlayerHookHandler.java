@@ -132,30 +132,30 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             if (owner.isCreative()) externalFlight = true;
             Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
             VectorHelper.Box box = getBox();
-            hookFlightActive = hookData.isCreative() && countPulling() > 0 && 
+            hookFlightActive = countPulling() > 0 && 
                     (box.isInside(ownerWaistPos) || box.closestPointInCube(ownerWaistPos).distanceTo(ownerWaistPos) < 5);
-            boolean old = owner.getAbilities().mayfly || owner.getAbilities().flying;
             owner.getAbilities().mayfly = externalFlight || hookFlightActive;
-            if (!externalFlight && !hookFlightActive) owner.getAbilities().flying = false;
-            if (old != (owner.getAbilities().mayfly || owner.getAbilities().flying)) owner.onUpdateAbilities();
+            if (!externalFlight && !hookFlightActive) {
+                owner.getAbilities().flying = false;
+                owner.getAbilities().mayfly = false;
+            }
+            owner.onUpdateAbilities();
         }));
     }
 
     @Override
     public void update() {
         moveVector = null;
-        updateCreativeFlight();
         getOwner().ifPresent(owner -> {
-            owner.setNoGravity(false);
+            updateCreativeFlight();
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
-                owner.setOnGround(false);
+                owner.setOnGround(true);
                 
                 float vPT = hookData.pullSpeed() / 20f;
                 Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
                 if (!hookData.isCreative()) {
-                    owner.setNoGravity(true);
                     Vec3 pullCenter = getPullCenter();
                     double x = pullCenter.x - ownerWaistPos.x;
                     double y = pullCenter.y - ownerWaistPos.y;
@@ -170,7 +170,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                         moveVector = ownerWaistPos.vectorTo(box.closestPointInCube(ownerWaistPos));
                     }
                     else {
-                        owner.setOnGround(true);
                         return;
                     }
                 }

@@ -62,6 +62,7 @@ public class SHookCapabilityPacket {
                     case RETRACT_HOOK -> handler.removeHook(id);
                     case RETRACT_ALL_HOOKS -> handler.removeAllHooks();
                     case FORCE_UPDATE -> handler.update();
+                    case JUMP -> handler.jump();
                 }
             }
             else {

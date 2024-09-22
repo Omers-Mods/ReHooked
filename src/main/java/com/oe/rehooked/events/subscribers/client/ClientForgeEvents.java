@@ -6,18 +6,22 @@ import com.oe.rehooked.client.KeyBindings;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
+import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
@@ -55,7 +59,7 @@ public class ClientForgeEvents {
             }
         }
         if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(false)) {
-            handler.removeAllHooks();
+            handler.jump();
         }
         handler.setOwner(player).update();
         if (handler.shouldMoveThisTick()) {
@@ -70,10 +74,24 @@ public class ClientForgeEvents {
         if (player != null) {
             IClientPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
                 if (handler.countPulling() > 0) {
-                    if (!player.getAbilities().mayfly)
-                        player.input.shiftKeyDown = false;
+                    if (!player.getAbilities().mayfly && !player.getAbilities().flying) {
+                        // prevent crouching while on hook which isn't creative
+                        if (player.hasPose(Pose.CROUCHING)) {
+                            event.getInput().shiftKeyDown = false;
+                        }
+                    }
                 }
             });
         }
+    }
+    
+    @SubscribeEvent
+    public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
+        if (Minecraft.getInstance().player == null || 
+                event.getEntity() == null || 
+                event.getEntity().getUUID() != Minecraft.getInstance().player.getUUID()) return;
+        
+        // if the entity jumping is the client player
+        HandlerHelper.getHookHandler(Minecraft.getInstance().player).ifPresent(ICommonPlayerHookHandler::jump);
     }
 }
