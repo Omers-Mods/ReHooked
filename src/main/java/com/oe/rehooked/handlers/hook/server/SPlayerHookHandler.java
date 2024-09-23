@@ -195,4 +195,9 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public Collection<HookEntity> getHooks() {
         return hooks;
     }
+
+    @Override
+    public void setDeltaVThisTick(Vec3 dV) {
+        moveVector = dV;
+    }
 }

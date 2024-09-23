@@ -105,6 +105,11 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     }
 
     @Override
+    public void setDeltaVThisTick(Vec3 dV) {
+        moveVector = dV;
+    }
+
+    @Override
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {

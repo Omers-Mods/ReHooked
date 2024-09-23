@@ -1,5 +1,6 @@
 package com.oe.rehooked.handlers.hook.def;
 
+import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.ClientHookCapabilityProvider;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
@@ -21,8 +22,10 @@ public interface IClientPlayerHookHandler extends ICommonPlayerHookHandler {
         getOwner().ifPresent(owner -> {
             if (owner.isCrouching()) 
                 PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS));
-            else
+            else {
                 PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.JUMP));
+                ICommonPlayerHookHandler.super.jump();
+            }
         });
     }
 }

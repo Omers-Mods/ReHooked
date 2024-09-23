@@ -1,5 +1,6 @@
 package com.oe.rehooked.handlers.hook.def;
 
+import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
@@ -103,5 +104,26 @@ public interface ICommonPlayerHookHandler {
         return countPulling() > 0 ? 5 : 1;
     }
     
-    void jump();
+    default void jump() {
+        ReHookedMod.LOGGER.debug("jumping");
+        update();
+        getOwner().ifPresent(owner -> {
+            setDeltaVThisTick(getJumpVector());
+            removeAllHooks();
+        });
+    }
+    
+    void setDeltaVThisTick(Vec3 dV);
+    
+    default Vec3 getJumpVector() {
+        return getHookData().map(hookData -> {
+            if (countPulling() > 0 && shouldMoveThisTick()) {
+                return getDeltaVThisTick().normalize()
+                        .multiply(hookData.pullSpeed() * 2,
+                                Math.max(hookData.pullSpeed() * 2, 1.5),
+                                hookData.pullSpeed() * 2);
+            }
+            return Vec3.ZERO;
+        }).orElse(Vec3.ZERO);
+    }
 }
