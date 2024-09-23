@@ -106,7 +106,6 @@ public interface ICommonPlayerHookHandler {
         getOwner().ifPresent(owner -> {
             setMomentum(getJumpVector());
             removeAllHooks();
-            update();
         });
     }
     
@@ -115,10 +114,11 @@ public interface ICommonPlayerHookHandler {
     default Vec3 getJumpVector() {
         return getHookData().map(hookData -> {
             if (countPulling() > 0 && shouldMoveThisTick()) {
-                return getDeltaVThisTick().normalize()
-                        .multiply(hookData.pullSpeed() * 2,
-                                Math.max(hookData.pullSpeed() * 2, 1.5),
-                                hookData.pullSpeed() * 2);
+                Vec3 dVT = getDeltaVThisTick();
+                // 
+                if (dVT.y < 1)
+                    dVT = new Vec3(dVT.x, 1, dVT.z);
+                return reduceCollisions(dVT);
             }
             return Vec3.ZERO;
         }).orElse(Vec3.ZERO);
@@ -131,22 +131,25 @@ public interface ICommonPlayerHookHandler {
     
     default void updateMomentum() {
         if (getMomentum() == null) return;
-        if (getMomentum().length() < THRESHOLD || countPulling() > 0) {
-            // todo: remove temporary debug logs
-            ReHookedMod.LOGGER.debug("Momentum length: {}", getMomentum().length());
-            ReHookedMod.LOGGER.debug("Count Pulling: {}", countPulling());
-            ReHookedMod.LOGGER.debug("Zeroing momentum");
+        if ((getMomentum().horizontalDistance() < THRESHOLD && getMomentum().y < THRESHOLD) || countPulling() > 0) {
             setMomentum(null);
             return;
         }
         getOwner().ifPresent(owner -> {
-            if (owner.onGround()) {
-                ReHookedMod.LOGGER.debug("Player is on ground, zeroing momentum");
-                setMomentum(null);
-                return;
+            double horizontalScale = 0.95;
+            double verticalScale = 0.9;
+            // if on ground or in water remove momentum faster
+            boolean special = owner.onGround() || owner.isInWater();
+            if (special) {
+                horizontalScale = 0.75;
+                verticalScale = 0.75;
             }
-            setDeltaVThisTick(getMomentum());
-            setMomentum(getMomentum().scale(0.99));
+            Vec3 actualMomentum = reduceCollisions(getMomentum());
+            // apply the momentum to the player and update next ticks momentum
+            setDeltaVThisTick(actualMomentum);
+            actualMomentum = actualMomentum.multiply(horizontalScale, verticalScale, horizontalScale);
+            if (!special) actualMomentum = actualMomentum.subtract(0, 0.08, 0);
+            setMomentum(actualMomentum);
         });
     }
 }
