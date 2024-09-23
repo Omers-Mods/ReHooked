@@ -12,7 +12,6 @@ import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;

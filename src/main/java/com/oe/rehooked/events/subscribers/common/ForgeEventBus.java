@@ -5,7 +5,6 @@ import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.ClientHookCapabilityProvider;
 import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
-import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.utils.HandlerHelper;
 import net.minecraft.resources.ResourceLocation;
