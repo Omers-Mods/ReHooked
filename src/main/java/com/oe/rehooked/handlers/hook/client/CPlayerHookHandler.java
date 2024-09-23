@@ -28,11 +28,14 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     private Vec3 moveVector;
     private Vec3 momentum;
     private long updateCounter;
+
+    private Vec3 lastPlayerPosition;
     
     public CPlayerHookHandler() {
         hooks = new ArrayList<>();
         owner = Optional.empty();
         moveVector = null;
+        lastPlayerPosition = null;
     }
     
     @Override
@@ -154,12 +157,12 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                 if (!hookData.isCreative() && moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
             owner.onUpdateAbilities();
+            if (updateCounter % 10 == 0 && actualPlayerPositionChange().length() > 0.5)
+                owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f);
+            updateMomentum();
         });
         handleParticles();
-        if (updateCounter % 10 == 0 && moveVector != null && moveVector.length() > 0.5)
-            getOwner().ifPresent(owner -> owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f));
         updateCounter++;
-        updateMomentum();
     }
 
     @Override
@@ -192,5 +195,15 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     @Override
     public void handleParticles() {
         for (HookEntity hookEntity : getHooks()) hookEntity.createParticles();
+    }
+
+    @Override
+    public Optional<Vec3> getLastPlayerPosition() {
+        return Optional.ofNullable(lastPlayerPosition);
+    }
+
+    @Override
+    public void storeLastPlayerPosition() {
+        getOwner().ifPresent(owner -> lastPlayerPosition = owner.position());
     }
 }

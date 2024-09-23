@@ -30,6 +30,8 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private boolean externalFlight;
     private boolean preventingFlightKick;
     
+    private Vec3 lastPlayerPosition;
+    
     public SPlayerHookHandler() {
         hooks = new ArrayList<>();
         owner = Optional.empty();
@@ -189,8 +191,8 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 if (moveVector.length() > vPT) moveVector = moveVector.normalize().scale(vPT);
                 if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
+            updateMomentum();
         });
-        updateMomentum();
     }
 
     @Override
@@ -222,5 +224,15 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public void setMomentum(Vec3 momentum) {
         IServerPlayerHookHandler.super.setMomentum(momentum);
         this.momentum = momentum;
+    }
+
+    @Override
+    public Optional<Vec3> getLastPlayerPosition() {
+        return Optional.ofNullable(lastPlayerPosition);
+    }
+
+    @Override
+    public void storeLastPlayerPosition() {
+        getOwner().ifPresent(owner -> lastPlayerPosition = owner.position());
     }
 }

@@ -102,7 +102,6 @@ public interface ICommonPlayerHookHandler {
     
     default void jump() {
         ReHookedMod.LOGGER.debug("jumping");
-        update();
         getOwner().ifPresent(owner -> {
             setMomentum(getJumpVector());
             removeAllHooks();
@@ -114,8 +113,7 @@ public interface ICommonPlayerHookHandler {
     default Vec3 getJumpVector() {
         return getHookData().map(hookData -> {
             if (countPulling() > 0 && shouldMoveThisTick()) {
-                Vec3 dVT = getDeltaVThisTick();
-                // 
+                Vec3 dVT = actualPlayerPositionChange();
                 if (dVT.y < 1)
                     dVT = new Vec3(dVT.x, 1, dVT.z);
                 return reduceCollisions(dVT);
@@ -152,4 +150,14 @@ public interface ICommonPlayerHookHandler {
             setMomentum(actualMomentum);
         });
     }
+    
+    Optional<Vec3> getLastPlayerPosition();
+    
+    default Vec3 actualPlayerPositionChange() {
+        return getOwner().map(Player::position)
+                .flatMap(currPos -> getLastPlayerPosition().map(lastPos -> lastPos.vectorTo(currPos)))
+                .orElse(Vec3.ZERO);
+    }
+    
+    void storeLastPlayerPosition();
 }

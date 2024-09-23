@@ -65,6 +65,7 @@ public class ClientForgeEvents {
         if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(false)) {
             handler.jump();
         }
+        handler.storeLastPlayerPosition();
     }
     
     @SubscribeEvent

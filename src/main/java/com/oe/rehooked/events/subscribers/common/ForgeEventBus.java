@@ -53,6 +53,7 @@ public class ForgeEventBus {
                     if (handler.shouldMoveThisTick()) {
                         player.setDeltaMovement(handler.getDeltaVThisTick());
                     }
+                    handler.storeLastPlayerPosition();
                 }));
     }
     
