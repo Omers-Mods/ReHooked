@@ -84,14 +84,4 @@ public class ClientForgeEvents {
             });
         }
     }
-    
-    @SubscribeEvent
-    public static void onPlayerJump(LivingEvent.LivingJumpEvent event) {
-        if (Minecraft.getInstance().player == null || 
-                event.getEntity() == null || 
-                event.getEntity().getUUID() != Minecraft.getInstance().player.getUUID()) return;
-        
-        // if the entity jumping is the client player
-        HandlerHelper.getHookHandler(Minecraft.getInstance().player).ifPresent(ICommonPlayerHookHandler::jump);
-    }
 }
