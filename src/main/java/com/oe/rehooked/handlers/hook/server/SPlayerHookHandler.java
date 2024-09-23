@@ -130,7 +130,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     }
 
     private void updateCreativeFlight() {
-        getOwner().ifPresent(owner -> getHookData().ifPresent(hookData -> {
+        getOwner().ifPresent(owner -> getHookData().ifPresentOrElse(hookData -> {
             if (!hookFlightActive && !preventingFlightKick) externalFlight = owner.getAbilities().mayfly || owner.getAbilities().flying;
             else if (!owner.getAbilities().mayfly && !owner.getAbilities().flying) externalFlight = false;
             if (owner.isCreative()) externalFlight = true;
@@ -151,6 +151,16 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 }
             }
             else {
+                owner.onUpdateAbilities();
+            }
+        }, () -> {
+            if (preventingFlightKick || hookFlightActive) {
+                preventingFlightKick = false;
+                hookFlightActive = false;
+            }
+            if (!externalFlight) {
+                owner.getAbilities().flying = false;
+                owner.getAbilities().mayfly = false;
                 owner.onUpdateAbilities();
             }
         }));
@@ -178,7 +188,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 else {
                     // if player going out of the box put him back in
                     VectorHelper.Box box = getBox();
-                    LOGGER.debug("Box {}", box);
                     if (!box.isInside(ownerWaistPos)) {
                         moveVector = ownerWaistPos.vectorTo(box.closestPointInCube(ownerWaistPos));
                     }
@@ -234,5 +243,10 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     @Override
     public void storeLastPlayerPosition() {
         getOwner().ifPresent(owner -> lastPlayerPosition = owner.position());
+    }
+
+    @Override
+    public void removeAllClientHooks(ServerPlayer player) {
+        PacketHandler.sendToPlayer(new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_ALL_HOOKS), player);
     }
 }
