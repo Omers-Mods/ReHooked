@@ -56,13 +56,4 @@ public class ForgeEventBus {
                     }
                 }));
     }
-    
-    @SubscribeEvent
-    public static void fixBreakSpeed(PlayerEvent.BreakSpeed event) {
-        if (!event.getEntity().onGround()) {
-            HandlerHelper.getHookHandler(event.getEntity())
-                    .map(ICommonPlayerHookHandler::getBreakSpeedMultiplier)
-                    .ifPresent(breakSpeedMultiplier -> event.setNewSpeed(event.getNewSpeed() * breakSpeedMultiplier));
-        }
-    }
 }
