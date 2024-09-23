@@ -100,10 +100,6 @@ public interface ICommonPlayerHookHandler {
         update();
     }
     
-    default float getBreakSpeedMultiplier() {
-        return countPulling() > 0 ? 5 : 1;
-    }
-    
     default void jump() {
         ReHookedMod.LOGGER.debug("jumping");
         update();
