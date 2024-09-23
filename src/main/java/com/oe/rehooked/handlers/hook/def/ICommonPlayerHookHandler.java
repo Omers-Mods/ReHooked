@@ -139,8 +139,8 @@ public interface ICommonPlayerHookHandler {
             double horizontalScale = 0.95;
             double verticalScale = 0.9;
             // if on ground or in water remove momentum faster
-            boolean special = owner.onGround() || owner.isInWater();
-            if (special) {
+            boolean moreFriction = owner.onGround() || owner.isInWater();
+            if (moreFriction) {
                 horizontalScale = 0.75;
                 verticalScale = 0.75;
             }
@@ -148,7 +148,7 @@ public interface ICommonPlayerHookHandler {
             // apply the momentum to the player and update next ticks momentum
             setDeltaVThisTick(actualMomentum);
             actualMomentum = actualMomentum.multiply(horizontalScale, verticalScale, horizontalScale);
-            if (!special) actualMomentum = actualMomentum.subtract(0, 0.08, 0);
+            if (!moreFriction && !owner.getAbilities().flying) actualMomentum = actualMomentum.subtract(0, 0.08, 0);
             setMomentum(actualMomentum);
         });
     }
