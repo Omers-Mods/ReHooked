@@ -28,6 +28,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private Vec3 momentum;
     private boolean hookFlightActive;
     private boolean externalFlight;
+    private boolean preventingFlightKick;
     
     public SPlayerHookHandler() {
         hooks = new ArrayList<>();
@@ -128,7 +129,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     private void updateCreativeFlight() {
         getOwner().ifPresent(owner -> getHookData().ifPresent(hookData -> {
-            if (!hookFlightActive) externalFlight = owner.getAbilities().mayfly || owner.getAbilities().flying;
+            if (!hookFlightActive && !preventingFlightKick) externalFlight = owner.getAbilities().mayfly || owner.getAbilities().flying;
             else if (!owner.getAbilities().mayfly && !owner.getAbilities().flying) externalFlight = false;
             if (owner.isCreative()) externalFlight = true;
             Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
@@ -137,10 +138,19 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                     (box.isInside(ownerWaistPos) || box.closestPointInCube(ownerWaistPos).distanceTo(ownerWaistPos) < 5);
             owner.getAbilities().mayfly = externalFlight || hookFlightActive;
             if (!externalFlight && !hookFlightActive) {
-                owner.getAbilities().flying = false;
-                owner.getAbilities().mayfly = false;
+                if (shouldMoveThisTick() || getMomentum() != null) {
+                    owner.getAbilities().mayfly = true;
+                    preventingFlightKick = true;
+                }
+                else {
+                    owner.getAbilities().flying = false;
+                    owner.getAbilities().mayfly = false;
+                    owner.onUpdateAbilities();
+                }
             }
-            owner.onUpdateAbilities();
+            else {
+                owner.onUpdateAbilities();
+            }
         }));
     }
 
