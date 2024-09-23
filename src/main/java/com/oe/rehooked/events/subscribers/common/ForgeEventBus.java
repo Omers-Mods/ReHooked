@@ -56,4 +56,12 @@ public class ForgeEventBus {
                     }
                 }));
     }
+    
+    @SubscribeEvent
+    public static void onBreakEvent(PlayerEvent.BreakSpeed event) {
+        HandlerHelper.getHookHandler(event.getEntity()).ifPresent(handler -> {
+            // negate the in-air mining speed debuff
+            if (handler.countPulling() > 0) event.setNewSpeed(event.getNewSpeed() * 5);
+        });
+    }
 }

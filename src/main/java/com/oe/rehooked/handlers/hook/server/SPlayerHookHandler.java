@@ -25,6 +25,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private Optional<Player> owner;
     
     private Vec3 moveVector;
+    private Vec3 momentum;
     private boolean hookFlightActive;
     private boolean externalFlight;
     
@@ -151,7 +152,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
-                owner.setOnGround(true);
+                owner.setOnGround(false);
                 
                 float vPT = hookData.pullSpeed() / 20f;
                 Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
@@ -179,6 +180,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
         });
+        updateMomentum();
     }
 
     @Override
@@ -199,5 +201,16 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     @Override
     public void setDeltaVThisTick(Vec3 dV) {
         moveVector = dV;
+    }
+
+    @Override
+    public Vec3 getMomentum() {
+        return momentum;
+    }
+
+    @Override
+    public void setMomentum(Vec3 momentum) {
+        IServerPlayerHookHandler.super.setMomentum(momentum);
+        this.momentum = momentum;
     }
 }

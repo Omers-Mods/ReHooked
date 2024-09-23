@@ -58,13 +58,13 @@ public class ClientForgeEvents {
                 });
             }
         }
-        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(false)) {
-            handler.jump();
-        }
         handler.setOwner(player).update();
         if (handler.shouldMoveThisTick()) {
             Vec3 deltaVThisTick = handler.getDeltaVThisTick();
             player.setDeltaMovement(deltaVThisTick);
+        }
+        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(false)) {
+            handler.jump();
         }
     }
     

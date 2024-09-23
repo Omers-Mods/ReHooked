@@ -104,8 +104,9 @@ public interface ICommonPlayerHookHandler {
         ReHookedMod.LOGGER.debug("jumping");
         update();
         getOwner().ifPresent(owner -> {
-            setDeltaVThisTick(getJumpVector());
+            setMomentum(getJumpVector());
             removeAllHooks();
+            update();
         });
     }
     
@@ -121,5 +122,31 @@ public interface ICommonPlayerHookHandler {
             }
             return Vec3.ZERO;
         }).orElse(Vec3.ZERO);
+    }
+    
+    Vec3 getMomentum();
+    default void setMomentum(Vec3 momentum) {
+        ReHookedMod.LOGGER.debug("Setting momentum to {}", momentum);
+    }
+    
+    default void updateMomentum() {
+        if (getMomentum() == null) return;
+        if (getMomentum().length() < THRESHOLD || countPulling() > 0) {
+            // todo: remove temporary debug logs
+            ReHookedMod.LOGGER.debug("Momentum length: {}", getMomentum().length());
+            ReHookedMod.LOGGER.debug("Count Pulling: {}", countPulling());
+            ReHookedMod.LOGGER.debug("Zeroing momentum");
+            setMomentum(null);
+            return;
+        }
+        getOwner().ifPresent(owner -> {
+            if (owner.onGround()) {
+                ReHookedMod.LOGGER.debug("Player is on ground, zeroing momentum");
+                setMomentum(null);
+                return;
+            }
+            setDeltaVThisTick(getMomentum());
+            setMomentum(getMomentum().scale(0.99));
+        });
     }
 }

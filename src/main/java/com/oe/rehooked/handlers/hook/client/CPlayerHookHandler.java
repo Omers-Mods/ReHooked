@@ -10,7 +10,6 @@ import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -27,6 +26,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     private Optional<Player> owner;
     
     private Vec3 moveVector;
+    private Vec3 momentum;
     private long updateCounter;
     
     public CPlayerHookHandler() {
@@ -110,12 +110,23 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     }
 
     @Override
+    public Vec3 getMomentum() {
+        return momentum;
+    }
+
+    @Override
+    public void setMomentum(Vec3 momentum) {
+        IClientPlayerHookHandler.super.setMomentum(momentum);
+        this.momentum = momentum;
+    }
+
+    @Override
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
-                owner.setOnGround(true);
+                owner.setOnGround(false);
                 
                 Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
                 float vPT = hookData.pullSpeed() / 20f;
@@ -148,6 +159,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         if (updateCounter % 10 == 0 && moveVector != null && moveVector.length() > 0.5)
             getOwner().ifPresent(owner -> owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f));
         updateCounter++;
+        updateMomentum();
     }
 
     @Override
