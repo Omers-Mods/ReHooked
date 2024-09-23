@@ -12,8 +12,6 @@ import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -233,8 +231,8 @@ public class HookEntity extends Projectile {
         if (getOwner() instanceof Player owner) {
             if (level().isClientSide()) {
                 // vector to the owner
-                Vec3 vectorToPlayer = position().vectorTo(owner.getEyePosition());
-                if (vectorToPlayer.length() < 5) {
+                Vec3 vectorToPlayer = position().vectorTo(PositionHelper.getWaistPosition(owner));
+                if (vectorToPlayer.length() < 1.5) {
                     IClientPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
                         handler.removeHook(this);
                         this.discard();
