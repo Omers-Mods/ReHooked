@@ -6,21 +6,17 @@ import com.oe.rehooked.client.KeyBindings;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
-import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
-import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
@@ -59,10 +55,9 @@ public class ClientForgeEvents {
         
         handler.setOwner(player).update();
         if (handler.shouldMoveThisTick()) {
-            Vec3 deltaVThisTick = handler.getDeltaVThisTick();
-            player.setDeltaMovement(deltaVThisTick);
+            player.setDeltaMovement(handler.getDeltaVThisTick());
         }
-        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(false)) {
+        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(true)) {
             handler.jump();
         }
         handler.storeLastPlayerPosition();
