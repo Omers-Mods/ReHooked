@@ -46,18 +46,18 @@ public class ClientForgeEvents {
             return;
         }
         IClientPlayerHookHandler handler = optHandler.get();
-        if (KeyBindings.FIRE_HOOK_KEY.consumeClick()) {
-            if (Screen.hasShiftDown()) {
-                Optional<HookEntity> target = VectorHelper.acquireLookTarget(HookEntity.class, player, 0.5);
-                target.ifPresent(handler::removeHook);
-            } else if (ticksSinceShot > 5) {
-                ticksSinceShot = 0;
-                CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
-                    Entity camera = Minecraft.getInstance().getCameraEntity();
-                    handler.shootFromRotation(camera.getXRot(), camera.getYRot());
-                });
-            }
+        if (KeyBindings.FIRE_HOOK_KEY.consumeClick() && ticksSinceShot > 5) {
+            ticksSinceShot = 0;
+            CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
+                Entity camera = Minecraft.getInstance().getCameraEntity();
+                handler.shootFromRotation(camera.getXRot(), camera.getYRot());
+            });
         }
+        if (KeyBindings.RETRACT_HOOK_KEY.consumeClick()) {
+            Optional<HookEntity> target = VectorHelper.acquireLookTarget(HookEntity.class, player, 0.5);
+            target.ifPresent(handler::removeHook);
+        }
+        
         handler.setOwner(player).update();
         if (handler.shouldMoveThisTick()) {
             Vec3 deltaVThisTick = handler.getDeltaVThisTick();

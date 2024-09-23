@@ -42,11 +42,14 @@ public class HookItem extends Item implements ICurioItem {
         if (!(pStack.getItem() instanceof HookItem)) return;
         pTooltipComponents.add(Component.translatable("tooltip.rehooked:" + hookType + "_hook.info"));
         if (Screen.hasShiftDown()) {
-            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_fire", KeyBindings.FIRE_HOOK_KEY.getKey().getDisplayName()));
-            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract", KeyBindings.FIRE_HOOK_KEY.getKey().getDisplayName()));
+            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_fire", 
+                    KeyBindings.getCombinedKeyName(KeyBindings.FIRE_HOOK_KEY)));
+            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract", 
+                    KeyBindings.getCombinedKeyName(KeyBindings.RETRACT_HOOK_KEY)));
             HookRegistry.getHookData(hookType).ifPresent(hookData -> {
                 if (!hookData.isCreative()) {
-                    pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract_all", KeyBindings.REMOVE_ALL_HOOKS_KEY.getKey().getDisplayName()));
+                    pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract_all", 
+                            KeyBindings.getCombinedKeyName(KeyBindings.REMOVE_ALL_HOOKS_KEY)));
                 }
             });
         }

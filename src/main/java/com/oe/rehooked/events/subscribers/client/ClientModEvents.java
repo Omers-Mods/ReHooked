@@ -22,6 +22,7 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void onRegisterKeys(RegisterKeyMappingsEvent event) {
         event.register(KeyBindings.FIRE_HOOK_KEY);
+        event.register(KeyBindings.RETRACT_HOOK_KEY);
         event.register(KeyBindings.REMOVE_ALL_HOOKS_KEY);
     }
 
