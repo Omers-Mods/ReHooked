@@ -85,6 +85,7 @@ public class HookEntity extends Projectile {
 
     @Override
     public boolean shouldRender(double pX, double pY, double pZ) {
+        if (retractedToPlayer) return false;
         if (getOwner() instanceof Player owner) {
             if (getOwner().shouldRender(pX, pY, pZ)) {
                 if (getState().equals(State.RETRACTING)) {
