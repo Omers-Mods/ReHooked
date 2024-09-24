@@ -94,18 +94,18 @@ public interface ICommonPlayerHookHandler {
         }).orElse(null);
     }
     default void onUnequip() {
-        ReHookedMod.LOGGER.info("Unequipped hook!");
+        ReHookedMod.LOGGER.debug("Unequipped hook!");
         removeAllHooks();
         update();
     }
     default void onEquip() {
-        ReHookedMod.LOGGER.info("Equipped hook!");
+        ReHookedMod.LOGGER.debug("Equipped hook!");
         removeAllHooks();
         update();
     }
     
     default void jump() {
-        ReHookedMod.LOGGER.info("jumping");
+        ReHookedMod.LOGGER.debug("jumping");
         getOwner().ifPresent(owner -> {
             setMomentum(getJumpVector());
             removeAllHooks();
