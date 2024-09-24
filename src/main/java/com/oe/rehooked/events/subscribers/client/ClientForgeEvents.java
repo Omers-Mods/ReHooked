@@ -48,7 +48,7 @@ public class ClientForgeEvents {
                 handler.shootFromRotation(camera.getXRot(), camera.getYRot());
             });
         }
-        if (KeyBindings.RETRACT_HOOK_KEY.consumeClick()) {
+        if (KeyBindings.RETRACT_HOOK_KEY.consumeClick() && !handler.getHooks().isEmpty()) {
             Optional<HookEntity> target = VectorHelper.acquireLookTarget(HookEntity.class, player, 0.5);
             target.ifPresent(handler::removeHook);
         }
@@ -57,7 +57,7 @@ public class ClientForgeEvents {
         if (handler.shouldMoveThisTick()) {
             player.setDeltaMovement(handler.getDeltaVThisTick());
         }
-        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHookData().map(HookData::isCreative).orElse(true)) {
+        if (KeyBindings.REMOVE_ALL_HOOKS_KEY.consumeClick() && !handler.getHooks().isEmpty() && !handler.getHookData().map(HookData::isCreative).orElse(true)) {
             handler.jump();
         }
         handler.storeLastPlayerPosition();
