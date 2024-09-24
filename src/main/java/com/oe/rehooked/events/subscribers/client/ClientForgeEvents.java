@@ -62,21 +62,4 @@ public class ClientForgeEvents {
         }
         handler.storeLastPlayerPosition();
     }
-    
-    @SubscribeEvent
-    public static void onInputUpdate(MovementInputUpdateEvent event) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null) {
-            IClientPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
-                if (handler.countPulling() > 0) {
-                    if (!player.getAbilities().mayfly && !player.getAbilities().flying) {
-                        // prevent crouching while on hook which isn't creative
-                        if (player.hasPose(Pose.CROUCHING)) {
-                            event.getInput().shiftKeyDown = false;
-                        }
-                    }
-                }
-            });
-        }
-    }
 }
