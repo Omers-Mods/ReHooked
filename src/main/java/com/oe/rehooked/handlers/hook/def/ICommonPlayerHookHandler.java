@@ -138,6 +138,10 @@ public interface ICommonPlayerHookHandler {
             return;
         }
         getOwner().ifPresent(owner -> {
+            if (owner.getAbilities().flying) {
+                setMomentum(null);
+                return;
+            }
             double horizontalScale = 0.95;
             double verticalScale = 0.9;
             // if on ground or in water remove momentum faster
