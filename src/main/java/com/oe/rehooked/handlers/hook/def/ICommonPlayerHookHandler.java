@@ -168,4 +168,6 @@ public interface ICommonPlayerHookHandler {
     }
     
     void storeLastPlayerPosition();
+    
+    void killHook(int id);
 }

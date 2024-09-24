@@ -1,6 +1,7 @@
 package com.oe.rehooked.handlers.hook.def;
 
 import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
+import com.oe.rehooked.entities.hook.HookEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
@@ -32,5 +33,13 @@ public interface IServerPlayerHookHandler extends ICommonPlayerHookHandler {
                 removeAllClientHooks(player);
         });
         update();
+    }
+    
+    @Override
+    default void killHook(int id) {
+        getOwner().map(Player::level).ifPresent(level -> {
+            if (level.getEntity(id) instanceof HookEntity hookEntity) 
+                hookEntity.discard();
+        });
     }
 }

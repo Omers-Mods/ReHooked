@@ -63,6 +63,7 @@ public class SHookCapabilityPacket {
                     case RETRACT_ALL_HOOKS -> handler.removeAllHooks();
                     case FORCE_UPDATE -> handler.update();
                     case JUMP -> handler.jump();
+                    case KILL -> handler.killHook(id);
                 }
             }
             else {
@@ -77,7 +78,8 @@ public class SHookCapabilityPacket {
         RETRACT_HOOK,
         RETRACT_ALL_HOOKS,
         JUMP,
-        FORCE_UPDATE;
+        FORCE_UPDATE,
+        KILL;
         
         public static State Get(int ordinal) {
             return State.values()[ordinal];

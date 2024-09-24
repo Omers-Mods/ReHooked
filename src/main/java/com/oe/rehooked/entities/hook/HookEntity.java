@@ -18,7 +18,6 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -59,7 +58,6 @@ public class HookEntity extends Projectile {
     protected int ticksInState = 0;
     protected boolean firstTickInState = true;
     protected Vec3 offset;
-    protected boolean retractedToPlayer = false;
     
     public HookEntity(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -84,28 +82,11 @@ public class HookEntity extends Projectile {
     }
 
     @Override
-    public boolean shouldRender(double pX, double pY, double pZ) {
-        if (getOwner() instanceof Player owner) {
-            if (getOwner().shouldRender(pX, pY, pZ)) {
-                if (getState().equals(State.RETRACTING)) {
-                    return PositionHelper.getWaistPosition(owner).distanceTo(position()) > 5;
-                }
-                else {
-                    return PositionHelper.getWaistPosition(owner).distanceTo(position()) > 0.3;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
     public void tick() {
-        if (!getState().equals(State.RETRACTING) && !(getOwner() instanceof Player)) {
-            if (!level().isClientSide()) {
-                LOGGER.debug("Owner not found, retracting");
-                setReason(Reason.EMPTY);
-                setState(State.RETRACTING);
-            }
+        if (!level().isClientSide() && !getState().equals(State.DONE) && 
+                !(getOwner() instanceof Player owner && owner.isAlive())) {
+            LOGGER.debug("Owner not found, setting state to done!");
+            setState(State.DONE);
         }
         
         if (!level().isClientSide()) handleSounds();
@@ -115,6 +96,11 @@ public class HookEntity extends Projectile {
             case SHOT -> tickShot();
             case PULLING -> tickPulling();
             case RETRACTING -> tickRetracting();
+            case DONE -> {
+                if (!level().isClientSide()) {
+                    discard();
+                }
+            }
         }
         
         // update position
@@ -123,10 +109,7 @@ public class HookEntity extends Projectile {
             setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
         }
         else if (getPrevState().equals(State.RETRACTING)) {
-            if (level().isClientSide())
-                setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
-            else if (getOwner() instanceof Player owner)
-                setPos(owner.position());
+            setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
         }
         
         // keep track of how many ticks in current state (also update prev state)
@@ -282,32 +265,22 @@ public class HookEntity extends Projectile {
                 Vec3 vectorToPlayer = position().vectorTo(PositionHelper.getWaistPosition(owner));
                 if (vectorToPlayer.length() < 5) {
                     IClientPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
-                        retractedToPlayer = true;
                         handler.removeHook(this);
-                        this.discard();
+                        setState(State.DONE);
+                        handler.killHook(getId());
                     });
                 }
                 // set the delta movement according to speed and distance from player
                 getHookType().flatMap(HookRegistry::getHookData).ifPresent(hookData -> {
-                    float speedModifier = hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed();
-                    if (vectorToPlayer.length() > speedModifier / 10f) {
-                        setDeltaMovement(vectorToPlayer.normalize().scale(speedModifier / 10f).add(owner.getDeltaMovement()));
+                    float speedModifier = hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed() / 10f;
+                    speedModifier += (float) owner.getDeltaMovement().length();
+                    if (vectorToPlayer.length() > speedModifier) {
+                        setDeltaMovement(vectorToPlayer.normalize().scale(speedModifier));
                     } else {
                         setDeltaMovement(vectorToPlayer);
                     }
                 });
             }
-            // send update to handler
-            if (!level().isClientSide()) {
-                if (firstTickInState) {
-                    IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
-                } else if (ticksInState > 20) {
-                    discard();
-                }
-            }
-        } else if (!level().isClientSide()){
-            // if owner not found discard
-            discard();
         }
     }
     
@@ -406,6 +379,7 @@ public class HookEntity extends Projectile {
         SHOT,
         PULLING,
         RETRACTING,
+        DONE
     }
     
     public enum Reason {
@@ -415,5 +389,11 @@ public class HookEntity extends Projectile {
         MISS,
         PLAYER,
         BREAK
+    }
+
+    @Override
+    public void remove(RemovalReason pReason) {
+        LOGGER.debug("Hook {} getting removed for {}", getUUID(), pReason);
+        super.remove(pReason);
     }
 }

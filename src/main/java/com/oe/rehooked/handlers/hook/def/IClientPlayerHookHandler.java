@@ -28,4 +28,9 @@ public interface IClientPlayerHookHandler extends ICommonPlayerHookHandler {
             }
         });
     }
+
+    @Override
+    default void killHook(int id) {
+        PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.KILL, id));
+    }
 }

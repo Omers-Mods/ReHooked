@@ -18,6 +18,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -35,8 +36,18 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     }
 
     @Override
+    public boolean shouldRender(HookEntity pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
+        if (pLivingEntity.isRemoved() || pLivingEntity.getHookType().isEmpty() || pLivingEntity.getState().equals(HookEntity.State.DONE)) return false;
+        if (pLivingEntity.getOwner() instanceof Player owner) {
+            if (Minecraft.getInstance().player != null && owner.getUUID().equals(Minecraft.getInstance().player.getUUID()))
+                return true;
+            return pCamera.isVisible(owner.getBoundingBox());
+        }
+        return false;
+    }
+
+    @Override
     public void render(HookEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
-        if (pEntity.getHookType().isEmpty() || pEntity.isRemoved()) return;
         handleHook(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         if (pEntity.hasChain() && pEntity.getOwner() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);

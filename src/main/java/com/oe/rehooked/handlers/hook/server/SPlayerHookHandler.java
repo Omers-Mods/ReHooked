@@ -87,8 +87,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         LOGGER.debug("Removing hook by entity with id: {}", hookEntity.getId());
         // this is a response to a request from the hook
         if (hooks.remove(hookEntity)) {
-            hookEntity.setReason(HookEntity.Reason.EMPTY);
-            hookEntity.setState(HookEntity.State.RETRACTING);
             // notify client player
             getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
                     new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()), 
