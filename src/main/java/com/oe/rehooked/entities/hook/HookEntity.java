@@ -85,11 +85,10 @@ public class HookEntity extends Projectile {
 
     @Override
     public boolean shouldRender(double pX, double pY, double pZ) {
-        if (retractedToPlayer) return false;
         if (getOwner() instanceof Player owner) {
             if (getOwner().shouldRender(pX, pY, pZ)) {
                 if (getState().equals(State.RETRACTING)) {
-                    return PositionHelper.getWaistPosition(owner).distanceTo(position()) > 2;
+                    return PositionHelper.getWaistPosition(owner).distanceTo(position()) > 5;
                 }
                 else {
                     return PositionHelper.getWaistPosition(owner).distanceTo(position()) > 0.3;
@@ -281,7 +280,7 @@ public class HookEntity extends Projectile {
             if (level().isClientSide()) {
                 // vector to the owner
                 Vec3 vectorToPlayer = position().vectorTo(PositionHelper.getWaistPosition(owner));
-                if (vectorToPlayer.length() < 1.5) {
+                if (vectorToPlayer.length() < 5) {
                     IClientPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
                         retractedToPlayer = true;
                         handler.removeHook(this);

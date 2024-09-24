@@ -36,7 +36,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
 
     @Override
     public void render(HookEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
-        if (pEntity.getHookType().isEmpty()) return;
+        if (pEntity.getHookType().isEmpty() || pEntity.isRemoved()) return;
         handleHook(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         if (pEntity.hasChain() && pEntity.getOwner() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
