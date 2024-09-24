@@ -302,7 +302,7 @@ public class HookEntity extends Projectile {
             if (!level().isClientSide()) {
                 if (firstTickInState) {
                     IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
-                } else if (ticksInState > 40) {
+                } else if (ticksInState > 20) {
                     discard();
                 }
             }
