@@ -27,5 +27,5 @@
   "sounds.rehooked.hook_hit": "Hook Hit Surface",
   "sounds.rehooked.hook_retract": "Hook Retracting",
   "sounds.rehooked.hook_shoot": "Hook Shot",
-  "sounds.rehooked.hook_moving": "Hook Moving"
+  "sounds.rehooked.hook_miss": "Hook Miss"
 }

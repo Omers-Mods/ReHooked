@@ -118,8 +118,8 @@ public interface ICommonPlayerHookHandler {
         return getHookData().map(hookData -> {
             if (countPulling() > 0 && shouldMoveThisTick()) {
                 Vec3 dVT = actualPlayerPositionChange();
-                if (dVT.y < 1)
-                    dVT = new Vec3(dVT.x, 1, dVT.z);
+                if (dVT.y < 0.75)
+                    dVT = new Vec3(dVT.x, 0.75, dVT.z);
                 return reduceCollisions(dVT);
             }
             return Vec3.ZERO;

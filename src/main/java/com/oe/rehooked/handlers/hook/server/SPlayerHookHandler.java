@@ -6,9 +6,11 @@ import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
+import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -71,12 +73,12 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         // this is a response to a request from the client
         if (hooks.removeIf(hookEntity -> hookEntity.getId() == id)) {
             // update the hook to retract
-            getOwner()
-                    .map(Player::level)
-                    .map(level -> level.getEntity(id))
-                    .ifPresent(entity -> {
-                        if (entity instanceof HookEntity hookEntity) hookEntity.setState(HookEntity.State.RETRACTING);
-                    });
+            getOwner().ifPresent(owner -> {
+                if (owner.level().getEntity(id) instanceof HookEntity hookEntity) {
+                    hookEntity.setReason(HookEntity.Reason.PLAYER);
+                    hookEntity.setState(HookEntity.State.RETRACTING);
+                }
+            });
         }
     }
 
@@ -85,6 +87,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         LOGGER.debug("Removing hook by entity with id: {}", hookEntity.getId());
         // this is a response to a request from the hook
         if (hooks.remove(hookEntity)) {
+            hookEntity.setReason(HookEntity.Reason.EMPTY);
             hookEntity.setState(HookEntity.State.RETRACTING);
             // notify client player
             getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
@@ -97,7 +100,10 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public void removeAllHooks() {
         LOGGER.debug("Removing all hooks ({})", hooks.size());
         // this is a response to a request from the client
-        hooks.forEach(hookEntity -> hookEntity.setState(HookEntity.State.RETRACTING));
+        hooks.forEach(hookEntity -> {
+            hookEntity.setReason(HookEntity.Reason.PLAYER);
+            hookEntity.setState(HookEntity.State.RETRACTING);
+        });
         hooks.clear();
     }
 

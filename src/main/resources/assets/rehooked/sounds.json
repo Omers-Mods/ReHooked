@@ -2,29 +2,36 @@
   "hook_hit": {
     "subtitle": "sounds.rehooked.hook_hit",
     "sounds": [
-      "minecraft:random/bowhit1",
-      "minecraft:random/bowhit2",
-      "minecraft:random/bowhit3",
-      "minecraft:random/bowhit4"
+      "rehooked:hook/hit/impact_plank_medium_000",
+      "rehooked:hook/hit/impact_plank_medium_001",
+      "rehooked:hook/hit/impact_plank_medium_002",
+      "rehooked:hook/hit/impact_plank_medium_003",
+      "rehooked:hook/hit/impact_plank_medium_004"
     ]
   },
   "hook_retract": {
     "subtitle": "sounds.rehooked.hook_retract",
     "sounds": [
-      "rehooked:metal_click"
+      {
+        "name": "minecraft:entity.fishing_bobber.retrieve",
+        "type": "event"
+      }
     ]
   },
   "hook_shoot": {
     "subtitle": "sounds.rehooked.hook_shoot",
     "sounds": [
-      "rehooked:book_place_1"
+      {
+        "name": "minecraft:item.crossbow.shoot",
+        "type": "event"
+      }
     ]
   },
-  "hook_moving": {
-    "subtitle": "sounds.rehooked.hook_moving",
+  "hook_miss": {
+    "subtitle": "sounds.rehooked.hook_miss",
     "sounds": [
-      "rehooked:handle_coins_1",
-      "rehooked:handle_coins_2"
+      "rehooked:hook/miss/belt_handle_1",
+      "rehooked:hook/miss/belt_handle_2"
     ]
   }
 }

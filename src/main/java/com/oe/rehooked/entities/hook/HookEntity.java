@@ -18,6 +18,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -51,10 +53,13 @@ public class HookEntity extends Projectile {
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Vector3f> DELTA_MOVEMENT = 
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Integer> REASON = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
 
     protected int ticksInState = 0;
     protected boolean firstTickInState = true;
     protected Vec3 offset;
+    protected boolean retractedToPlayer = false;
     
     public HookEntity(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -80,9 +85,16 @@ public class HookEntity extends Projectile {
 
     @Override
     public boolean shouldRender(double pX, double pY, double pZ) {
-        if (getOwner() instanceof Player owner)
-            return getOwner().shouldRender(pX, pY, pZ) && 
-                    PositionHelper.getWaistPosition(owner).distanceTo(position()) > 0.3;
+        if (getOwner() instanceof Player owner) {
+            if (getOwner().shouldRender(pX, pY, pZ)) {
+                if (getState().equals(State.RETRACTING)) {
+                    return PositionHelper.getWaistPosition(owner).distanceTo(position()) > 2;
+                }
+                else {
+                    return PositionHelper.getWaistPosition(owner).distanceTo(position()) > 0.3;
+                }
+            }
+        }
         return false;
     }
 
@@ -91,9 +103,12 @@ public class HookEntity extends Projectile {
         if (!getState().equals(State.RETRACTING) && !(getOwner() instanceof Player)) {
             if (!level().isClientSide()) {
                 LOGGER.debug("Owner not found, retracting");
+                setReason(Reason.EMPTY);
                 setState(State.RETRACTING);
             }
         }
+        
+        if (!level().isClientSide()) handleSounds();
         
         // "state machine"
         switch (getState()) {
@@ -125,7 +140,39 @@ public class HookEntity extends Projectile {
         // run the super class tick method
         super.tick();
     }
-
+    
+    protected void handleSounds() {
+        boolean handledReason = false;
+        switch (getReason()) {
+            case SHOT -> {
+                level().playSound(null, getX(), getY(), getZ(), ReHookedSounds.HOOK_SHOOT.get(), SoundSource.PLAYERS, 0.2f, 0.5f);
+                handledReason = true;
+            }
+            case HIT -> {
+                getHitPos().ifPresent(hitPos -> {
+                    SoundType soundType = level().getBlockState(hitPos).getSoundType();
+                    level().playSound(null, hitPos.getX(), hitPos.getY(), hitPos.getZ(),
+                            soundType.getHitSound(),
+                            SoundSource.BLOCKS, soundType.getVolume(), soundType.getPitch());
+                    level().playSound(null, hitPos.getX(), hitPos.getY(), hitPos.getZ(),
+                            ReHookedSounds.HOOK_HIT.get(), 
+                            SoundSource.BLOCKS, 0.35f, 0.5f);
+                });
+                handledReason = true;
+            }
+            case MISS, BREAK -> {
+                if (getOwner() instanceof Player owner)
+                    level().playSound(null, getOwner().getX(), owner.getY(), owner.getZ(), ReHookedSounds.HOOK_MISS.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                handledReason = true;
+            }
+            case PLAYER -> {
+                level().playSound(null, getX(), getY(), getZ(), ReHookedSounds.HOOK_RETRACT.get(), SoundSource.NEUTRAL, 1f, 1f);
+                handledReason = true;
+            }
+        }
+        if (handledReason) setReason(Reason.EMPTY);
+    }
+    
     @OnlyIn(Dist.CLIENT)
     public void createParticles() {
         getHookType().flatMap(HookRegistry::getHookData).map(HookData::particleType).map(Supplier::get).ifPresent(particleType -> {
@@ -161,7 +208,7 @@ public class HookEntity extends Projectile {
         float f1 = -Mth.sin((pX + pZ) * ((float)Math.PI / 180F));
         float f2 = Mth.cos(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
         this.shoot(f, f1, f2, pVelocity, pInaccuracy);
-        level().playSeededSound(null, pX, pY, pZ, ReHookedSounds.HOOK_SHOOT.get(), SoundSource.NEUTRAL, 0.2f, 1f, 0);
+        setReason(Reason.SHOT);
     }
 
     protected void tickShot() {
@@ -172,19 +219,18 @@ public class HookEntity extends Projectile {
             // check if needs to destroy instant hook
             if (!level().isClientSide() && !firstTickInState && hookData.speed() == Float.MAX_VALUE) {
                 LOGGER.debug("Retracting instant hook on second shot tick");
+                setReason(Reason.MISS);
                 setState(State.RETRACTING);
                 setDeltaMovement(Vec3.ZERO);
                 return;
             }
             if (getOwner() instanceof Player owner) {
-                // play the chain sound
-                if (ticksInState % 10 == 0) {
-                    level().playSeededSound(null, owner.getX(), owner.getY(), owner.getZ(), ReHookedSounds.HOOK_MOVING.get(), SoundSource.NEUTRAL, 0.2f, 1f, 0);
-                }
                 // check if moved further than the target
                 if (PositionHelper.getWaistPosition(owner).distanceTo(position()) > hookData.range()) {
                     LOGGER.debug("Moved further than range from owner");
+                    setReason(Reason.MISS);
                     setState(State.RETRACTING);
+                    setDeltaMovement(Vec3.ZERO);
                 }
                 else {
                     // check if hit anything
@@ -195,9 +241,9 @@ public class HookEntity extends Projectile {
                         Vec3 hitLocation = hitResult.getLocation();
                         setDeltaMovement(position().vectorTo(hitLocation));
                         if (!level().isClientSide()) {
+                            setReason(Reason.HIT);
                             setState(State.PULLING);
                             setHitPos(hitResult.getBlockPos());
-                            level().playSeededSound(null, hitLocation.x, hitLocation.y, hitLocation.z, ReHookedSounds.HOOK_HIT.get(), SoundSource.NEUTRAL, 0.2f, 0.2f, 0);
                         }
                     }
                 }
@@ -218,8 +264,10 @@ public class HookEntity extends Projectile {
             }
         }
         getHitPos().ifPresent(hitPos -> {
-            if (level().getBlockState(hitPos).isAir())
+            if (level().getBlockState(hitPos).isAir()) {
+                setReason(Reason.BREAK);
                 setState(State.RETRACTING);
+            }
         });
         // block collision detection while pulling to prevent rendering as black blob
         if (isInWall() && getOwner() instanceof Player owner) {
@@ -234,11 +282,11 @@ public class HookEntity extends Projectile {
                 Vec3 vectorToPlayer = position().vectorTo(PositionHelper.getWaistPosition(owner));
                 if (vectorToPlayer.length() < 1.5) {
                     IClientPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
+                        retractedToPlayer = true;
                         handler.removeHook(this);
                         this.discard();
                     });
                 }
-                else if (ticksInState % 5 == 0) owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f);
                 // set the delta movement according to speed and distance from player
                 getHookType().flatMap(HookRegistry::getHookData).ifPresent(hookData -> {
                     float speedModifier = hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed();
@@ -252,7 +300,6 @@ public class HookEntity extends Projectile {
             // send update to handler
             if (!level().isClientSide()) {
                 if (firstTickInState) {
-                    level().playSeededSound(null, getX(), getY(), getZ(), ReHookedSounds.HOOK_RETRACT.get(), SoundSource.NEUTRAL, 0.2f, 1f, 0);
                     IServerPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> handler.removeHook(this));
                 } else if (ticksInState > 40) {
                     discard();
@@ -279,9 +326,10 @@ public class HookEntity extends Projectile {
     }
 
     public boolean hasChain() {
-        return getHookType().flatMap(HookRegistry::getHookData).map(hookData -> {
-            return !(hookData.particleType() != null && hookData.isCreative());
-        }).orElse(false);
+        return getHookType()
+                .flatMap(HookRegistry::getHookData)
+                .map(hookData -> !(hookData.particleType() != null && hookData.isCreative()))
+                .orElse(false);
     }
     
     @Override
@@ -332,12 +380,21 @@ public class HookEntity extends Projectile {
         return entityData.get(DELTA_MOVEMENT);
     }
     
+    public void setReason(Reason reason) {
+        entityData.set(REASON, reason.ordinal());
+    }
+    
+    public Reason getReason() {
+        return Reason.values()[entityData.get(REASON)];
+    }
+    
     @Override
     protected void defineSynchedData() {
         entityData.define(HIT_POS, Optional.empty());
         entityData.define(STATE, State.SHOT.ordinal());
         entityData.define(PREV_STATE, State.SHOT.ordinal());
         entityData.define(DELTA_MOVEMENT, new Vector3f(0, 0, 0));
+        entityData.define(REASON, Reason.EMPTY.ordinal());
     }
 
     @Override
@@ -349,5 +406,14 @@ public class HookEntity extends Projectile {
         SHOT,
         PULLING,
         RETRACTING,
+    }
+    
+    public enum Reason {
+        EMPTY,
+        SHOT,
+        HIT,
+        MISS,
+        PLAYER,
+        BREAK
     }
 }

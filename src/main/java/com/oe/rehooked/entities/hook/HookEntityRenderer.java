@@ -35,14 +35,6 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     }
 
     @Override
-    public boolean shouldRender(HookEntity pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
-        boolean superShouldRender = super.shouldRender(pLivingEntity, pCamera, pCamX, pCamY, pCamZ);
-        if (Minecraft.getInstance().player != null && pLivingEntity.getOwner() != null) 
-            superShouldRender |= Minecraft.getInstance().player.getUUID().equals(pLivingEntity.getOwner().getUUID());
-        return superShouldRender;
-    }
-
-    @Override
     public void render(HookEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         if (pEntity.getHookType().isEmpty()) return;
         handleHook(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);

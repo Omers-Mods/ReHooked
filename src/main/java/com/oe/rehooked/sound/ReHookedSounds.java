@@ -13,9 +13,9 @@ public class ReHookedSounds {
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, ReHookedMod.MOD_ID);
     
     public static final RegistryObject<SoundEvent> HOOK_HIT = createEvent("hook_hit");
-    public static final RegistryObject<SoundEvent> HOOK_RETRACT = createEvent("hook_retract");
+    public static final RegistryObject<SoundEvent> HOOK_MISS = createEvent("hook_miss");
     public static final RegistryObject<SoundEvent> HOOK_SHOOT = createEvent("hook_shoot");
-    public static final RegistryObject<SoundEvent> HOOK_MOVING = createEvent("hook_moving");
+    public static final RegistryObject<SoundEvent> HOOK_RETRACT = createEvent("hook_retract");
     
     private static RegistryObject<SoundEvent> createEvent(String name) {
         ResourceLocation loc = new ResourceLocation(ReHookedMod.MOD_ID, name);

@@ -31,6 +31,8 @@ public class ReHookedMod {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> 
                 () -> PacketHandler.addHandler(CHookCapabilityPacket.class, CHookCapabilityProcessor::handle));
 
+        // register mod sounds
+        ReHookedSounds.register(modEventBus);
         // register mod particles
         ReHookedParticles.register(modEventBus);
         // Register mod entities
@@ -39,8 +41,6 @@ public class ReHookedMod {
         ReHookedCreativeModeTab.register(modEventBus);
         // Register mod items
         ReHookedItems.register(modEventBus);
-        // register mod sounds
-        ReHookedSounds.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

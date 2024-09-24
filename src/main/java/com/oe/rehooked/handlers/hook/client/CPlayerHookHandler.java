@@ -157,8 +157,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                 if (!hookData.isCreative() && moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
             owner.onUpdateAbilities();
-            if (updateCounter % 10 == 0 && actualPlayerPositionChange().length() > 0.5)
-                owner.playSound(ReHookedSounds.HOOK_MOVING.get(), 0.2f, 1f);
             updateMomentum();
         });
         handleParticles();
