@@ -91,8 +91,14 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
                     new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()), 
                     (ServerPlayer) owner));
-            hookEntity.setReason(HookEntity.Reason.PLAYER);
-            hookEntity.setState(HookEntity.State.RETRACTING);
+            if (hookEntity.getState().equals(HookEntity.State.RETRACTING)) {
+                hookEntity.setReason(HookEntity.Reason.EMPTY);
+                hookEntity.setState(HookEntity.State.DONE);
+            }
+            else {
+                hookEntity.setReason(HookEntity.Reason.PLAYER);
+                hookEntity.setState(HookEntity.State.RETRACTING);
+            }
         }
     }
 

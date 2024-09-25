@@ -5,8 +5,6 @@ import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
-import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
-import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.HandlerHelper;
@@ -14,6 +12,7 @@ import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -25,7 +24,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,7 +39,6 @@ import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 public class HookEntity extends Projectile {
@@ -76,6 +73,11 @@ public class HookEntity extends Projectile {
     }
 
     @Override
+    public boolean isAlwaysTicking() {
+        return true;
+    }
+
+    @Override
     protected boolean canHitEntity(Entity pTarget) {
         return false;
     }
@@ -102,8 +104,9 @@ public class HookEntity extends Projectile {
 
     @Override
     public void tick() {
+        Player owner = tryGetOwnerFromCachedId();
         if (!level().isClientSide() && !getState().equals(State.DONE) && 
-                !(getOwner() instanceof Player owner && owner.isAlive())) {
+                !(owner != null && owner.isAlive())) {
             LOGGER.debug("Owner not found, setting state to done!");
             setState(State.DONE);
         }
@@ -135,7 +138,7 @@ public class HookEntity extends Projectile {
         trackTicksInState();
 
         // create offset on first tick
-        if (offset == null && getOwner() instanceof Player owner) {
+        if (offset == null && owner != null) {
             offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() - 0.1, 0)).normalize();
         }
         
@@ -163,8 +166,9 @@ public class HookEntity extends Projectile {
                 handledReason = true;
             }
             case MISS, BREAK -> {
-                if (getOwner() instanceof Player owner)
-                    level().playSound(null, getOwner().getX(), owner.getY(), owner.getZ(), ReHookedSounds.HOOK_MISS.get(), SoundSource.PLAYERS, 0.5f, 1f);
+                Player owner = tryGetOwnerFromCachedId();
+                if (owner != null)
+                    level().playSound(null, owner.getX(), owner.getY(), owner.getZ(), ReHookedSounds.HOOK_MISS.get(), SoundSource.PLAYERS, 0.5f, 1f);
                 handledReason = true;
             }
             case PLAYER -> {
@@ -178,7 +182,8 @@ public class HookEntity extends Projectile {
     @OnlyIn(Dist.CLIENT)
     public void createParticles() {
         getHookData().map(HookData::particleType).map(Supplier::get).ifPresent(particleType -> {
-            if (getOwner() instanceof Player owner) {
+            Player owner = tryGetOwnerFromCachedId();
+            if (owner != null) {
                 Vec3 ownerWaist = PositionHelper.getWaistPosition(owner);
                 Vec3 toOwner = position().vectorTo(ownerWaist).normalize().scale(0.2);
                 for (int i = 1; i < 26; i++) {
@@ -226,7 +231,8 @@ public class HookEntity extends Projectile {
                 setDeltaMovement(Vec3.ZERO);
                 return;
             }
-            if (getOwner() instanceof Player owner) {
+            Player owner = tryGetOwnerFromCachedId();
+            if (owner != null) {
                 // check if moved further than the target
                 if (PositionHelper.getWaistPosition(owner).distanceTo(position()) > hookData.range()) {
                     LOGGER.debug("Moved further than range from owner");
@@ -272,20 +278,21 @@ public class HookEntity extends Projectile {
             }
         });
         // block collision detection while pulling to prevent rendering as black blob
-        if (isInWall() && getOwner() instanceof Player owner) {
+        Player owner = tryGetOwnerFromCachedId();
+        if (isInWall() && owner != null) {
             setPos(position().add(position().vectorTo(owner.position()).normalize().scale(0.1)));
         }
     }
     
     protected void tickRetracting() {
-        if (getOwner() instanceof Player owner) {
-            if (level().isClientSide()) {
+        Player owner = tryGetOwnerFromCachedId();
+        if (owner != null) {
+            if (!level().isClientSide()) {
                 // vector to the owner
                 Vec3 vectorToPlayer = position().vectorTo(PositionHelper.getWaistPosition(owner));
                 if (vectorToPlayer.length() < 5) {
-                    IClientPlayerHookHandler.FromPlayer(owner).ifPresent(handler -> {
+                    HandlerHelper.getHookHandler(owner).ifPresent(handler -> {
                         handler.removeHook(this);
-                        setState(State.DONE);
                         handler.killHook(getId());
                     });
                 }
