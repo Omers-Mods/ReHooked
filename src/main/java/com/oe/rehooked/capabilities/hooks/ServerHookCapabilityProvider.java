@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ServerHookCapabilityProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+public class ServerHookCapabilityProvider implements ICapabilityProvider {
     public static final Capability<IServerPlayerHookHandler> SERVER_HOOK_HANDLER =
             CapabilityManager.get(new CapabilityToken<>() {});
 
@@ -29,17 +29,5 @@ public class ServerHookCapabilityProvider implements ICapabilityProvider, INBTSe
         if (cap.equals(SERVER_HOOK_HANDLER))
             return serverHandlerOptional.cast();
         return LazyOptional.empty();
-    }
-
-    @Override
-    public CompoundTag serializeNBT() {
-        CompoundTag nbt = new CompoundTag();
-        createServerHookHandler().saveNBTData(nbt);
-        return nbt;
-    }
-
-    @Override
-    public void deserializeNBT(CompoundTag nbt) {
-        createServerHookHandler().loadNBTData(nbt);
     }
 }

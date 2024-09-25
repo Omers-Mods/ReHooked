@@ -1,6 +1,7 @@
 package com.oe.rehooked.handlers.hook.server;
 
 import com.mojang.logging.LogUtils;
+import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
@@ -8,7 +9,6 @@ import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -31,18 +31,15 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     
     private Vec3 moveVector;
     private Vec3 momentum;
-    private boolean hookFlightActive;
-    private boolean externalFlight;
-    private boolean preventingFlightKick;
-    
     private Vec3 lastPlayerPosition;
+    
+    private FlightHandler flightHandler;
     
     public SPlayerHookHandler() {
         hooks = new ArrayList<>();
         owner = Optional.empty();
         moveVector = null;
-        hookFlightActive = false;
-        externalFlight = false;
+        flightHandler = new FlightHandler();
     }
 
     @Override
@@ -137,49 +134,12 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public Optional<Player> getOwner() {
         return owner;
     }
-
-    private void updateCreativeFlight() {
-        getOwner().ifPresent(owner -> getHookData().ifPresentOrElse(hookData -> {
-            if (!hookFlightActive && !preventingFlightKick) externalFlight = owner.getAbilities().mayfly || owner.getAbilities().flying;
-            else if (!owner.getAbilities().mayfly && !owner.getAbilities().flying) externalFlight = false;
-            if (owner.isCreative()) externalFlight = true;
-            Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
-            VectorHelper.Box box = getBox();
-            hookFlightActive = countPulling() > 0 && 
-                    (box.isInside(ownerWaistPos) || box.closestPointInCube(ownerWaistPos).distanceTo(ownerWaistPos) < 5);
-            owner.getAbilities().mayfly = externalFlight || hookFlightActive;
-            if (!externalFlight && !hookFlightActive) {
-                if (shouldMoveThisTick() || getMomentum() != null) {
-                    owner.getAbilities().mayfly = true;
-                    preventingFlightKick = true;
-                }
-                else {
-                    owner.getAbilities().flying = false;
-                    owner.getAbilities().mayfly = false;
-                    owner.onUpdateAbilities();
-                }
-            }
-            else {
-                owner.onUpdateAbilities();
-            }
-        }, () -> {
-            if (preventingFlightKick || hookFlightActive) {
-                preventingFlightKick = false;
-                hookFlightActive = false;
-            }
-            if (!externalFlight) {
-                owner.getAbilities().flying = false;
-                owner.getAbilities().mayfly = false;
-                owner.onUpdateAbilities();
-            }
-        }));
-    }
-
+    
     @Override
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {
-            updateCreativeFlight();
+            flightHandler.updateFlight((ServerPlayer) owner, this);
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
@@ -262,23 +222,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     @Override
     public void copyFrom(IServerPlayerHookHandler handler) {
         if (handler instanceof SPlayerHookHandler other) {
-            this.externalFlight = other.externalFlight;
-            this.hookFlightActive = other.hookFlightActive;
-            this.preventingFlightKick = other.preventingFlightKick;
+            this.flightHandler = other.flightHandler;
         }
     }
-    
-    @Override
-    public void saveNBTData(CompoundTag nbt) {
-        nbt.putBoolean(EXTERNAL_FLIGHT, externalFlight);
-        nbt.putBoolean(HOOK_FLIGHT_ACTIVE, hookFlightActive);
-        nbt.putBoolean(PREVENTING_FLIGHT_KICK, preventingFlightKick);
-    }
-    
-    @Override
-    public void loadNBTData(CompoundTag nbt) {
-        externalFlight = nbt.getBoolean(EXTERNAL_FLIGHT);
-        hookFlightActive = nbt.getBoolean(HOOK_FLIGHT_ACTIVE);
-        preventingFlightKick = nbt.getBoolean(PREVENTING_FLIGHT_KICK);
-    } 
 }

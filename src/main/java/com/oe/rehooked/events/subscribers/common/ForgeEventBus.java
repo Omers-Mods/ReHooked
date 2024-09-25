@@ -64,4 +64,19 @@ public class ForgeEventBus {
             if (handler.countPulling() > 0) event.setNewSpeed(event.getNewSpeed() * 5);
         });
     }
+    
+    @SubscribeEvent
+    public static void onPlayerCloned(PlayerEvent.Clone event) {
+        if (event.getEntity().level().isClientSide()) return;
+        HandlerHelper.getHookHandler(event.getEntity()).ifPresent(newHandler -> {
+            HandlerHelper.getHookHandler(event.getOriginal()).ifPresent(oldHandler -> {
+                if (newHandler instanceof IServerPlayerHookHandler newServerHandler &&
+                    oldHandler instanceof IServerPlayerHookHandler oldServerHandler) {
+                    newServerHandler.copyFrom(oldServerHandler);
+                    newHandler.setOwner(event.getEntity());
+                    newHandler.update();
+                }
+            });
+        });
+    }
 }

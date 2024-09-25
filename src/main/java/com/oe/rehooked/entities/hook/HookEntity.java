@@ -90,6 +90,11 @@ public class HookEntity extends Projectile {
     }
 
     @Override
+    public boolean shouldRenderAtSqrDistance(double pDistance) {
+        return getHookData().map(hookData -> pDistance < hookData.range() * hookData.range()).orElse(false);
+    }
+
+    @Override
     public void setOwner(@Nullable Entity pOwner) {
         super.setOwner(pOwner);
         setOwnerId(pOwner != null ? pOwner.getId() : -1);
