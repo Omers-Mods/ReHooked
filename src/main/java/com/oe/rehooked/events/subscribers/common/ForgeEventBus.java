@@ -70,8 +70,8 @@ public class ForgeEventBus {
         if (event.getEntity().level().isClientSide()) return;
         HandlerHelper.getHookHandler(event.getEntity()).ifPresent(newHandler -> {
             HandlerHelper.getHookHandler(event.getOriginal()).ifPresent(oldHandler -> {
-                if (newHandler instanceof IServerPlayerHookHandler newServerHandler &&
-                    oldHandler instanceof IServerPlayerHookHandler oldServerHandler) {
+                if (newHandler instanceof IServerPlayerHookHandler newServerHandler && 
+                        oldHandler instanceof IServerPlayerHookHandler oldServerHandler) {
                     newServerHandler.copyFrom(oldServerHandler);
                     newHandler.setOwner(event.getEntity());
                     newHandler.update();
