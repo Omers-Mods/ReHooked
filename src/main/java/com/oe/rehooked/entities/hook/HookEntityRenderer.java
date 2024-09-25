@@ -3,7 +3,6 @@ package com.oe.rehooked.entities.hook;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.oe.rehooked.data.HookData;
-import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
 import com.oe.rehooked.utils.PositionHelper;
 import net.minecraft.client.Minecraft;
@@ -14,7 +13,6 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -38,10 +36,11 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     @Override
     public boolean shouldRender(HookEntity pLivingEntity, Frustum pCamera, double pCamX, double pCamY, double pCamZ) {
         if (pLivingEntity.isRemoved() || pLivingEntity.getHookType().isEmpty() || pLivingEntity.getState().equals(HookEntity.State.DONE)) return false;
-        if (pLivingEntity.getOwner() instanceof Player owner) {
+        if (pLivingEntity.tryGetOwnerFromCachedId() != null) {
+            Player owner = pLivingEntity.tryGetOwnerFromCachedId();
             if (Minecraft.getInstance().player != null && owner.getUUID().equals(Minecraft.getInstance().player.getUUID()))
                 return true;
-            return pCamera.isVisible(owner.getBoundingBox());
+            return pCamera.isVisible(owner.getBoundingBox()) || super.shouldRender(pLivingEntity, pCamera, pCamX, pCamY, pCamZ);
         }
         return false;
     }
@@ -49,7 +48,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     @Override
     public void render(HookEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         handleHook(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
-        if (pEntity.hasChain() && pEntity.getOwner() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
+        if (pEntity.hasChain() && pEntity.tryGetOwnerFromCachedId() != null) handleChain(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
         super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
     }
 
@@ -74,7 +73,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     private void handleChain(HookEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         pPoseStack.pushPose();
         // get relevant positions
-        Entity owner = pEntity.getOwner();
+        Entity owner = pEntity.tryGetOwnerFromCachedId();
         Vec3 waistPos = PositionHelper.getWaistPosition(owner);
         Vec3 hookPos = pEntity.position();
         Vec3 playerToHook = waistPos.vectorTo(hookPos);
@@ -85,7 +84,7 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
         pPoseStack.translate(-0.5, 0.0, -0.5);
         // add chains
         float distance = (float) playerToHook.length();
-        pEntity.getHookType().flatMap(HookRegistry::getHookData).ifPresent(hookData -> {
+        pEntity.getHookData().ifPresent(hookData -> {
             BlockState chain = Blocks.CHAIN.defaultBlockState();
             for (int i = 0; i < (int) distance; i++) {
                 pContext.getBlockRenderDispatcher().renderSingleBlock(chain, pPoseStack, pBuffer, pPackedLight, OverlayTexture.NO_OVERLAY);
@@ -103,6 +102,6 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     
     @Override
     public ResourceLocation getTextureLocation(HookEntity pEntity) {
-        return pEntity.getHookType().flatMap(HookRegistry::getHookData).map(HookData::texture).orElseGet(null);
+        return pEntity.getHookData().map(HookData::texture).orElseGet(null);
     }
 }

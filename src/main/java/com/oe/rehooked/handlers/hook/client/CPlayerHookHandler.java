@@ -27,7 +27,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     
     private Vec3 moveVector;
     private Vec3 momentum;
-    private long updateCounter;
 
     private Vec3 lastPlayerPosition;
     
@@ -160,7 +159,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
             updateMomentum();
         });
         handleParticles();
-        updateCounter++;
     }
 
     @Override

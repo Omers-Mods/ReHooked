@@ -4,12 +4,10 @@ import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
-import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -30,10 +28,7 @@ public interface ICommonPlayerHookHandler {
     Optional<Player> getOwner();
     default Optional<HookData> getHookData() {
         return getOwner()
-                .flatMap(owner -> CurioUtils.GetCuriosOfType(HookItem.class, owner))
-                .flatMap(CurioUtils::GetIfUnique)
-                .map(ItemStack::getItem)
-                .map(item -> ((HookItem) item).getHookType())
+                .flatMap(CurioUtils::GetHookType)
                 .flatMap(HookRegistry::getHookData);
     }
     void update();

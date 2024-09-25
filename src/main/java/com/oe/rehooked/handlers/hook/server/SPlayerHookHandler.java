@@ -6,11 +6,10 @@ import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
-import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
@@ -22,6 +21,10 @@ import java.util.Optional;
 
 public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private static final Logger LOGGER = LogUtils.getLogger(); 
+    
+    public static final String EXTERNAL_FLIGHT = "external_flight";
+    public static final String HOOK_FLIGHT_ACTIVE = "hook_flight_active";
+    public static final String PREVENTING_FLIGHT_KICK = "preventing_flight_kick";
     
     private final List<HookEntity> hooks;
     private Optional<Player> owner;
@@ -91,6 +94,8 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
                     new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()), 
                     (ServerPlayer) owner));
+            hookEntity.setReason(HookEntity.Reason.PLAYER);
+            hookEntity.setState(HookEntity.State.RETRACTING);
         }
     }
 
@@ -253,4 +258,27 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public void removeAllClientHooks(ServerPlayer player) {
         PacketHandler.sendToPlayer(new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_ALL_HOOKS), player);
     }
+
+    @Override
+    public void copyFrom(IServerPlayerHookHandler handler) {
+        if (handler instanceof SPlayerHookHandler other) {
+            this.externalFlight = other.externalFlight;
+            this.hookFlightActive = other.hookFlightActive;
+            this.preventingFlightKick = other.preventingFlightKick;
+        }
+    }
+    
+    @Override
+    public void saveNBTData(CompoundTag nbt) {
+        nbt.putBoolean(EXTERNAL_FLIGHT, externalFlight);
+        nbt.putBoolean(HOOK_FLIGHT_ACTIVE, hookFlightActive);
+        nbt.putBoolean(PREVENTING_FLIGHT_KICK, preventingFlightKick);
+    }
+    
+    @Override
+    public void loadNBTData(CompoundTag nbt) {
+        externalFlight = nbt.getBoolean(EXTERNAL_FLIGHT);
+        hookFlightActive = nbt.getBoolean(HOOK_FLIGHT_ACTIVE);
+        preventingFlightKick = nbt.getBoolean(PREVENTING_FLIGHT_KICK);
+    } 
 }

@@ -2,6 +2,7 @@ package com.oe.rehooked.handlers.hook.def;
 
 import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
 import com.oe.rehooked.entities.hook.HookEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
@@ -42,4 +43,10 @@ public interface IServerPlayerHookHandler extends ICommonPlayerHookHandler {
                 hookEntity.discard();
         });
     }
+    
+    void copyFrom(IServerPlayerHookHandler handler);
+
+    void saveNBTData(CompoundTag nbt);
+
+    void loadNBTData(CompoundTag nbt);
 }

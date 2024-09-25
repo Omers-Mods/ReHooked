@@ -9,6 +9,7 @@ import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.CurioUtils;
+import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
@@ -35,10 +36,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class HookEntity extends Projectile {
@@ -53,6 +56,10 @@ public class HookEntity extends Projectile {
     private static final EntityDataAccessor<Vector3f> DELTA_MOVEMENT = 
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> REASON = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<String> HOOK_TYPE = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Integer> OWNER_ID = 
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
 
     protected int ticksInState = 0;
@@ -79,6 +86,13 @@ public class HookEntity extends Projectile {
         noCulling = true;
         setOwner(player);
         setPos(player.getEyePosition());
+        CurioUtils.GetHookType(player).ifPresent(this::setHookType);
+    }
+
+    @Override
+    public void setOwner(@Nullable Entity pOwner) {
+        super.setOwner(pOwner);
+        setOwnerId(pOwner != null ? pOwner.getId() : -1);
     }
 
     @Override
@@ -158,7 +172,7 @@ public class HookEntity extends Projectile {
     
     @OnlyIn(Dist.CLIENT)
     public void createParticles() {
-        getHookType().flatMap(HookRegistry::getHookData).map(HookData::particleType).map(Supplier::get).ifPresent(particleType -> {
+        getHookData().map(HookData::particleType).map(Supplier::get).ifPresent(particleType -> {
             if (getOwner() instanceof Player owner) {
                 Vec3 ownerWaist = PositionHelper.getWaistPosition(owner);
                 Vec3 toOwner = position().vectorTo(ownerWaist).normalize().scale(0.2);
@@ -196,7 +210,7 @@ public class HookEntity extends Projectile {
 
     protected void tickShot() {
         // move the hook in the goal direction, checking for hits in the process
-        Optional<HookData> optHookData = getHookType().flatMap(HookRegistry::getHookData);
+        Optional<HookData> optHookData = getHookData();
         if (optHookData.isPresent()) {
             HookData hookData = optHookData.get();
             // check if needs to destroy instant hook
@@ -271,7 +285,7 @@ public class HookEntity extends Projectile {
                     });
                 }
                 // set the delta movement according to speed and distance from player
-                getHookType().flatMap(HookRegistry::getHookData).ifPresent(hookData -> {
+                getHookData().ifPresent(hookData -> {
                     float speedModifier = hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed() / 10f;
                     speedModifier += (float) owner.getDeltaMovement().length();
                     if (vectorToPlayer.length() > speedModifier) {
@@ -299,8 +313,7 @@ public class HookEntity extends Projectile {
     }
 
     public boolean hasChain() {
-        return getHookType()
-                .flatMap(HookRegistry::getHookData)
+        return getHookData()
                 .map(hookData -> !(hookData.particleType() != null && hookData.isCreative()))
                 .orElse(false);
     }
@@ -329,12 +342,16 @@ public class HookEntity extends Projectile {
         return entityData.get(HIT_POS);
     }
     
-    public Optional<String> getHookType() {
-        return Optional.ofNullable(getOwner()).flatMap(owner -> CurioUtils.GetCuriosOfType(HookItem.class, (Player) owner))
-                .flatMap(CurioUtils::GetIfUnique)
-                .map(ItemStack::getItem)
-                .map(item -> (HookItem) item)
-                .map(HookItem::getHookType);
+    public Optional<HookData> getHookData() {
+        return HookRegistry.getHookData(getHookType());
+    }
+    
+    public String getHookType() {
+        return entityData.get(HOOK_TYPE);
+    }
+    
+    public void setHookType(String hookType) {
+        entityData.set(HOOK_TYPE, hookType);
     }
     
     protected void setPrevState(State state) {
@@ -361,6 +378,20 @@ public class HookEntity extends Projectile {
         return Reason.values()[entityData.get(REASON)];
     }
     
+    public Integer getOwnerId() {
+        return entityData.get(OWNER_ID);
+    }
+    
+    public void setOwnerId(Integer id) {
+        entityData.set(OWNER_ID, id);
+    }
+    
+    public Player tryGetOwnerFromCachedId() {
+        if (level().getEntity(getOwnerId()) instanceof Player owner)
+            return owner;
+        return null;
+    }
+    
     @Override
     protected void defineSynchedData() {
         entityData.define(HIT_POS, Optional.empty());
@@ -368,6 +399,8 @@ public class HookEntity extends Projectile {
         entityData.define(PREV_STATE, State.SHOT.ordinal());
         entityData.define(DELTA_MOVEMENT, new Vector3f(0, 0, 0));
         entityData.define(REASON, Reason.EMPTY.ordinal());
+        entityData.define(HOOK_TYPE, "");
+        entityData.define(OWNER_ID, -1);
     }
 
     @Override
