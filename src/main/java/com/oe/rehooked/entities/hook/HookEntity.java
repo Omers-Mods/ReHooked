@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
-import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.HandlerHelper;
@@ -12,7 +11,6 @@ import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -34,6 +32,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.slf4j.Logger;
@@ -78,7 +77,7 @@ public class HookEntity extends Projectile {
     }
 
     @Override
-    protected boolean canHitEntity(Entity pTarget) {
+    protected boolean canHitEntity(@NotNull Entity pTarget) {
         return false;
     }
 
@@ -204,12 +203,12 @@ public class HookEntity extends Projectile {
     }
 
     @Override
-    public Vec3 getDeltaMovement() {
+    public @NotNull Vec3 getDeltaMovement() {
         return new Vec3(getSharedDeltaV());
     }
 
     @Override
-    public void shootFromRotation(Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
+    public void shootFromRotation(@NotNull Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
         LOGGER.debug("Shooting!");
         float f = -Mth.sin(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
         float f1 = -Mth.sin((pX + pZ) * ((float)Math.PI / 180F));
@@ -331,11 +330,11 @@ public class HookEntity extends Projectile {
     }
     
     @Override
-    protected void readAdditionalSaveData(CompoundTag pCompound) {
+    protected void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag pCompound) {
+    protected void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
     }
     
     public void setState(State state) {
@@ -416,7 +415,7 @@ public class HookEntity extends Projectile {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
+    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
     
@@ -437,7 +436,7 @@ public class HookEntity extends Projectile {
     }
 
     @Override
-    public void remove(RemovalReason pReason) {
+    public void remove(@NotNull RemovalReason pReason) {
         LOGGER.debug("Hook {} getting removed for {}", getUUID(), pReason);
         super.remove(pReason);
     }

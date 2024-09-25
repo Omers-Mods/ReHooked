@@ -1,7 +1,6 @@
 package com.oe.rehooked.handlers.hook.server;
 
 import com.mojang.logging.LogUtils;
-import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
@@ -20,13 +19,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class SPlayerHookHandler implements IServerPlayerHookHandler {
-    private static final Logger LOGGER = LogUtils.getLogger(); 
-    
-    public static final String EXTERNAL_FLIGHT = "external_flight";
-    public static final String HOOK_FLIGHT_ACTIVE = "hook_flight_active";
-    public static final String PREVENTING_FLIGHT_KICK = "preventing_flight_kick";
+    private static final Logger LOGGER = LogUtils.getLogger();
     
     private final List<HookEntity> hooks;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Player> owner;
     
     private Vec3 moveVector;
@@ -117,17 +113,15 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public void shootFromRotation(float xRot, float yRot) {
         LOGGER.debug("Shooting from rotation: {}, {}", xRot, yRot);
         // this is a response to a client request
-        getOwner().ifPresent(owner -> {
-            getHookData().ifPresent(hookData -> {
-                if (hooks.size() + 1 > hookData.count())
-                    removeHook(hooks.get(0));
-                HookEntity hookEntity = new HookEntity(owner);
-                owner.level().addFreshEntity(hookEntity);
-                addHook(hookEntity);
-                hookEntity.shootFromRotation(owner, xRot, yRot, 0,
-                        hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed() / 20f, 0);
-            });
-        });
+        getOwner().ifPresent(owner -> getHookData().ifPresent(hookData -> {
+            if (hooks.size() + 1 > hookData.count())
+                removeHook(hooks.get(0));
+            HookEntity hookEntity = new HookEntity(owner);
+            owner.level().addFreshEntity(hookEntity);
+            addHook(hookEntity);
+            hookEntity.shootFromRotation(owner, xRot, yRot, 0,
+                    hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed() / 20f, 0);
+        }));
     }
 
     @Override
