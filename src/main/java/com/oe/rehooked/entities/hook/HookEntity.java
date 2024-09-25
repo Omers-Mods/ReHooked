@@ -325,7 +325,7 @@ public class HookEntity extends Projectile {
 
     public boolean hasChain() {
         return getHookData()
-                .map(hookData -> !(hookData.particleType() != null && hookData.isCreative()))
+                .map(hookData -> hookData.particleType() == null)
                 .orElse(false);
     }
     
