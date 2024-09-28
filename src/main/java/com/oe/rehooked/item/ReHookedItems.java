@@ -15,26 +15,25 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.Optional;
 
 public class ReHookedItems {
+    public static final String WOOD = "wood";
+    public static final String IRON = "iron";
+    public static final String DIAMOND = "diamond";
+    public static final String RED = "red";
+    public static final String ENDER = "ender";
+    
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ReHookedMod.MOD_ID);
     
-    public static final RegistryObject<Item> WOOD_HOOK = 
-            ITEMS.register("wood_hook", () -> new HookItem("wood"));
-    public static final RegistryObject<Item> IRON_HOOK = 
-            ITEMS.register("iron_hook", () -> new HookItem("iron"));
-    public static final RegistryObject<Item> DIAMOND_HOOK =
-            ITEMS.register("diamond_hook", () -> new HookItem("diamond"));
-    public static final RegistryObject<Item> RED_HOOK =
-            ITEMS.register("red_hook", () -> new HookItem("red"));
-    public static final RegistryObject<Item> ENDER_HOOK =
-            ITEMS.register("ender_hook", () -> new HookItem("ender"));
+    public static final RegistryObject<Item> WOOD_HOOK = CreateHookItem(WOOD);
+    public static final RegistryObject<Item> IRON_HOOK = CreateHookItem(IRON);
+    public static final RegistryObject<Item> DIAMOND_HOOK = CreateHookItem(DIAMOND);
+    public static final RegistryObject<Item> RED_HOOK = CreateHookItem(RED);
+    public static final RegistryObject<Item> ENDER_HOOK = CreateHookItem(ENDER);
     
-    public static void register(IEventBus eventBus) {
-        // define all hook variants
-        HookRegistry.registerHook("wood", new HookData(1, 16, 12, 6, false, getHookTexture("wood"), () -> null));
-        HookRegistry.registerHook("iron", new HookData(2, 32, 24, 12, false, getHookTexture("iron"), () -> null));
-        HookRegistry.registerHook("diamond", new HookData(4, 64, 48, 24, false, getHookTexture("diamond"), () -> null));
-        HookRegistry.registerHook("ender", new HookData(1, 96, Float.MAX_VALUE, 48, false, getHookTexture("ender"), () -> null));
-        HookRegistry.registerHook("red", new HookData(3, 16, 8, 6, true, getHookTexture("red"), ReHookedParticles.RED_HOOK_PARTICLE::get));
+    private static RegistryObject<Item> CreateHookItem(String type) {
+        return ITEMS.register(type + "_hook", () -> new HookItem(type));
+    }
+    
+    public static void Init(IEventBus eventBus) {
         // register the objects
         ITEMS.register(eventBus);
     }
