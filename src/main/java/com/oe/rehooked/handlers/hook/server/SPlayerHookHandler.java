@@ -120,7 +120,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
             owner.level().addFreshEntity(hookEntity);
             addHook(hookEntity);
             hookEntity.shootFromRotation(owner, xRot, yRot, 0,
-                    hookData.speed() == Float.MAX_VALUE ? hookData.range() : hookData.speed() / 20f, 0);
+                    Math.min(hookData.speed() / 20f, hookData.range()), 0);
         }));
     }
 
