@@ -8,6 +8,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 
 import java.util.function.Consumer;
@@ -21,12 +22,16 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
     @Override
     protected void buildRecipes(Consumer<FinishedRecipe> pWriter) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.WOOD_HOOK.get())
-                .pattern("###")
-                .pattern(" ##")
-                .pattern("# #")
-                .define('#', Items.STICK)
-                .unlockedBy("has_sticks", 
-                        inventoryTrigger(ItemPredicate.Builder.item().of(Items.STICK).build()))
+                .pattern("WWP")
+                .pattern(" SW")
+                .pattern("W W")
+                .define('W', Tags.Items.RODS_WOODEN)
+                .define('S', Tags.Items.STRING)
+                .define('P', Items.WOODEN_PICKAXE)
+                .unlockedBy("has_rod_wooden", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.RODS_WOODEN).build()))
+                .unlockedBy("has_string", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.STRING).build()))
                 .save(pWriter);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.IRON_HOOK.get())
@@ -34,11 +39,15 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                 .pattern(" HI")
                 .pattern("C I")
                 .define('C', Items.CHAIN)
-                .define('I', Items.IRON_INGOT)
+                .define('I', Tags.Items.INGOTS_IRON)
                 .define('P', Items.IRON_PICKAXE)
                 .define('H', ReHookedItems.WOOD_HOOK.get())
                 .unlockedBy("has_wooden_hook", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.WOOD_HOOK.get()).build()))
+                .unlockedBy("has_iron_ingot", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.INGOTS_IRON).build()))
+                .unlockedBy("has_chain", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Items.CHAIN).build()))
                 .save(pWriter);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.DIAMOND_HOOK.get())
@@ -46,11 +55,13 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                 .pattern(" HD")
                 .pattern("C D")
                 .define('C', Items.CHAIN)
-                .define('D', Items.DIAMOND)
+                .define('D', Tags.Items.GEMS_DIAMOND)
                 .define('P', Items.DIAMOND_PICKAXE)
                 .define('H', ReHookedItems.IRON_HOOK.get())
                 .unlockedBy("has_iron_hook", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.IRON_HOOK.get()).build()))
+                .unlockedBy("has_diamond", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.GEMS_DIAMOND).build()))
                 .save(pWriter);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.RED_HOOK.get())
@@ -62,6 +73,8 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                 .define('H', ReHookedItems.IRON_HOOK.get())
                 .unlockedBy("has_iron_hook",
                         inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.IRON_HOOK.get()).build()))
+                .unlockedBy("has_redstone", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.DUSTS_REDSTONE).build()))
                 .save(pWriter);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.ENDER_HOOK.get())
