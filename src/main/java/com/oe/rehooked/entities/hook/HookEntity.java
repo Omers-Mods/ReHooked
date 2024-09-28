@@ -103,9 +103,8 @@ public class HookEntity extends Projectile {
 
     @Override
     public void tick() {
-        Player owner = tryGetOwnerFromCachedId();
         if (!level().isClientSide() && !getState().equals(State.DONE) && 
-                !(owner != null && owner.isAlive())) {
+                !(getOwner() instanceof Player owner && owner.isAlive())) {
             LOGGER.debug("Owner not found, setting state to done!");
             setState(State.DONE);
         }
@@ -165,8 +164,7 @@ public class HookEntity extends Projectile {
                 handledReason = true;
             }
             case MISS, BREAK -> {
-                Player owner = tryGetOwnerFromCachedId();
-                if (owner != null)
+                if (getOwner() instanceof Player owner)
                     level().playSound(null, owner.getX(), owner.getY(), owner.getZ(), ReHookedSounds.HOOK_MISS.get(), SoundSource.PLAYERS, 0.5f, 1f);
                 handledReason = true;
             }
@@ -284,9 +282,8 @@ public class HookEntity extends Projectile {
     }
     
     protected void tickRetracting() {
-        Player owner = tryGetOwnerFromCachedId();
-        if (owner != null) {
-            if (!level().isClientSide()) {
+        if (!level().isClientSide()) {
+            if (getOwner() instanceof Player owner) {
                 // vector to the owner
                 Vec3 vectorToPlayer = position().vectorTo(PositionHelper.getWaistPosition(owner));
                 if (vectorToPlayer.length() < 5) {
@@ -331,10 +328,12 @@ public class HookEntity extends Projectile {
     
     @Override
     protected void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.readAdditionalSaveData(pCompound);
     }
 
     @Override
     protected void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.addAdditionalSaveData(pCompound);
     }
     
     public void setState(State state) {
