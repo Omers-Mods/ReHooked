@@ -1,10 +1,12 @@
 package com.oe.rehooked.item;
 
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.config.server.stats.HookStatsConfig;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.particle.ReHookedParticles;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -12,7 +14,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.Optional;
+import java.util.function.Supplier;
 
 public class ReHookedItems {
     public static final String WOOD = "wood";
@@ -38,7 +40,28 @@ public class ReHookedItems {
         ITEMS.register(eventBus);
     }
     
+    private static HookData CompleteConfigData(String type, ResourceLocation texture, Supplier<ParticleOptions> particleType) {
+        return HookStatsConfig
+                .GetConfigDataForType(type)
+                .map(HookStatsConfig.HookConfigData::getData)
+                .map(partial -> partial.complete(texture, particleType))
+                .orElse(null);
+    }
+    
     private static ResourceLocation getHookTexture(String name) {
         return new ResourceLocation(ReHookedMod.MOD_ID, "textures/entity/hook/" + name + "/" + name + ".png");
+    }
+    
+    private static void DefaultRegisterHook(String type) {
+        HookRegistry.registerHook(type, CompleteConfigData(type, getHookTexture(type), () -> null));
+    }
+    
+    public static void RegisterConfigProperties() {
+        // define all hook variants
+        DefaultRegisterHook(WOOD);
+        DefaultRegisterHook(IRON);
+        DefaultRegisterHook(DIAMOND);
+        DefaultRegisterHook(ENDER);
+        HookRegistry.registerHook(RED, CompleteConfigData(RED, getHookTexture(RED), ReHookedParticles.RED_HOOK_PARTICLE::get));
     }
 }
