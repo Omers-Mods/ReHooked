@@ -9,6 +9,7 @@ import com.oe.rehooked.entities.layers.ReHookedModelLayers;
 import com.oe.rehooked.entities.test.TestCubeModel;
 import com.oe.rehooked.entities.test.TestCubeRenderer;
 import com.oe.rehooked.particle.ReHookedParticles;
+import com.oe.rehooked.particle.hook.impl.EnderHookParticles;
 import com.oe.rehooked.particle.hook.impl.RedHookParticles;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -41,5 +42,6 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void onRegisterParticleProvider(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ReHookedParticles.RED_HOOK_PARTICLE.get(), RedHookParticles.Provider::new);
+        event.registerSpriteSet(ReHookedParticles.ENDER_HOOK_PARTICLE.get(), EnderHookParticles.Provider::new);
     }
 }
