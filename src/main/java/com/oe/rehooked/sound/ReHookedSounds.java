@@ -22,7 +22,7 @@ public class ReHookedSounds {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(loc));
     }
     
-    public static void register(IEventBus eventBus) {
+    public static void Init(IEventBus eventBus) {
         SOUND_EVENTS.register(eventBus);
     }
 }

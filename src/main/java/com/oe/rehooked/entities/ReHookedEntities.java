@@ -17,8 +17,7 @@ public class ReHookedEntities {
     public static final RegistryObject<EntityType<HookEntity>> HOOK_PROJECTILE =
             ENTITY_TYPES.register("hook_projectile", () -> EntityType.Builder.<HookEntity>of(HookEntity::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f)
-                    .clientTrackingRange(8)
-                    .setTrackingRange(8)
+                    .clientTrackingRange(Integer.MAX_VALUE)
                     .updateInterval(Integer.MAX_VALUE)
                     .noSave()
                     .build("hook_projectile")
@@ -34,7 +33,7 @@ public class ReHookedEntities {
                     .build("direction_cube")
             );
     
-    public static void register(IEventBus eventBus) {
+    public static void Init(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);
     }
 }

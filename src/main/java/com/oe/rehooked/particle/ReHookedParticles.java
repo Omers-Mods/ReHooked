@@ -15,7 +15,7 @@ public class ReHookedParticles {
     public static final RegistryObject<SimpleParticleType> RED_HOOK_PARTICLE = 
             PARTICLE_TYPES.register("red_hook_particle", () -> new SimpleParticleType(true));
     
-    public static void register(IEventBus eventBus) {
+    public static void Init(IEventBus eventBus) {
         PARTICLE_TYPES.register(eventBus);
     }
 }

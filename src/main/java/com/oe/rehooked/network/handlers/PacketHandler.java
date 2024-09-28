@@ -38,7 +38,7 @@ public class PacketHandler {
         else context.get().setPacketHandled(true);
     }
     
-    public static void register() {
+    public static void Init() {
         ReHookedMod.LOGGER.debug("Packet handler register started...");
         
         INSTANCE.messageBuilder(SHookCapabilityPacket.class, NetworkDirection.PLAY_TO_SERVER.ordinal())

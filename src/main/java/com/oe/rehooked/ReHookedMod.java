@@ -1,6 +1,7 @@
 package com.oe.rehooked;
 
 import com.mojang.logging.LogUtils;
+import com.oe.rehooked.config.server.ReHookedConfig;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.item.ReHookedItems;
 import com.oe.rehooked.network.handlers.PacketHandler;
@@ -27,20 +28,22 @@ public class ReHookedMod {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
         // Register packets
-        PacketHandler.register();
+        PacketHandler.Init();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> 
                 () -> PacketHandler.addHandler(CHookCapabilityPacket.class, CHookCapabilityProcessor::handle));
 
+        // register config
+        ReHookedConfig.Init();
         // register mod sounds
-        ReHookedSounds.register(modEventBus);
+        ReHookedSounds.Init(modEventBus);
         // register mod particles
-        ReHookedParticles.register(modEventBus);
+        ReHookedParticles.Init(modEventBus);
         // Register mod entities
-        ReHookedEntities.register(modEventBus);
+        ReHookedEntities.Init(modEventBus);
         // Register mod creative tab
-        ReHookedCreativeModeTab.register(modEventBus);
+        ReHookedCreativeModeTab.Init(modEventBus);
         // Register mod items
-        ReHookedItems.register(modEventBus);
+        ReHookedItems.Init(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);

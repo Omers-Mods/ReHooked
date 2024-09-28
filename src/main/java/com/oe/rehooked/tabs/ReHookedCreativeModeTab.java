@@ -27,7 +27,7 @@ public class ReHookedCreativeModeTab {
                     })
                     .build());
     
-    public static void register(IEventBus eventBus) {
+    public static void Init(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
     }
 }
