@@ -260,13 +260,6 @@ public class HookEntity extends Projectile {
         if (firstTickInState) {
             // stop moving
             setDeltaMovement(Vec3.ZERO);
-            if (level().isClientSide()){
-                // move client pos to hit
-                getHitPos().map(BlockPos::getCenter).ifPresent(pos -> {
-                    if (offset != null) setPos(pos.add(offset.scale(0.5)));
-                    else setPos(pos);
-                });
-            }
         }
         getHitPos().ifPresent(hitPos -> {
             if (level().getBlockState(hitPos).isAir()) {
