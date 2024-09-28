@@ -61,7 +61,7 @@ public class ReHookedItems {
         DefaultRegisterHook(WOOD);
         DefaultRegisterHook(IRON);
         DefaultRegisterHook(DIAMOND);
-        DefaultRegisterHook(ENDER);
+        HookRegistry.registerHook(ENDER, CompleteConfigData(ENDER, getHookTexture(ENDER), ReHookedParticles.ENDER_HOOK_PARTICLE::get));
         HookRegistry.registerHook(RED, CompleteConfigData(RED, getHookTexture(RED), ReHookedParticles.RED_HOOK_PARTICLE::get));
     }
 }

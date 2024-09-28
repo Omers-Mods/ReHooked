@@ -184,13 +184,19 @@ public class HookEntity extends Projectile {
             Player owner = tryGetOwnerFromCachedId();
             if (owner != null) {
                 Vec3 ownerWaist = PositionHelper.getWaistPosition(owner);
-                Vec3 toOwner = position().vectorTo(ownerWaist).normalize().scale(0.2);
-                for (int i = 1; i < 26; i++) {
-                    level().addParticle(particleType,
-                            Mth.lerp((double) i / 50d, ownerWaist.x, getX()),
-                            Mth.lerp((double) i / 50d, ownerWaist.y, getY()),
-                            Mth.lerp((double) i / 50d, ownerWaist.z, getZ()),
-                            toOwner.x, toOwner.y, toOwner.z);
+                Vec3 particleSpeed = owner.getDeltaMovement().reverse().scale(0.8);
+                double rDist = ownerWaist.distanceTo(position()) + 1;
+                for (int i = 0; i < rDist; i++) {
+                    for (int k = 0; k < 2; k++) {
+                        double lerpX = Mth.lerp((double) (i + 0.5f * k) / rDist, ownerWaist.x, getX());
+                        double lerpY = Mth.lerp((double) (i + 0.5f * k) / rDist, ownerWaist.y, getY());
+                        double lerpZ = Mth.lerp((double) (i + 0.5f * k) / rDist, ownerWaist.z, getZ());
+                        level().addParticle(particleType,
+                                lerpX + Math.random() * 0.25,
+                                lerpY + Math.random() * 0.15,
+                                lerpZ + Math.random() * 0.25,
+                                particleSpeed.x, particleSpeed.y, particleSpeed.z);
+                    }
                 }
             }
         });

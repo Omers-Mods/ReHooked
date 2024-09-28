@@ -7,18 +7,13 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.SimpleParticleType;
 
-import java.util.Random;
-
 public class EnderHookParticles extends HookColoredParticles {
-    
     protected EnderHookParticles(ClientLevel pLevel, double pX, double pY, double pZ, SpriteSet spriteSet, double pXSpeed, double pYSpeed, double pZSpeed) {
         super(pLevel, pX, pY, pZ, spriteSet, pXSpeed, pYSpeed, pZSpeed);
-        float colMod = (float) Math.random() * 0.6f + 0.4f;
-        this.rCol = colMod * 0.9f;
-        this.gCol = colMod * 0.3f;
-        this.bCol = colMod;
-        this.lifetime = (int) (Math.random() * 4);
-        this.setAlpha(1);
+        this.lifetime = 45;
+        this.gravity = 0.6f;
+        setColor(0.64f, 0f, 1f);
+        setAlpha(0.6f);
     }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
@@ -29,7 +24,7 @@ public class EnderHookParticles extends HookColoredParticles {
         }
 
         public Particle createParticle(SimpleParticleType particleType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
-            return new RedHookParticles(pLevel, pX, pY, pZ, spriteSet, pXSpeed, pYSpeed, pZSpeed);
+            return new EnderHookParticles(pLevel, pX, pY, pZ, spriteSet, pXSpeed, pYSpeed, pZSpeed);
         }
     }
 }

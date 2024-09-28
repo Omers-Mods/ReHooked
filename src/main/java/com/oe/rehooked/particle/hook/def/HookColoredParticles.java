@@ -1,8 +1,9 @@
 package com.oe.rehooked.particle.hook.def;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
-import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 
 public class HookColoredParticles extends TextureSheetParticle {
     
@@ -23,17 +24,5 @@ public class HookColoredParticles extends TextureSheetParticle {
     @Override
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
-    }
-    
-    public static class Provider implements ParticleProvider<SimpleParticleType> {
-        private final SpriteSet spriteSet;
-        
-        public Provider(SpriteSet spriteSet) {
-            this.spriteSet = spriteSet;
-        }
-        
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
-            return new HookColoredParticles(pLevel, pX, pY, pZ, spriteSet, pXSpeed, pYSpeed, pZSpeed);
-        }
     }
 }
