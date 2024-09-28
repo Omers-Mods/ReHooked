@@ -136,8 +136,10 @@ public class HookEntity extends Projectile {
         trackTicksInState();
 
         // create offset on first tick
-        if (offset == null && owner != null) {
-            offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() - 0.1, 0)).normalize();
+        if (offset == null) {
+            Player owner = tryGetOwnerFromCachedId();
+            if (owner != null)
+                offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() - 0.1, 0)).normalize();
         }
         
         // run the super class tick method
@@ -221,7 +223,7 @@ public class HookEntity extends Projectile {
         if (optHookData.isPresent()) {
             HookData hookData = optHookData.get();
             // check if needs to destroy instant hook
-            if (!level().isClientSide() && !firstTickInState && hookData.speed() == Float.MAX_VALUE) {
+            if (!level().isClientSide() && !firstTickInState && hookData.speed() / 20f >= hookData.range()) {
                 LOGGER.debug("Retracting instant hook on second shot tick");
                 setReason(Reason.MISS);
                 setState(State.RETRACTING);
