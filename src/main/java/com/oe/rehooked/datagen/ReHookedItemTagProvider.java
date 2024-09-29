@@ -29,6 +29,24 @@ public class ReHookedItemTagProvider extends ItemTagsProvider {
                 .add(ReHookedItems.BLAZING_HOOK.get())
                 .add(ReHookedItems.ENDER_HOOK.get())
                 .add(ReHookedItems.DEJA_VHUK.get());
+        
+        this.tag(ReHookedTags.Items.MUSIC_DISC)
+                .add(Items.MUSIC_DISC_13)
+                .add(Items.MUSIC_DISC_CAT)
+                .add(Items.MUSIC_DISC_BLOCKS)
+                .add(Items.MUSIC_DISC_CHIRP)
+                .add(Items.MUSIC_DISC_FAR)
+                .add(Items.MUSIC_DISC_MALL)
+                .add(Items.MUSIC_DISC_MELLOHI)
+                .add(Items.MUSIC_DISC_STAL)
+                .add(Items.MUSIC_DISC_STRAD)
+                .add(Items.MUSIC_DISC_WARD)
+                .add(Items.MUSIC_DISC_11)
+                .add(Items.MUSIC_DISC_WAIT)
+                .add(Items.MUSIC_DISC_PIGSTEP)
+                .add(Items.MUSIC_DISC_OTHERSIDE)
+                .add(Items.MUSIC_DISC_RELIC)
+                .add(Items.MUSIC_DISC_5);
     }
 
     @Override
