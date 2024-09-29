@@ -1,6 +1,5 @@
 package com.oe.rehooked.entities.hook;
 
-import com.mojang.logging.LogUtils;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.ReHookedEntities;
@@ -10,6 +9,7 @@ import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -35,10 +35,8 @@ import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import org.slf4j.Logger;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class HookEntity extends Projectile {
     private static final EntityDataAccessor<Optional<BlockPos>> HIT_POS =
@@ -59,6 +57,7 @@ public class HookEntity extends Projectile {
     protected int ticksInState = 0;
     protected boolean firstTickInState = true;
     protected Vec3 offset;
+    protected int ticksSinceParticles = 0;
     
     public HookEntity(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -177,21 +176,27 @@ public class HookEntity extends Projectile {
     
     @OnlyIn(Dist.CLIENT)
     public void createParticles() {
-        getHookData().map(HookData::particleType).map(Supplier::get).ifPresent(particleType -> {
+        ticksSinceParticles++;
+        getHookData().ifPresent(hookData -> {
+            if (ticksSinceParticles >= hookData.ticksBetweenSpawns()) return;
+            ticksSinceParticles = 0;
+            ParticleOptions particleType = hookData.particleType().get();
+            if (particleType == null) return;
             Player owner = tryGetOwnerFromCachedId();
             if (owner != null) {
                 Vec3 ownerWaist = PositionHelper.getWaistPosition(owner);
                 Vec3 particleSpeed = owner.getDeltaMovement().reverse().scale(0.8);
                 double rDist = ownerWaist.distanceTo(position()) + 1;
                 for (int i = 0; i < rDist; i++) {
-                    for (int k = 0; k < 2; k++) {
-                        double lerpX = Mth.lerp((double) (i + 0.5f * k) / rDist, ownerWaist.x, getX());
-                        double lerpY = Mth.lerp((double) (i + 0.5f * k) / rDist, ownerWaist.y, getY());
-                        double lerpZ = Mth.lerp((double) (i + 0.5f * k) / rDist, ownerWaist.z, getZ());
+                    int numParticles = random.nextIntBetweenInclusive(hookData.minParticlesPerBlock(), hookData.maxParticlesPerBlock());
+                    for (int k = 0; k < numParticles; k++) {
+                        double lerpX = Mth.lerp((double) (i + ((1f / numParticles) * k)) / rDist, ownerWaist.x, getX());
+                        double lerpY = Mth.lerp((double) (i + ((1f / numParticles) * k)) / rDist, ownerWaist.y, getY());
+                        double lerpZ = Mth.lerp((double) (i + ((1f / numParticles) * k)) / rDist, ownerWaist.z, getZ());
                         level().addParticle(particleType,
-                                lerpX + Math.random() * 0.25,
-                                lerpY + Math.random() * 0.15,
-                                lerpZ + Math.random() * 0.25,
+                                lerpX + Math.random() * hookData.radius(),
+                                lerpY + Math.random() * hookData.radius(),
+                                lerpZ + Math.random() * hookData.radius(),
                                 particleSpeed.x, particleSpeed.y, particleSpeed.z);
                     }
                 }
