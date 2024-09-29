@@ -33,5 +33,14 @@
       "rehooked:hook/miss/belt_handle_1",
       "rehooked:hook/miss/belt_handle_2"
     ]
+  },
+  "deja_vu": {
+    "subtitle": "sounds.rehooked.meme.deja_vu",
+    "sounds": [
+      {
+        "name": "rehooked:hook/meme/deja_vu",
+        "stream": true
+      }
+    ]
   }
 }
