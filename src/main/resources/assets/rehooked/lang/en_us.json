@@ -4,6 +4,7 @@
   "item.rehooked.diamond_hook": "Diamond Hook",
   "item.rehooked.red_hook": "Red Hook",
   "item.rehooked.ender_hook": "Ender Hook",
+  "item.rehooked.deja_vu_hook": "Deja Vhuk",
   
   "creative.tab.hooks": "Hooks",
 
@@ -12,6 +13,7 @@
   "tooltip.rehooked:diamond_hook.info": "Plenty of hooks, plenty of speed.",
   "tooltip.rehooked:red_hook.info": "Creative flight within the volume defined by the hooks",
   "tooltip.rehooked:ender_hook.info": "Fast. Very, very fast.",
+  "tooltip.rehooked:deja_vu_hook.info": "Higher on the street!",
   "tooltip.rehooked.press_shift_more_info": "<Press Shift to see controls>",
   "tooltip.rehooked.press_fire": "Press %1$s to fire",
   "tooltip.rehooked.press_retract": "Press %1$s while looking at a hook to retract it",
@@ -27,5 +29,6 @@
   "sounds.rehooked.hook_hit": "Hook Hit Surface",
   "sounds.rehooked.hook_retract": "Hook Retracting",
   "sounds.rehooked.hook_shoot": "Hook Shot",
-  "sounds.rehooked.hook_miss": "Hook Miss"
+  "sounds.rehooked.hook_miss": "Hook Miss",
+  "sounds.rehooked.meme.deja_vu": "Deja Vu Starts Playing"
 }
