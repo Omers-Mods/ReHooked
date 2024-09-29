@@ -200,7 +200,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void setMomentum(Vec3 momentum) {
-        IServerPlayerHookHandler.super.setMomentum(momentum);
         this.momentum = momentum;
     }
 

@@ -118,7 +118,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
 
     @Override
     public void setMomentum(Vec3 momentum) {
-        IClientPlayerHookHandler.super.setMomentum(momentum);
         this.momentum = momentum;
     }
 
