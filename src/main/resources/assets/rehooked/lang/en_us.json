@@ -3,6 +3,7 @@
   "item.rehooked.iron_hook": "Iron Hook",
   "item.rehooked.diamond_hook": "Diamond Hook",
   "item.rehooked.red_hook": "Red Hook",
+  "item.rehooked.blazing_hook": "Blazing Hook",
   "item.rehooked.ender_hook": "Ender Hook",
   "item.rehooked.deja_vu_hook": "Deja Vhuk",
   
@@ -12,6 +13,7 @@
   "tooltip.rehooked:iron_hook.info": "Allows floating midair by firing two hooks at opposing points",
   "tooltip.rehooked:diamond_hook.info": "Plenty of hooks, plenty of speed.",
   "tooltip.rehooked:red_hook.info": "Creative flight within the volume defined by the hooks",
+  "tooltip.rehooked:blazing_hook.info": "Blazingly fast! (also blazingly hot)",
   "tooltip.rehooked:ender_hook.info": "Fast. Very, very fast.",
   "tooltip.rehooked:deja_vu_hook.info": "Higher on the street!",
   "tooltip.rehooked.press_shift_more_info": "<Press Shift to see controls>",
