@@ -77,6 +77,21 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.DUSTS_REDSTONE).build()))
                 .save(pWriter);
         
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.BLAZING_HOOK.get())
+                .pattern("DBH")
+                .pattern(" BB")
+                .pattern("B D")
+                .define('B', Tags.Items.RODS_BLAZE)
+                .define('H', ReHookedItems.DIAMOND_HOOK.get())
+                .define('D', Tags.Items.DUSTS_GLOWSTONE)
+                .unlockedBy("has_diamond_hook",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.DIAMOND_HOOK.get()).build()))
+                .unlockedBy("has_blaze_rod", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.RODS_BLAZE).build()))
+                .unlockedBy("has_glowstone", 
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.DUSTS_GLOWSTONE).build()))
+                .save(pWriter);
+                
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.ENDER_HOOK.get())
                 .pattern("EEH")
                 .pattern(" PE")

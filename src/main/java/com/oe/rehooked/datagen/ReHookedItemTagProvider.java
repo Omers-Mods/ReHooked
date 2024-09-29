@@ -6,6 +6,7 @@ import com.oe.rehooked.tags.ReHookedTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ public class ReHookedItemTagProvider extends ItemTagsProvider {
                 .add(ReHookedItems.IRON_HOOK.get())
                 .add(ReHookedItems.DIAMOND_HOOK.get())
                 .add(ReHookedItems.RED_HOOK.get())
+                .add(ReHookedItems.BLAZING_HOOK.get())
                 .add(ReHookedItems.ENDER_HOOK.get())
                 .add(ReHookedItems.DEJA_VHUK.get());
     }
