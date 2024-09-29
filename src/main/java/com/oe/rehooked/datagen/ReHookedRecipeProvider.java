@@ -1,6 +1,7 @@
 package com.oe.rehooked.datagen;
 
 import com.oe.rehooked.item.ReHookedItems;
+import com.oe.rehooked.tags.ReHookedTags;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -101,6 +102,18 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                 .define('H', ReHookedItems.DIAMOND_HOOK.get())
                 .unlockedBy("has_diamond_hook",
                         inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.DIAMOND_HOOK.get()).build()))
+                .save(pWriter);
+        
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.DEJA_VHUK.get())
+                .pattern("  D")
+                .pattern(" H ")
+                .pattern("D  ")
+                .define('D', ReHookedTags.Items.MUSIC_DISC)
+                .define('H', ReHookedItems.BLAZING_HOOK.get())
+                .unlockedBy("has_blazing_hook",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.BLAZING_HOOK.get()).build()))
+                .unlockedBy("has_music_disc",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedTags.Items.MUSIC_DISC).build()))
                 .save(pWriter);
     }
 }
