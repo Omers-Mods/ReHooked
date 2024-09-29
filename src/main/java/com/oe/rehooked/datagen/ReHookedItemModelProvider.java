@@ -22,6 +22,7 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
         simpleItem(ReHookedItems.DIAMOND_HOOK);
         simpleItem(ReHookedItems.RED_HOOK);
         simpleItem(ReHookedItems.ENDER_HOOK);
+        simpleItem(ReHookedItems.DEJA_VHUK);
     }
     
     private ItemModelBuilder simpleItem(RegistryObject<Item> item) {

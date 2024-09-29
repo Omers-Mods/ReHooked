@@ -25,7 +25,8 @@ public class ReHookedItemTagProvider extends ItemTagsProvider {
                 .add(ReHookedItems.IRON_HOOK.get())
                 .add(ReHookedItems.DIAMOND_HOOK.get())
                 .add(ReHookedItems.RED_HOOK.get())
-                .add(ReHookedItems.ENDER_HOOK.get());
+                .add(ReHookedItems.ENDER_HOOK.get())
+                .add(ReHookedItems.DEJA_VHUK.get());
     }
 
     @Override
