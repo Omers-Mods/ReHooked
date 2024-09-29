@@ -41,8 +41,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class HookEntity extends Projectile {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    
     private static final EntityDataAccessor<Optional<BlockPos>> HIT_POS =
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
     private static final EntityDataAccessor<Integer> STATE = 
@@ -105,7 +103,6 @@ public class HookEntity extends Projectile {
     public void tick() {
         if (!level().isClientSide() && !getState().equals(State.DONE) && 
                 !(getOwner() instanceof Player owner && owner.isAlive())) {
-            LOGGER.debug("Owner not found, setting state to done!");
             setState(State.DONE);
         }
         
@@ -215,7 +212,6 @@ public class HookEntity extends Projectile {
 
     @Override
     public void shootFromRotation(@NotNull Entity pShooter, float pX, float pY, float pZ, float pVelocity, float pInaccuracy) {
-        LOGGER.debug("Shooting!");
         float f = -Mth.sin(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
         float f1 = -Mth.sin((pX + pZ) * ((float)Math.PI / 180F));
         float f2 = Mth.cos(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
@@ -230,7 +226,6 @@ public class HookEntity extends Projectile {
             HookData hookData = optHookData.get();
             // check if needs to destroy instant hook
             if (!level().isClientSide() && !firstTickInState && hookData.speed() / 20f >= hookData.range()) {
-                LOGGER.debug("Retracting instant hook on second shot tick");
                 setReason(Reason.MISS);
                 setState(State.RETRACTING);
                 setDeltaMovement(Vec3.ZERO);
@@ -240,7 +235,6 @@ public class HookEntity extends Projectile {
             if (owner != null) {
                 // check if moved further than the target
                 if (PositionHelper.getWaistPosition(owner).distanceTo(position()) > hookData.range()) {
-                    LOGGER.debug("Moved further than range from owner");
                     setReason(Reason.MISS);
                     setState(State.RETRACTING);
                     setDeltaMovement(Vec3.ZERO);
@@ -250,7 +244,6 @@ public class HookEntity extends Projectile {
                     BlockHitResult hitResult = VectorHelper.getFromEntityAndAngle(this, this.getDeltaMovement().normalize(), this.getDeltaMovement().length());
                     BlockState hitState = level().getBlockState(hitResult.getBlockPos());
                     if (!hitState.isAir() && hitResult.getType().equals(HitResult.Type.BLOCK)) {
-                        LOGGER.debug("Hit a block at {}", hitResult.getBlockPos().getCenter());
                         Vec3 hitLocation = hitResult.getLocation();
                         setDeltaMovement(position().vectorTo(hitLocation));
                         if (!level().isClientSide()) {
@@ -316,7 +309,6 @@ public class HookEntity extends Projectile {
         else {
             firstTickInState = true;
             ticksInState = 0;
-            LOGGER.debug("Hook changed from {} to {}", getPrevState(), currState);
             setPrevState(currState);
         }
     }
@@ -433,11 +425,5 @@ public class HookEntity extends Projectile {
         MISS,
         PLAYER,
         BREAK
-    }
-
-    @Override
-    public void remove(@NotNull RemovalReason pReason) {
-        LOGGER.debug("Hook {} getting removed for {}", getUUID(), pReason);
-        super.remove(pReason);
     }
 }

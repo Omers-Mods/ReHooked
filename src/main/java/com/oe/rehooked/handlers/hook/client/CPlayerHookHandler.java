@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class CPlayerHookHandler implements IClientPlayerHookHandler {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    
     private final List<HookEntity> hooks;
     private Optional<Player> owner;
     
@@ -39,17 +37,13 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     
     @Override
     public void addHook(int id) {
-        LOGGER.debug("Adding hook with id: {}", id);
         if (owner.isPresent()) {
             Player player = owner.get();
             Entity entity = player.level().getEntity(id);
             if (entity instanceof HookEntity hookEntity) {
-                LOGGER.debug("Hook entity is being added!");
                 hooks.add(hookEntity);
                 hookEntity.setOwner(player);
             }
-        } else {
-            LOGGER.debug("Owner not found!");
         }
     }
 
@@ -75,7 +69,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     @Override
     public void removeAllHooks() {
         if (hooks.isEmpty()) return;
-        LOGGER.debug("Removing all hooks {}", hooks.size());
         // this is a response to a key press from the player
         // notify the server
         getOwner().ifPresent(owner -> 
@@ -86,7 +79,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
-        LOGGER.debug("Shooting from rotation: {}, {}", xRot, yRot);
         PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.SHOOT, 0, xRot, yRot));
     }
 
@@ -134,7 +126,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
                 if (hookData.isCreative()) {
                     // if player going out of the box put him back in
                     VectorHelper.Box box = getBox();
-                    LOGGER.debug("Box {}", box);
                     if (!box.isInside(ownerWaistPos)) {
                         moveVector = ownerWaistPos.vectorTo(box.closestPointInCube(ownerWaistPos));
                     }

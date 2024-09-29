@@ -24,7 +24,6 @@ public class CHookCapabilityProcessor implements IHandler {
     }
 
     private static void handle(CHookCapabilityPacket packet) {
-        LOGGER.debug("Handling client hook packet for: {}", packet.packetType);
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         Optional<IClientPlayerHookHandler> optHandler = IClientPlayerHookHandler.FromPlayer(player).resolve();
@@ -36,9 +35,6 @@ public class CHookCapabilityProcessor implements IHandler {
                 case RETRACT_ALL_HOOKS -> handler.removeAllHooks();
                 case FORCE_UPDATE -> handler.update();
             }
-        }
-        else {
-            LOGGER.debug("Missing handler capability");
         }
     }
 }

@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class SPlayerHookHandler implements IServerPlayerHookHandler {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    
     private final List<HookEntity> hooks;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Player> owner;
@@ -40,7 +38,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void addHook(int id) {
-        LOGGER.debug("Adding new hook by id: {}", id);
         // hooks will always be added on the server first
         getOwner().map(Player::level).map(level -> level.getEntity(id)).map(entity -> {
             if (entity instanceof HookEntity hookEntity) {
@@ -55,7 +52,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void addHook(HookEntity hookEntity) {
-        LOGGER.debug("Adding new hook by entity with id: {}", hookEntity.getId());
         // hooks will always be added on the server first
         hooks.add(hookEntity);
         getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
@@ -65,7 +61,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void removeHook(int id) {
-        LOGGER.debug("Removing hook by id: {}", id);
         // this is a response to a request from the client
         if (hooks.removeIf(hookEntity -> hookEntity.getId() == id)) {
             // update the hook to retract
@@ -80,7 +75,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void removeHook(HookEntity hookEntity) {
-        LOGGER.debug("Removing hook by entity with id: {}", hookEntity.getId());
         // this is a response to a request from the hook
         if (hooks.remove(hookEntity)) {
             // notify client player
@@ -100,7 +94,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void removeAllHooks() {
-        LOGGER.debug("Removing all hooks ({})", hooks.size());
         // this is a response to a request from the client
         hooks.forEach(hookEntity -> {
             hookEntity.setReason(HookEntity.Reason.PLAYER);
@@ -111,7 +104,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
-        LOGGER.debug("Shooting from rotation: {}, {}", xRot, yRot);
         // this is a response to a client request
         getOwner().ifPresent(owner -> getHookData().ifPresent(hookData -> {
             if (hooks.size() + 1 > hookData.count())
