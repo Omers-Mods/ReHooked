@@ -6,8 +6,10 @@ import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.item.ReHookedItems;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
+import com.oe.rehooked.network.packets.client.CSoundPacket;
 import com.oe.rehooked.network.packets.client.processing.CHookCapabilityProcessor;
 import com.oe.rehooked.particle.ReHookedParticles;
+import com.oe.rehooked.sound.ClientSoundManager;
 import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.tabs.ReHookedCreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,7 +32,10 @@ public class ReHookedMod {
         // Register packets
         PacketHandler.Init();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> 
-                () -> PacketHandler.addHandler(CHookCapabilityPacket.class, CHookCapabilityProcessor::handle));
+                () -> {
+                    PacketHandler.addHandler(CHookCapabilityPacket.class, CHookCapabilityProcessor::handle);
+                    PacketHandler.addHandler(CSoundPacket.class, ClientSoundManager::handlePacket);
+                });
 
         // register config
         ReHookedConfig.Init();
