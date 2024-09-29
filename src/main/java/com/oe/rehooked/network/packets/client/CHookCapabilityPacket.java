@@ -1,12 +1,8 @@
 package com.oe.rehooked.network.packets.client;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.network.FriendlyByteBuf;
-import org.slf4j.Logger;
 
 public class CHookCapabilityPacket {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    
     public final State packetType;
     public final int id;
     

@@ -1,6 +1,5 @@
 package com.oe.rehooked.handlers.hook.def;
 
-import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
@@ -89,18 +88,15 @@ public interface ICommonPlayerHookHandler {
         }).orElse(null);
     }
     default void onUnequip() {
-        ReHookedMod.LOGGER.debug("Unequipped hook!");
         removeAllHooks();
         update();
     }
     default void onEquip() {
-        ReHookedMod.LOGGER.debug("Equipped hook!");
         removeAllHooks();
         update();
     }
     
     default void jump() {
-        ReHookedMod.LOGGER.debug("jumping");
         getOwner().ifPresent(owner -> {
             setMomentum(getJumpVector());
             removeAllHooks();
@@ -122,9 +118,7 @@ public interface ICommonPlayerHookHandler {
     }
     
     Vec3 getMomentum();
-    default void setMomentum(Vec3 momentum) {
-        ReHookedMod.LOGGER.debug("Setting momentum to {}", momentum);
-    }
+    void setMomentum(Vec3 momentum);
     
     default void updateMomentum() {
         if (getMomentum() == null) return;

@@ -1,18 +1,14 @@
 package com.oe.rehooked.network.packets.server;
 
-import com.mojang.logging.LogUtils;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class SHookCapabilityPacket {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    
     private final State packetType;
     private final int id;
     private final float xRot;
@@ -49,13 +45,11 @@ public class SHookCapabilityPacket {
     
     public void handle(Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
-            LOGGER.debug("Handling server hook packet for: {}", packetType);
             ServerPlayer player = context.get().getSender();
             if (player == null) return;
             Optional<IServerPlayerHookHandler> optHandler = IServerPlayerHookHandler.FromPlayer(player).resolve();
             if (optHandler.isPresent()) {
                 IServerPlayerHookHandler handler = optHandler.get();
-                LOGGER.debug("Got hook handler");
                 handler.setOwner(player);
                 switch (packetType) {
                     case SHOOT -> handler.shootFromRotation(xRot, yRot);
@@ -65,9 +59,6 @@ public class SHookCapabilityPacket {
                     case JUMP -> handler.jump();
                     case KILL -> handler.killHook(id);
                 }
-            }
-            else {
-                LOGGER.debug("Missing handler capability");
             }
         });
         context.get().setPacketHandled(true);
