@@ -8,6 +8,9 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ReHookedSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = 
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, ReHookedMod.MOD_ID);
@@ -16,6 +19,7 @@ public class ReHookedSounds {
     public static final RegistryObject<SoundEvent> HOOK_MISS = createEvent("hook_miss");
     public static final RegistryObject<SoundEvent> HOOK_SHOOT = createEvent("hook_shoot");
     public static final RegistryObject<SoundEvent> HOOK_RETRACT = createEvent("hook_retract");
+    public static final RegistryObject<SoundEvent> DEJA_VU = createEvent("deja_vu");
     
     private static RegistryObject<SoundEvent> createEvent(String name) {
         ResourceLocation loc = new ResourceLocation(ReHookedMod.MOD_ID, name);
@@ -23,6 +27,22 @@ public class ReHookedSounds {
     }
     
     public static void Init(IEventBus eventBus) {
+        SoundEvents.add(HOOK_HIT);
+        SoundEvents.add(HOOK_MISS);
+        SoundEvents.add(HOOK_SHOOT);
+        SoundEvents.add(HOOK_RETRACT);
+        SoundEvents.add(DEJA_VU);
+        
         SOUND_EVENTS.register(eventBus);
+    }
+    
+    private static final List<RegistryObject<SoundEvent>> SoundEvents = new ArrayList<>();
+    
+    public static RegistryObject<SoundEvent> GetEvent(int index) {
+        return SoundEvents.get(index);
+    }
+    
+    public static int GetIndex(RegistryObject<SoundEvent> registry) {
+        return SoundEvents.indexOf(registry);
     }
 }
