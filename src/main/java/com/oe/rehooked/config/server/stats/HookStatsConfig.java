@@ -49,6 +49,9 @@ public class HookStatsConfig {
         createHookCategory(ReHookedItems.ENDER, builder, 
                 new IncompleteHookData(1, 96, 1920, 48, false));
         
+        createHookCategory(ReHookedItems.DEJA_VU, builder,
+                new IncompleteHookData(2, 150, 10000,75, false));
+        
         builder.pop();
     }
     
@@ -103,8 +106,8 @@ public class HookStatsConfig {
     }
 
     public record IncompleteHookData(int count, float range, float travelSpeed, float pullSpeed, boolean isCreative) {
-        public HookData complete(ResourceLocation texture, Supplier<ParticleOptions> particleType) {
-            return new HookData(count, range, travelSpeed, pullSpeed, isCreative, texture, particleType);
+        public HookData complete(String type, ResourceLocation texture, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {
+            return new HookData(type, count, range, travelSpeed, pullSpeed, isCreative, texture, particleType, minParticlesPerBlock, maxParticlesPerBlock, radius, ticksBetweenSpawns);
         }
     }
 }

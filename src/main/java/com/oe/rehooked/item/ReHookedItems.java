@@ -7,6 +7,7 @@ import com.oe.rehooked.data.HookRegistry;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.particle.ReHookedParticles;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -22,6 +23,7 @@ public class ReHookedItems {
     public static final String DIAMOND = "diamond";
     public static final String RED = "red";
     public static final String ENDER = "ender";
+    public static final String DEJA_VU = "deja_vu";
     
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ReHookedMod.MOD_ID);
     
@@ -30,6 +32,7 @@ public class ReHookedItems {
     public static final RegistryObject<Item> DIAMOND_HOOK = CreateHookItem(DIAMOND);
     public static final RegistryObject<Item> RED_HOOK = CreateHookItem(RED);
     public static final RegistryObject<Item> ENDER_HOOK = CreateHookItem(ENDER);
+    public static final RegistryObject<Item> DEJA_VHUK = CreateHookItem(DEJA_VU);
     
     private static RegistryObject<Item> CreateHookItem(String type) {
         return ITEMS.register(type + "_hook", () -> new HookItem(type));
@@ -40,11 +43,19 @@ public class ReHookedItems {
         ITEMS.register(eventBus);
     }
     
-    private static HookData CompleteConfigData(String type, ResourceLocation texture, Supplier<ParticleOptions> particleType) {
+    private static HookData CompleteConfigData(String type, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {
         return HookStatsConfig
                 .GetConfigDataForType(type)
                 .map(HookStatsConfig.HookConfigData::getData)
-                .map(partial -> partial.complete(texture, particleType))
+                .map(partial -> partial.complete(type, getHookTexture(type), particleType, minParticlesPerBlock, maxParticlesPerBlock, radius, ticksBetweenSpawns))
+                .orElse(null);
+    }
+    
+    private static HookData CompleteConfigData(String type) {
+        return HookStatsConfig
+                .GetConfigDataForType(type)
+                .map(HookStatsConfig.HookConfigData::getData)
+                .map(partial -> partial.complete(type, getHookTexture(type), () -> null, 0, 0, 0, 0))
                 .orElse(null);
     }
     
@@ -52,16 +63,20 @@ public class ReHookedItems {
         return new ResourceLocation(ReHookedMod.MOD_ID, "textures/entity/hook/" + name + "/" + name + ".png");
     }
     
-    private static void DefaultRegisterHook(String type) {
-        HookRegistry.registerHook(type, CompleteConfigData(type, getHookTexture(type), () -> null));
+    private static void RegisterHookWithParticles(String type, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {
+        HookRegistry.registerHook(type, CompleteConfigData(type, particleType, minParticlesPerBlock, maxParticlesPerBlock, radius, ticksBetweenSpawns));
+    }
+    private static void RegisterHookWithChain(String type) {
+        HookRegistry.registerHook(type, CompleteConfigData(type));
     }
     
     public static void RegisterConfigProperties() {
         // define all hook variants
-        DefaultRegisterHook(WOOD);
-        DefaultRegisterHook(IRON);
-        DefaultRegisterHook(DIAMOND);
-        HookRegistry.registerHook(ENDER, CompleteConfigData(ENDER, getHookTexture(ENDER), ReHookedParticles.ENDER_HOOK_PARTICLE::get));
-        HookRegistry.registerHook(RED, CompleteConfigData(RED, getHookTexture(RED), ReHookedParticles.RED_HOOK_PARTICLE::get));
+        RegisterHookWithChain(WOOD);
+        RegisterHookWithChain(IRON);
+        RegisterHookWithChain(DIAMOND);
+        RegisterHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 2, 3, 0.2, 4);
+        RegisterHookWithParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 2, 3, 0.1, 4);
+        RegisterHookWithParticles(DEJA_VU, ParticleTypes.NOTE::getType, 0, 1, 0.5, 20);
     }
 }
