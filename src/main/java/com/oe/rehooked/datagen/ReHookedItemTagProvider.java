@@ -27,8 +27,7 @@ public class ReHookedItemTagProvider extends ItemTagsProvider {
                 .add(ReHookedItems.DIAMOND_HOOK.get())
                 .add(ReHookedItems.RED_HOOK.get())
                 .add(ReHookedItems.BLAZING_HOOK.get())
-                .add(ReHookedItems.ENDER_HOOK.get())
-                .add(ReHookedItems.DEJA_VHUK.get());
+                .add(ReHookedItems.ENDER_HOOK.get());
         
         this.tag(ReHookedTags.Items.MUSIC_DISC)
                 .add(Items.MUSIC_DISC_13)

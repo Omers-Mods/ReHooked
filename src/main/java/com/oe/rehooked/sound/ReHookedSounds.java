@@ -19,7 +19,6 @@ public class ReHookedSounds {
     public static final RegistryObject<SoundEvent> HOOK_MISS = createEvent("hook_miss");
     public static final RegistryObject<SoundEvent> HOOK_SHOOT = createEvent("hook_shoot");
     public static final RegistryObject<SoundEvent> HOOK_RETRACT = createEvent("hook_retract");
-    public static final RegistryObject<SoundEvent> DEJA_VU = createEvent("deja_vu");
     
     private static RegistryObject<SoundEvent> createEvent(String name) {
         ResourceLocation loc = new ResourceLocation(ReHookedMod.MOD_ID, name);
@@ -31,7 +30,6 @@ public class ReHookedSounds {
         SoundEvents.add(HOOK_MISS);
         SoundEvents.add(HOOK_SHOOT);
         SoundEvents.add(HOOK_RETRACT);
-        SoundEvents.add(DEJA_VU);
         
         SOUND_EVENTS.register(eventBus);
     }

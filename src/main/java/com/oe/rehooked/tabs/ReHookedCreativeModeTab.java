@@ -25,7 +25,6 @@ public class ReHookedCreativeModeTab {
                         pOutput.accept(ReHookedItems.RED_HOOK.get());
                         pOutput.accept(ReHookedItems.BLAZING_HOOK.get());
                         pOutput.accept(ReHookedItems.ENDER_HOOK.get());
-                        pOutput.accept(ReHookedItems.DEJA_VHUK.get());
                     })
                     .build());
     

@@ -52,9 +52,6 @@ public class HookStatsConfig {
         createHookCategory(ReHookedItems.ENDER, builder, 
                 new IncompleteHookData(1, 96, 1920, 48, false));
         
-        createHookCategory(ReHookedItems.DEJA_VU, builder,
-                new IncompleteHookData(2, 150, 10000,75, false));
-        
         builder.pop();
     }
     
