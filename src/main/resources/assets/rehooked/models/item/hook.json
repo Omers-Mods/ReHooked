@@ -43,14 +43,6 @@
       "textures": {
         "layer0": "rehooked:item/ender_hook"
       }
-    },
-    {
-      "predicate": {
-        "rehooked:hook_type": "deja_vu"
-      },
-      "textures": {
-        "layer0": "rehooked:item/deja_vu_hook"
-      }
     }
   ]
 }

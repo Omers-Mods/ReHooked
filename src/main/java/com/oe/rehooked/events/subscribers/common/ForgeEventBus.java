@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.ClientHookCapabilityProvider;
 import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
-import com.oe.rehooked.capabilities.meme.ServerDejaVuCapabilityProvider;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.utils.HandlerHelper;
@@ -37,10 +36,6 @@ public class ForgeEventBus {
                         event.addCapability(new ResourceLocation(ReHookedMod.MOD_ID, "capabilities.hook.server"),
                                 new ServerHookCapabilityProvider());
                     }
-                    if (!player.getCapability(ServerDejaVuCapabilityProvider.SERVER_DEJA_VU_HANDLER).isPresent()) {
-                        event.addCapability(new ResourceLocation(ReHookedMod.MOD_ID, "capabilities.deja_vu.server"),
-                                new ServerDejaVuCapabilityProvider());
-                    }
                 }
             }
         }
@@ -61,9 +56,6 @@ public class ForgeEventBus {
                     player.setDeltaMovement(handler.getDeltaVThisTick());
                 }
                 handler.storeLastPlayerPosition();
-            });
-            player.getCapability(ServerDejaVuCapabilityProvider.SERVER_DEJA_VU_HANDLER).ifPresent(handler -> {
-                handler.setOwner(player).tick();
             });
         });
     }
