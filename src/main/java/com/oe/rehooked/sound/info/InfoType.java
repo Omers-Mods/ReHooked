@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public enum InfoType {
     ;
-    private Class<? extends IKeepAliveInfo> clazz;
+    private final Class<? extends IKeepAliveInfo> clazz;
     InfoType(Class<? extends IKeepAliveInfo> clazz) {
         this.clazz = clazz;
     }

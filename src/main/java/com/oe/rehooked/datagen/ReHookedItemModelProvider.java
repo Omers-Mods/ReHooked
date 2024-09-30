@@ -25,8 +25,8 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
         simpleItem(ReHookedItems.ENDER_HOOK);
     }
     
-    private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
-        return withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
+    private void simpleItem(RegistryObject<Item> item) {
+        withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
                 .texture("layer0", new ResourceLocation(ReHookedMod.MOD_ID, "item/" + item.getId().getPath()));
     }
 }

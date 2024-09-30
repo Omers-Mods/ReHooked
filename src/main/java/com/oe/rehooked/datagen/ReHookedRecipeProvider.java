@@ -1,7 +1,6 @@
 package com.oe.rehooked.datagen;
 
 import com.oe.rehooked.item.ReHookedItems;
-import com.oe.rehooked.tags.ReHookedTags;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
