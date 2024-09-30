@@ -5,7 +5,6 @@ import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
@@ -25,8 +24,8 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
         simpleItem(ReHookedItems.ENDER_HOOK);
     }
     
-    private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
-        return withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
+    private void simpleItem(RegistryObject<Item> item) {
+        withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
                 .texture("layer0", new ResourceLocation(ReHookedMod.MOD_ID, "item/" + item.getId().getPath()));
     }
 }
