@@ -148,7 +148,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
             owner.onUpdateAbilities();
             updateMomentum();
         });
-        handleParticles();
     }
 
     @Override
@@ -176,11 +175,6 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         }
         
         return maxDistance + THRESHOLD;
-    }
-
-    @Override
-    public void handleParticles() {
-        for (HookEntity hookEntity : getHooks()) hookEntity.createParticles();
     }
 
     @Override

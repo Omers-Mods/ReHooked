@@ -15,7 +15,6 @@ public interface IClientPlayerHookHandler extends ICommonPlayerHookHandler {
     }
 
     double getMaxHookDistance();
-    void handleParticles();
 
     @Override
     default void jump() {

@@ -138,6 +138,8 @@ public class HookEntity extends Projectile {
                 offset = position().vectorTo(owner.position().add(0, owner.getEyeHeight() - 0.1, 0)).normalize();
         }
         
+        if (level().isClientSide()) createParticles();
+        
         // run the super class tick method
         super.tick();
     }
