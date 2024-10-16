@@ -1,6 +1,7 @@
 package com.oe.rehooked;
 
 import com.mojang.logging.LogUtils;
+import com.oe.rehooked.block.ReHookedBlocks;
 import com.oe.rehooked.config.server.ReHookedConfig;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.item.ReHookedItems;
@@ -49,6 +50,8 @@ public class ReHookedMod {
         ReHookedCreativeModeTab.Init(modEventBus);
         // Register mod items
         ReHookedItems.Init(modEventBus);
+        // Register mod blocks
+        ReHookedBlocks.Init(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
