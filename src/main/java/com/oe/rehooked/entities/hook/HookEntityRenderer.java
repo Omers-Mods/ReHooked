@@ -64,9 +64,6 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
         pPoseStack.mulPose(Axis.YP.rotationDegrees(pEntity.getYRot() + 270f));
         pPoseStack.mulPose(Axis.ZP.rotationDegrees(pEntity.getXRot() + 90f));
         pPoseStack.translate(0, -1, 0);
-        if (pEntity.isInWall()) {
-            pPoseStack.translate(0, direction.y - 1, 0);
-        }
         this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(model.renderType(getTextureLocation(pEntity))), pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         pPoseStack.popPose();
     }
