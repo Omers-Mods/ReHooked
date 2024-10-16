@@ -77,7 +77,7 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.DUSTS_REDSTONE).build()))
                 .save(pWriter);
         
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.BLAZING_HOOK.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.BLAZE_HOOK.get())
                 .pattern("DBH")
                 .pattern(" BB")
                 .pattern("B D")

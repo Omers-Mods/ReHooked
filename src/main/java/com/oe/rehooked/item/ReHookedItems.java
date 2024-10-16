@@ -23,7 +23,7 @@ public class ReHookedItems {
     public static final String DIAMOND = "diamond";
     public static final String RED = "red";
     public static final String ENDER = "ender";
-    public static final String BLAZING = "blazing";
+    public static final String BLAZE = "blaze";
     
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ReHookedMod.MOD_ID);
     
@@ -31,7 +31,7 @@ public class ReHookedItems {
     public static final RegistryObject<Item> IRON_HOOK = CreateHookItem(IRON);
     public static final RegistryObject<Item> DIAMOND_HOOK = CreateHookItem(DIAMOND);
     public static final RegistryObject<Item> RED_HOOK = CreateHookItem(RED);
-    public static final RegistryObject<Item> BLAZING_HOOK = CreateHookItem(BLAZING);
+    public static final RegistryObject<Item> BLAZE_HOOK = CreateHookItem(BLAZE);
     public static final RegistryObject<Item> ENDER_HOOK = CreateHookItem(ENDER);
     
     private static RegistryObject<Item> CreateHookItem(String type) {
@@ -75,8 +75,8 @@ public class ReHookedItems {
         RegisterHookWithChain(WOOD);
         RegisterHookWithChain(IRON);
         RegisterHookWithChain(DIAMOND);
-        RegisterHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 2, 3, 0.2, 4);
-        RegisterHookWithParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 2, 3, 0.1, 4);
-        RegisterHookWithParticles(BLAZING, ParticleTypes.FLAME::getType, 0, 1, 0.1, 20);
+        RegisterHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 1, 2, 0.2, 4);
+        RegisterHookWithParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 1, 2, 0.1, 4);
+        RegisterHookWithParticles(BLAZE, ParticleTypes.FLAME::getType, 0, 1, 0.1, 20);
     }
 }

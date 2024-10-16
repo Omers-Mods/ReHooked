@@ -46,7 +46,7 @@ public class HookStatsConfig {
         createHookCategory(ReHookedItems.RED, builder,
                 new IncompleteHookData(3, 16, 8, 6, true));
 
-        createHookCategory(ReHookedItems.BLAZING, builder,
+        createHookCategory(ReHookedItems.BLAZE, builder,
                 new IncompleteHookData(2, 64, 1920, 36, false));
         
         createHookCategory(ReHookedItems.ENDER, builder, 

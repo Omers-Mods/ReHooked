@@ -20,7 +20,7 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
         simpleItem(ReHookedItems.IRON_HOOK);
         simpleItem(ReHookedItems.DIAMOND_HOOK);
         simpleItem(ReHookedItems.RED_HOOK);
-        simpleItem(ReHookedItems.BLAZING_HOOK);
+        simpleItem(ReHookedItems.BLAZE_HOOK);
         simpleItem(ReHookedItems.ENDER_HOOK);
     }
     
