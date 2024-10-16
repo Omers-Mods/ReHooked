@@ -211,6 +211,11 @@ public class HookEntity extends Projectile {
     }
 
     @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
     public void setDeltaMovement(Vec3 pDeltaMovement) {
         setSharedDeltaV(pDeltaMovement.toVector3f());
         super.setDeltaMovement(pDeltaMovement);
