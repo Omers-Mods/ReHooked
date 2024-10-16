@@ -1,6 +1,7 @@
 package com.oe.rehooked.tabs;
 
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.item.ReHookedComponents;
 import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -25,6 +26,8 @@ public class ReHookedCreativeModeTab {
                         pOutput.accept(ReHookedItems.RED_HOOK.get());
                         pOutput.accept(ReHookedItems.BLAZE_HOOK.get());
                         pOutput.accept(ReHookedItems.ENDER_HOOK.get());
+                        pOutput.accept(ReHookedComponents.WOOD_CHAIN.get());
+                        pOutput.accept(ReHookedComponents.DIAMOND_CHAIN.get());
                     })
                     .build());
     
