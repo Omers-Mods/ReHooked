@@ -3,10 +3,7 @@ package com.oe.rehooked.network.handlers;
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
-import com.oe.rehooked.network.packets.client.CSoundPacket;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
-import com.oe.rehooked.network.packets.server.SSoundPacket;
-import com.oe.rehooked.sound.ServerSoundManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -64,22 +61,6 @@ public class PacketHandler {
                 .add();
 
         LOGGER.debug("Registered ClientHookPacket");
-        
-        INSTANCE.messageBuilder(SSoundPacket.class, id++)
-                .encoder(SSoundPacket::encode)
-                .decoder(SSoundPacket::new)
-                .consumerMainThread(ServerSoundManager::handlePacket)
-                .add();
-
-        LOGGER.debug("Registered ServerSoundPacket");
-
-        INSTANCE.messageBuilder(CSoundPacket.class, id++)
-                .encoder(CSoundPacket::encode)
-                .decoder(CSoundPacket::new)
-                .consumerMainThread(PacketHandler::handle)
-                .add();
-
-        LOGGER.debug("Registered ClientSoundPacket");
     }
     
     public static void sendToServer(Object msg) {
