@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.block.ReHookedBlocks;
 import com.oe.rehooked.config.server.ReHookedConfig;
 import com.oe.rehooked.entities.ReHookedEntities;
+import com.oe.rehooked.item.ReHookedComponents;
 import com.oe.rehooked.item.ReHookedItems;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
@@ -47,6 +48,8 @@ public class ReHookedMod {
         ReHookedCreativeModeTab.Init(modEventBus);
         // Register mod items
         ReHookedItems.Init(modEventBus);
+        // Register mod crafting components
+        ReHookedComponents.Init(modEventBus);
         // Register mod blocks
         ReHookedBlocks.Init(modEventBus);
 

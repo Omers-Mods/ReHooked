@@ -1,6 +1,7 @@
 package com.oe.rehooked.datagen;
 
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.item.ReHookedComponents;
 import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -22,10 +23,18 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
         simpleItem(ReHookedItems.RED_HOOK);
         simpleItem(ReHookedItems.BLAZE_HOOK);
         simpleItem(ReHookedItems.ENDER_HOOK);
+        
+        componentItem(ReHookedComponents.WOOD_CHAIN);
+        componentItem(ReHookedComponents.DIAMOND_CHAIN);
     }
     
     private void simpleItem(RegistryObject<Item> item) {
         withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
                 .texture("layer0", new ResourceLocation(ReHookedMod.MOD_ID, "item/" + item.getId().getPath()));
+    }
+    
+    private void componentItem(RegistryObject<Item> item) {
+        withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
+                .texture("layer0", new ResourceLocation(ReHookedMod.MOD_ID, "item/component/" + item.getId().getPath()));
     }
 }

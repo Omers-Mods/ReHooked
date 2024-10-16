@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class DiamondChain extends Item {
-    public DiamondChain(Properties pProperties) {
-        super(pProperties);
+    public DiamondChain() {
+        super(new Properties().defaultDurability(0).stacksTo(16));
     }
 
     @Override

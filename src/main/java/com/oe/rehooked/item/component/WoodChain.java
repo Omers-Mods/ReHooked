@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class WoodChain extends Item {
-    public WoodChain(Properties pProperties) {
-        super(pProperties);
+    public WoodChain() {
+        super(new Properties().defaultDurability(0).stacksTo(16));
     }
 
     @Override
