@@ -45,7 +45,7 @@ public interface ICommonPlayerHookHandler {
         for (HookEntity hookEntity : getHooks()) {
             if (hookEntity.getState().equals(HookEntity.State.PULLING) && hookEntity.getHitPos().isPresent()) {
                 pulling++;
-                Vec3 hit = hookEntity.getHitPos().get().getCenter();
+                Vec3 hit = hookEntity.position();
                 x += hit.x;
                 y += hit.y;
                 z += hit.z;
