@@ -9,7 +9,6 @@ import net.minecraft.world.item.Item;
 public class ReHookedTags {
     public class Items {
         public static final TagKey<Item> HOOK = curiosTag("hook");
-        public static final TagKey<Item> MUSIC_DISC = tag("music_disc");
         
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(ReHookedMod.MOD_ID, name));
