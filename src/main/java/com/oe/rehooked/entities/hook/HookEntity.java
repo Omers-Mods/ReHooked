@@ -53,6 +53,10 @@ public class HookEntity extends Projectile {
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> OWNER_ID = 
             SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> RENDER_PARTICLES = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Vector3f> DIRECTION = 
+            SynchedEntityData.defineId(HookEntity.class, EntityDataSerializers.VECTOR3);
 
     protected int ticksInState = 0;
     protected boolean firstTickInState = true;
@@ -180,7 +184,7 @@ public class HookEntity extends Projectile {
     public void createParticles() {
         ticksSinceParticles++;
         getHookData().ifPresent(hookData -> {
-            if (ticksSinceParticles >= hookData.ticksBetweenSpawns()) return;
+            if (ticksSinceParticles >= hookData.ticksBetweenSpawns() || (getState().equals(State.PULLING) && !getRenderParticles())) return;
             ticksSinceParticles = 0;
             ParticleOptions particleType = hookData.particleType().get();
             if (particleType == null) return;
@@ -223,6 +227,7 @@ public class HookEntity extends Projectile {
         float f1 = -Mth.sin((pX + pZ) * ((float)Math.PI / 180F));
         float f2 = Mth.cos(pY * ((float)Math.PI / 180F)) * Mth.cos(pX * ((float)Math.PI / 180F));
         this.shoot(f, f1, f2, pVelocity, pInaccuracy);
+        setShotDirection(getDeltaMovement().normalize().toVector3f());
         setReason(Reason.SHOT);
     }
 
@@ -257,6 +262,7 @@ public class HookEntity extends Projectile {
                             setReason(Reason.HIT);
                             setState(State.PULLING);
                             setHitPos(hitResult.getBlockPos());
+                            setShotDirection(position().vectorTo(hitLocation).toVector3f());
                         }
                     }
                 }
@@ -275,11 +281,6 @@ public class HookEntity extends Projectile {
                 setState(State.RETRACTING);
             }
         });
-        // block collision detection while pulling to prevent rendering as black blob
-        Player owner = tryGetOwnerFromCachedId();
-        if (isInWall() && owner != null) {
-            setPos(position().add(position().vectorTo(owner.position()).normalize().scale(0.1)));
-        }
     }
     
     protected void tickRetracting() {
@@ -287,6 +288,7 @@ public class HookEntity extends Projectile {
             if (getOwner() instanceof Player owner) {
                 // vector to the owner
                 Vec3 vectorToPlayer = position().vectorTo(PositionHelper.getWaistPosition(owner));
+                setShotDirection(vectorToPlayer.toVector3f());
                 if (vectorToPlayer.length() < 5) {
                     HandlerHelper.getHookHandler(owner).ifPresent(handler -> {
                         handler.removeHook(this);
@@ -402,6 +404,22 @@ public class HookEntity extends Projectile {
         return null;
     }
     
+    public void setRenderParticles(boolean renderParticles) {
+        entityData.set(RENDER_PARTICLES, renderParticles);
+    }
+    
+    public boolean getRenderParticles() {
+        return entityData.get(RENDER_PARTICLES);
+    }
+    
+    public void setShotDirection(Vector3f direction) {
+        entityData.set(DIRECTION, direction);
+    }
+    
+    public Vector3f getShotDirection() {
+        return entityData.get(DIRECTION);
+    }
+
     @Override
     protected void defineSynchedData() {
         entityData.define(HIT_POS, Optional.empty());
@@ -411,6 +429,8 @@ public class HookEntity extends Projectile {
         entityData.define(REASON, Reason.EMPTY.ordinal());
         entityData.define(HOOK_TYPE, "");
         entityData.define(OWNER_ID, -1);
+        entityData.define(RENDER_PARTICLES, true);
+        entityData.define(DIRECTION, Vec3.ZERO.toVector3f());
     }
 
     @Override
