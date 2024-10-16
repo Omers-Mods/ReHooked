@@ -1,6 +1,5 @@
 package com.oe.rehooked.handlers.hook.server;
 
-import com.mojang.logging.LogUtils;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
@@ -11,7 +10,6 @@ import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -162,6 +160,8 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
             updateMomentum();
+            boolean renderParticles = actualPlayerPositionChange().length() > THRESHOLD;
+            getHooks().forEach(hookEntity -> hookEntity.setRenderParticles(renderParticles));
         });
     }
 
