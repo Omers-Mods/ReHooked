@@ -1,16 +1,22 @@
 package com.oe.rehooked.handlers.hook.server;
 
+import com.oe.rehooked.data.AdditionalHandlersRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
+import com.oe.rehooked.handlers.additional.def.ICommonHandler;
+import com.oe.rehooked.handlers.additional.def.IServerHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
+import com.oe.rehooked.utils.CurioUtils;
+import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +32,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private Vec3 lastPlayerPosition;
     
     private FlightHandler flightHandler;
+    private IServerHandler additional;
     
     public SPlayerHookHandler() {
         hooks = new ArrayList<>();
@@ -130,6 +137,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         moveVector = null;
         getOwner().ifPresent(owner -> {
             flightHandler.updateFlight((ServerPlayer) owner, this);
+            if (additional != null) additional.Update();
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
@@ -215,5 +223,23 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         if (handler instanceof SPlayerHookHandler other) {
             this.flightHandler = other.flightHandler;
         }
+    }
+
+    @Override
+    public void onUnequip() {
+        IServerPlayerHookHandler.super.onUnequip();
+        additional = null;
+    }
+
+    @Override
+    public void onEquip() {
+        IServerPlayerHookHandler.super.onEquip();
+        additional = null;
+        owner.flatMap(CurioUtils::GetHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
+            try {
+                additional = (IServerHandler) cl.getDeclaredConstructor(IServerPlayerHookHandler.class).newInstance(this);
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ignore) {
+            }
+        });
     }
 }

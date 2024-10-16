@@ -1,16 +1,22 @@
 package com.oe.rehooked.handlers.hook.client;
 
+import com.oe.rehooked.data.AdditionalHandlersRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
+import com.oe.rehooked.handlers.additional.def.IClientHandler;
+import com.oe.rehooked.handlers.additional.def.IServerHandler;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
+import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +30,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     private Vec3 momentum;
 
     private Vec3 lastPlayerPosition;
+    private IClientHandler additional;
     
     public CPlayerHookHandler() {
         hooks = new ArrayList<>();
@@ -114,6 +121,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {
+            if (additional != null) additional.Update();
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.setOnGround(false);
@@ -182,5 +190,24 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     @Override
     public void storeLastPlayerPosition() {
         getOwner().ifPresent(owner -> lastPlayerPosition = owner.position());
+    }
+
+    @Override
+    public void onUnequip() {
+        IClientPlayerHookHandler.super.onUnequip();
+        additional = null;
+    }
+
+    @Override
+    public void onEquip() {
+        IClientPlayerHookHandler.super.onEquip();
+        additional = null;
+        owner.flatMap(CurioUtils::GetHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
+            try {
+                additional = (IClientHandler) cl.getDeclaredConstructor(IClientPlayerHookHandler.class).newInstance(this);
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                     InvocationTargetException ignore) {
+            }
+        });
     }
 }

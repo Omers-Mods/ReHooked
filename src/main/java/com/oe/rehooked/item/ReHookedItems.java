@@ -2,8 +2,10 @@ package com.oe.rehooked.item;
 
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.config.server.stats.HookStatsConfig;
+import com.oe.rehooked.data.AdditionalHandlersRegistry;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
+import com.oe.rehooked.handlers.additional.FireHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.particle.ReHookedParticles;
 import net.minecraft.core.particles.ParticleOptions;
@@ -73,10 +75,16 @@ public class ReHookedItems {
     public static void RegisterConfigProperties() {
         // define all hook variants
         RegisterHookWithChain(WOOD);
+        
         RegisterHookWithChain(IRON);
+        
         RegisterHookWithChain(DIAMOND);
+        
         RegisterHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 1, 2, 0.2, 4);
+        
         RegisterHookWithParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 1, 2, 0.1, 4);
+        
         RegisterHookWithParticles(BLAZE, ParticleTypes.FLAME::getType, 0, 1, 0.1, 20);
+        AdditionalHandlersRegistry.registerHandler(BLAZE, FireHookHandler.class);
     }
 }

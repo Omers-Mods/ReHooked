@@ -1,6 +1,7 @@
 package com.oe.rehooked.utils;
 
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -12,9 +13,12 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class VectorHelper {
     public static BlockHitResult getFromEntityAndAngle(Entity entity, Vec3 angle, double range) {
@@ -62,6 +66,27 @@ public class VectorHelper {
         }
         
         return Optional.empty();
+    }
+
+    public static Set<Entity> EntitiesInRange(Level level, Vec3 orig, Vec3 dest, double radius, Predicate<Entity> predicate) {
+        Vec3 way = orig.vectorTo(dest);
+        Vec3 norm = way.normalize();
+        int distanceTraveled = 0;
+        double range = way.length();
+        
+        double lookX = orig.x;
+        double lookY = orig.y;
+        double lookZ = orig.z;
+        Set<Entity> entities = new HashSet<>();
+        while (distanceTraveled < range) {
+            lookX += norm.x;
+            lookY += norm.y;
+            lookZ += norm.z;
+            distanceTraveled++;
+            AABB bb = new AABB(lookX-radius, lookY-radius, lookZ-radius, lookX+radius, lookY+radius, lookZ+radius);
+            entities.addAll(level.getEntitiesOfClass(Entity.class, bb, predicate));
+        }
+        return entities;
     }
     
     public static class Box {
