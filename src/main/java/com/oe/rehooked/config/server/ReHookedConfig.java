@@ -6,17 +6,17 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
 public class ReHookedConfig {
-    private static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
+    private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
     
     static {
         createConfig();
     }
     
     private static void createConfig() {
-        HookStatsConfig.Init(COMMON_BUILDER);
+        HookStatsConfig.Init(SERVER_BUILDER);
     }
     
     public static void Init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, COMMON_BUILDER.build());
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_BUILDER.build());
     }
 }
