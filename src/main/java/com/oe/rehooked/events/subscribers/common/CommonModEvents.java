@@ -11,8 +11,8 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 public class CommonModEvents {
     @SubscribeEvent
     public static void onReloadConfig(ModConfigEvent.Reloading event) {
-        if (event.getConfig().getType().equals(ModConfig.Type.COMMON)) {
-            ReHookedMod.LOGGER.info("Common config loaded, registering item properties.");
+        if (event.getConfig().getType().equals(ModConfig.Type.SERVER)) {
+            ReHookedMod.LOGGER.info("Server config loaded, registering item properties.");
             ReHookedItems.RegisterConfigProperties();
             ReHookedMod.LOGGER.info("Finished registering item properties from config.");
         }
