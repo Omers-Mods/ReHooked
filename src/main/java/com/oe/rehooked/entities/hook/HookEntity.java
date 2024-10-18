@@ -127,6 +127,10 @@ public class HookEntity extends Projectile {
         Vec3 dV = getDeltaMovement();
         if (getPrevState().equals(State.SHOT)) {
             setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
+            if (getHitPos().isPresent() && tryGetOwnerFromCachedId() != null) {
+                Vector3f scaled = getShotDirection().normalize().mul(0.15f);
+                setPos(getX() - scaled.x, getY() - scaled.y, getZ() - scaled.z);
+            }
         }
         else if (getPrevState().equals(State.RETRACTING)) {
             setPos(getX() + dV.x, getY() + dV.y, getZ() + dV.z);
@@ -208,11 +212,6 @@ public class HookEntity extends Projectile {
                 }
             }
         });
-    }
-
-    @Override
-    public boolean fireImmune() {
-        return true;
     }
 
     @Override

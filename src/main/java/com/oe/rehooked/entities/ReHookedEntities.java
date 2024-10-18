@@ -20,7 +20,9 @@ public class ReHookedEntities {
                     .clientTrackingRange(10)
                     .updateInterval(Integer.MAX_VALUE)
                     .noSave()
-                    .build("hook_projectile")
+                    .noSummon()
+                    .fireImmune()
+                    .build("rehooked:hook_projectile")
             );
     
     public static final RegistryObject<EntityType<TestCubeEntity>> DIRECTION_CUBE = 
