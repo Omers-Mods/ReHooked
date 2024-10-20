@@ -2,14 +2,12 @@ package com.oe.rehooked.handlers.hook.server;
 
 import com.oe.rehooked.data.AdditionalHandlersRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
-import com.oe.rehooked.handlers.additional.def.ICommonHandler;
 import com.oe.rehooked.handlers.additional.def.IServerHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
 import com.oe.rehooked.utils.CurioUtils;
-import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
