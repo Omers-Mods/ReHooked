@@ -1,6 +1,7 @@
 package com.oe.rehooked.item;
 
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.config.client.visuals.HookVisualsConfig;
 import com.oe.rehooked.config.server.stats.HookStatsConfig;
 import com.oe.rehooked.data.AdditionalHandlersRegistry;
 import com.oe.rehooked.data.HookData;
@@ -80,11 +81,17 @@ public class ReHookedItems {
         
         RegisterHookWithChain(DIAMOND);
         
-        RegisterHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 1, 2, 0.2, 4);
+        if (HookVisualsConfig.getChainSetting(ENDER).map(value -> value.get().equals(HookVisualsConfig.CHAIN)).orElse(false))
+            RegisterHookWithChain(ENDER);
+        else
+            RegisterHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 1, 2, 0.2, 4);
         
         RegisterHookWithParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 1, 2, 0.1, 4);
-        
-        RegisterHookWithParticles(BLAZE, ParticleTypes.FLAME::getType, 0, 1, 0.1, 20);
+
+        if (HookVisualsConfig.getChainSetting(BLAZE).map(value -> value.get().equals(HookVisualsConfig.CHAIN)).orElse(false))
+            RegisterHookWithChain(BLAZE);
+        else
+            RegisterHookWithParticles(BLAZE, ParticleTypes.FLAME::getType, 0, 1, 0.1, 20);
         AdditionalHandlersRegistry.registerHandler(BLAZE, FireHookHandler.class);
     }
 }
