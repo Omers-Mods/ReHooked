@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": { "model": "rehooked:block/ender_chain" }
+    "axis=x": {
+      "model": "rehooked:block/ender_chain",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "rehooked:block/ender_chain"
+    },
+    "axis=z": {
+      "model": "rehooked:block/ender_chain",
+      "x": 90
+    }
   }
 }
