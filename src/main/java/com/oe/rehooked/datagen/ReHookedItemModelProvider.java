@@ -26,6 +26,8 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
         
         componentItem(ReHookedComponents.WOOD_CHAIN);
         componentItem(ReHookedComponents.DIAMOND_CHAIN);
+        componentItem(ReHookedComponents.BLAZE_CHAIN);
+        componentItem(ReHookedComponents.ENDER_CHAIN);
     }
     
     private void simpleItem(RegistryObject<Item> item) {
