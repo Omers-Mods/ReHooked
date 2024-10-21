@@ -26,7 +26,7 @@ public class ReHookedComponents {
     
     private static RegistryObject<Item> registerChainComponent(String name) {
         Optional<RegistryObject<Block>> blockObj = ReHookedBlocks.BLOCKS.getEntries().stream().filter(regObj -> regObj.getId().getPath().equals(name)).findFirst();
-        if (blockObj.isPresent())
+        if (blockObj.isPresent() && false)
             return COMPONENTS.register(name, () -> new BlockItem(blockObj.get().get(), new Item.Properties()));
         else
             return COMPONENTS.register(name, () -> new Item(new Item.Properties()));
