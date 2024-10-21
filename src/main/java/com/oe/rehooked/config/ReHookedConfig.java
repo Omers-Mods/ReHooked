@@ -1,4 +1,4 @@
-package com.oe.rehooked.config.server;
+package com.oe.rehooked.config;
 
 import com.oe.rehooked.config.server.stats.HookStatsConfig;
 import net.minecraftforge.common.ForgeConfigSpec;

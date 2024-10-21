@@ -2,7 +2,7 @@ package com.oe.rehooked;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.block.ReHookedBlocks;
-import com.oe.rehooked.config.server.ReHookedConfig;
+import com.oe.rehooked.config.ReHookedConfig;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.item.ReHookedComponents;
 import com.oe.rehooked.item.ReHookedItems;
