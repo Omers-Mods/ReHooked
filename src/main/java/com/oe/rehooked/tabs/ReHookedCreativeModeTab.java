@@ -28,6 +28,8 @@ public class ReHookedCreativeModeTab {
                         pOutput.accept(ReHookedItems.ENDER_HOOK.get());
                         pOutput.accept(ReHookedComponents.WOOD_CHAIN.get());
                         pOutput.accept(ReHookedComponents.DIAMOND_CHAIN.get());
+                        pOutput.accept(ReHookedComponents.BLAZE_CHAIN.get());
+                        pOutput.accept(ReHookedComponents.ENDER_CHAIN.get());
                     })
                     .build());
     
