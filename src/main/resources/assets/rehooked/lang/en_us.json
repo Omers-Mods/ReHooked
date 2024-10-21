@@ -9,6 +9,8 @@
   
   "item.rehooked.wood_chain": "Wooden Chain",
   "item.rehooked.diamond_chain": "Diamond Chain",
+  "item.rehooked.blaze_chain": "Blaze Chain",
+  "item.rehooked.ender_chain": "Ender Chain",
   
   "creative.tab.hooks": "Hooks",
 
