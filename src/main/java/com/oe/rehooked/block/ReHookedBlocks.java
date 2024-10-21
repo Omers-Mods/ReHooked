@@ -17,11 +17,13 @@ public class ReHookedBlocks {
 
     public static final RegistryObject<Block> WOOD_CHAIN = BLOCKS.register("wood_chain", () -> new ChainBlock(BlockBehaviour.Properties.copy(Blocks.CHAIN)));
     public static final RegistryObject<Block> DIAMOND_CHAIN = BLOCKS.register("diamond_chain", () -> new ChainBlock(BlockBehaviour.Properties.copy(Blocks.CHAIN)));
+    public static final RegistryObject<Block> ENDER_CHAIN = BLOCKS.register("ender_chain", () -> new ChainBlock(BlockBehaviour.Properties.copy(Blocks.CHAIN)));
     
     public static void Init(IEventBus eventBus) {
         BLOCKS.register(eventBus);
 
         ChainRegistry.registerChain(ReHookedItems.WOOD, WOOD_CHAIN);
         ChainRegistry.registerChain(ReHookedItems.DIAMOND, DIAMOND_CHAIN);
+        ChainRegistry.registerChain(ReHookedItems.ENDER, ENDER_CHAIN);
     }
 }
