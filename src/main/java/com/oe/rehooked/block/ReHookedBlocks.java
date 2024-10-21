@@ -17,6 +17,7 @@ public class ReHookedBlocks {
 
     public static final RegistryObject<Block> WOOD_CHAIN = BLOCKS.register("wood_chain", () -> new ChainBlock(BlockBehaviour.Properties.copy(Blocks.CHAIN)));
     public static final RegistryObject<Block> DIAMOND_CHAIN = BLOCKS.register("diamond_chain", () -> new ChainBlock(BlockBehaviour.Properties.copy(Blocks.CHAIN)));
+    public static final RegistryObject<Block> BLAZE_CHAIN = BLOCKS.register("blaze_chain", () -> new ChainBlock(BlockBehaviour.Properties.copy(Blocks.CHAIN)));
     public static final RegistryObject<Block> ENDER_CHAIN = BLOCKS.register("ender_chain", () -> new ChainBlock(BlockBehaviour.Properties.copy(Blocks.CHAIN)));
     
     public static void Init(IEventBus eventBus) {
