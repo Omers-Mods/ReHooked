@@ -328,7 +328,7 @@ public class HookEntity extends Projectile {
 
     public boolean hasChain() {
         return getHookData()
-                .map(hookData -> hookData.particleType().get() == null)
+                .map(hookData -> hookData.particleType().get() == null && !(getState().equals(State.RETRACTING) && hookData.speed() / 20f >= hookData.range()))
                 .orElse(false);
     }
     
