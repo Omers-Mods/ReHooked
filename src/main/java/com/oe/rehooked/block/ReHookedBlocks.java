@@ -25,6 +25,7 @@ public class ReHookedBlocks {
 
         ChainRegistry.registerChain(ReHookedItems.WOOD, WOOD_CHAIN);
         ChainRegistry.registerChain(ReHookedItems.DIAMOND, DIAMOND_CHAIN);
+        ChainRegistry.registerChain(ReHookedItems.BLAZE, BLAZE_CHAIN);
         ChainRegistry.registerChain(ReHookedItems.ENDER, ENDER_CHAIN);
     }
 }
