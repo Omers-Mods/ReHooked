@@ -48,10 +48,10 @@ public class ReHookedMod {
         ReHookedCreativeModeTab.Init(modEventBus);
         // Register mod items
         ReHookedItems.Init(modEventBus);
-        // Register mod crafting components
-        ReHookedComponents.Init(modEventBus);
         // Register mod blocks
         ReHookedBlocks.Init(modEventBus);
+        // Register mod crafting components
+        ReHookedComponents.Init(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
