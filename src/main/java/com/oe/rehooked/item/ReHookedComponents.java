@@ -1,7 +1,9 @@
 package com.oe.rehooked.item;
 
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.item.component.BlazeChain;
 import com.oe.rehooked.item.component.DiamondChain;
+import com.oe.rehooked.item.component.EnderChain;
 import com.oe.rehooked.item.component.WoodChain;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -14,6 +16,8 @@ public class ReHookedComponents {
     
     public static final RegistryObject<Item> WOOD_CHAIN = COMPONENTS.register("wood_chain", WoodChain::new);
     public static final RegistryObject<Item> DIAMOND_CHAIN = COMPONENTS.register("diamond_chain", DiamondChain::new);
+    public static final RegistryObject<Item> BLAZE_CHAIN = COMPONENTS.register("blaze_chain", BlazeChain::new);
+    public static final RegistryObject<Item> ENDER_CHAIN = COMPONENTS.register("ender_chain", EnderChain::new);
     
     public static void Init(IEventBus eventBus) {
         COMPONENTS.register(eventBus);
