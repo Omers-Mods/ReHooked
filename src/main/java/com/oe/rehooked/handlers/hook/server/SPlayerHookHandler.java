@@ -15,10 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private final List<HookEntity> hooks;
@@ -153,6 +150,16 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 }
                 else {
                     creative[0] = true;
+                    // check if all hooks are at a legal™ distance from the player
+                    List<HookEntity> list = getHooks().stream()
+                            .filter(entity -> entity.position().distanceTo(ownerWaistPos) > hookData.range() * (2f + THRESHOLD))
+                            .toList();
+                    for (HookEntity hookEntity : list) {
+                        removeHook(hookEntity);
+                        killHook(hookEntity.getId());
+                    }
+                    if (countPulling() == 0) return;
+                            
                     // if player going out of the box put him back in
                     VectorHelper.Box box = getBox();
                     if (!box.isInside(ownerWaistPos)) {
