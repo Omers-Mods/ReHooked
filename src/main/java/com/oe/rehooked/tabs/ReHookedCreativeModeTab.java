@@ -7,15 +7,15 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ReHookedCreativeModeTab {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = 
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ReHookedMod.MOD_ID);
 
-    public static final RegistryObject<CreativeModeTab> HOOK_TAB = CREATIVE_MODE_TABS.register("hooks_tab", 
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> HOOK_TAB = CREATIVE_MODE_TABS.register("hooks_tab", 
             () -> CreativeModeTab.builder()
                     .icon(() -> new ItemStack(ReHookedItems.DIAMOND_HOOK.get()))
                     .title(Component.translatable("creative.tab.hooks"))
@@ -33,7 +33,7 @@ public class ReHookedCreativeModeTab {
                     })
                     .build());
     
-    public static void Init(IEventBus eventBus) {
+    public static void init(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
     }
 }

@@ -3,8 +3,8 @@ package com.oe.rehooked.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.oe.rehooked.ReHookedMod;
 import net.minecraft.client.KeyMapping;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.client.settings.KeyModifier;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
+import net.neoforged.neoforge.client.settings.KeyModifier;
 
 public class KeyBindings {
     private static final String CATEGORY = "key.categories." + ReHookedMod.MOD_ID;

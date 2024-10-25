@@ -20,7 +20,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class TestCubeRenderer extends EntityRenderer<TestCubeEntity> {
     public static final ResourceLocation TEXTURE =
-            new ResourceLocation(ReHookedMod.MOD_ID, "textures/test/direction_cube/test_cube.png");
+            ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "textures/test/direction_cube/test_cube.png");
     protected EntityRendererProvider.Context pContext;
     protected EntityModel<TestCubeEntity> model;
     protected float lastDelta = 0;
@@ -43,7 +43,7 @@ public class TestCubeRenderer extends EntityRenderer<TestCubeEntity> {
         pPoseStack.mulPose(Axis.YP.rotationDegrees(-Minecraft.getInstance().player.getYHeadRot() + 90f));
         pPoseStack.mulPose(Axis.ZP.rotationDegrees(Minecraft.getInstance().player.getXRot()));
         pPoseStack.translate(0, -0.5, 0);
-        this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(model.renderType(getTextureLocation(pEntity))), pPackedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        this.model.renderToBuffer(pPoseStack, pBuffer.getBuffer(model.renderType(getTextureLocation(pEntity))), pPackedLight, OverlayTexture.NO_OVERLAY);
         pPoseStack.popPose();
     }
 
@@ -56,7 +56,7 @@ public class TestCubeRenderer extends EntityRenderer<TestCubeEntity> {
         pPoseStack.pushPose();
         LocalPlayer player = Minecraft.getInstance().player;
         // get relevant positions
-        Vec3 waistPos = player.position().add(0, player.getEyeHeight() / 1.5, 0);
+        Vec3 waistPos = player != null ? player.position().add(0, player.getEyeHeight() / 1.5, 0) : pEntity.position();
         Vec3 cubePos = pEntity.position();
         Vec3 playerToCube = waistPos.vectorTo(cubePos);
         Vec3 normal = playerToCube.normalize();

@@ -18,7 +18,7 @@ public class FireHookHandler implements IServerHandler {
                 handler.getHooks().forEach(hook -> 
                         VectorHelper.EntitiesInRange(hook.level(), owner.position(), hook.position(), 
                                         hook.getBoundingBox().getSize(), entity -> filter(owner, hook, entity))
-                                .forEach(entity -> entity.setSecondsOnFire(5))));
+                                .forEach(entity -> entity.setRemainingFireTicks(100))));
     }
     
     private boolean filter(Entity owner, Entity hook, Entity entity) {

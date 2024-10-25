@@ -1,16 +1,16 @@
 package com.oe.rehooked.handlers.hook.def;
 
-import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
 import com.oe.rehooked.entities.hook.HookEntity;
+import com.oe.rehooked.mixin.common.player.IReHookedPlayerExtension;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
-import net.minecraftforge.common.util.LazyOptional;
 
-@AutoRegisterCapability
+import java.util.Optional;
+
 public interface IServerPlayerHookHandler extends ICommonPlayerHookHandler {
-    static LazyOptional<IServerPlayerHookHandler> FromPlayer(Player player) {
-        return player.getCapability(ServerHookCapabilityProvider.SERVER_HOOK_HANDLER);
+    static Optional<IServerPlayerHookHandler> fromPlayer(Player player) {
+        return ((IReHookedPlayerExtension) player).reHooked$getHookHandler()
+                .map(handler -> (IServerPlayerHookHandler) handler);
     }
     
     void removeAllClientHooks(ServerPlayer player);

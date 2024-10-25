@@ -40,7 +40,7 @@ public class TestCubeModel extends EntityModel<TestCubeEntity> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		directionCube.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int i, int i1, int i2) {
+		directionCube.render(poseStack, vertexConsumer, i, i1, i2);
 	}
 }

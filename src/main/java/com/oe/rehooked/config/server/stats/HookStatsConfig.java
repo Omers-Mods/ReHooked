@@ -4,7 +4,7 @@ import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 public class HookStatsConfig {
     private static final Map<String, HookConfigData> HOOK_CONFIG_DATA_MAP = new HashMap<>();
     
-    private static void createHookCategory(String hookType, ForgeConfigSpec.Builder builder, IncompleteHookData partialHookData) {
+    private static void createHookCategory(String hookType, ModConfigSpec.Builder builder, IncompleteHookData partialHookData) {
         builder.comment(StringUtils.capitalize(hookType) + " Hook Stats");
         builder.push(hookType);
         
@@ -31,7 +31,7 @@ public class HookStatsConfig {
         builder.pop();
     }
     
-    public static void Init(ForgeConfigSpec.Builder builder) {
+    public static void init(ModConfigSpec.Builder builder) {
         builder.push("hook_stats");
         
         createHookCategory(ReHookedItems.WOOD, builder,
@@ -60,14 +60,14 @@ public class HookStatsConfig {
     }
     
     public static class HookConfigData {
-        public final ForgeConfigSpec.IntValue COUNT;
-        public final ForgeConfigSpec.DoubleValue RANGE;
-        public final ForgeConfigSpec.DoubleValue SPEED;
-        public final ForgeConfigSpec.DoubleValue PULL_SPEED;
-        public final ForgeConfigSpec.BooleanValue IS_CREATIVE;
+        public final ModConfigSpec.IntValue COUNT;
+        public final ModConfigSpec.DoubleValue RANGE;
+        public final ModConfigSpec.DoubleValue SPEED;
+        public final ModConfigSpec.DoubleValue PULL_SPEED;
+        public final ModConfigSpec.BooleanValue IS_CREATIVE;
 
 
-        public HookConfigData(ForgeConfigSpec.IntValue count, ForgeConfigSpec.DoubleValue range, ForgeConfigSpec.DoubleValue speed, ForgeConfigSpec.DoubleValue pullSpeed, ForgeConfigSpec.BooleanValue isCreative) {
+        public HookConfigData(ModConfigSpec.IntValue count, ModConfigSpec.DoubleValue range, ModConfigSpec.DoubleValue speed, ModConfigSpec.DoubleValue pullSpeed, ModConfigSpec.BooleanValue isCreative) {
             COUNT = count;
             RANGE = range;
             SPEED = speed;
@@ -75,7 +75,7 @@ public class HookStatsConfig {
             IS_CREATIVE = isCreative;
         }
         
-        public static HookConfigData Create(ForgeConfigSpec.Builder builder, int count, double range, double travelSpeed, double pullSpeed, boolean isCreative) {
+        public static HookConfigData Create(ModConfigSpec.Builder builder, int count, double range, double travelSpeed, double pullSpeed, boolean isCreative) {
             return new HookConfigData(
                     builder.comment("The number of hooks")
                             .defineInRange("count", count, 1, Integer.MAX_VALUE),

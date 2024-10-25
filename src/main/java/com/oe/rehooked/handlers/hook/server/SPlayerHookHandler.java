@@ -5,17 +5,20 @@ import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.additional.def.IServerHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
-import com.oe.rehooked.network.handlers.PacketHandler;
-import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
+import com.oe.rehooked.network.payloads.client.CHookPayload;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private final List<HookEntity> hooks;
@@ -45,18 +48,20 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 return hookEntity;
             }
             return null;
-        }).flatMap(hookEntity -> getOwner()).ifPresent(owner -> PacketHandler.sendToPlayer(
-                new CHookCapabilityPacket(CHookCapabilityPacket.State.ADD_HOOK, id),
-                (ServerPlayer) owner));
+        }).flatMap(hookEntity -> getOwner()).ifPresent(owner -> PacketDistributor.sendToPlayer(
+                (ServerPlayer) owner,
+                new CHookPayload(CHookPayload.State.ADD_HOOK, id)
+        ));
     }
 
     @Override
     public void addHook(HookEntity hookEntity) {
         // hooks will always be added on the server first
         hooks.add(hookEntity);
-        getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
-                new CHookCapabilityPacket(CHookCapabilityPacket.State.ADD_HOOK, hookEntity.getId()), 
-                (ServerPlayer) owner));
+        getOwner().ifPresent(owner -> PacketDistributor.sendToPlayer(
+                (ServerPlayer) owner,
+                new CHookPayload(CHookPayload.State.ADD_HOOK, hookEntity.getId())
+        ));
     }
 
     @Override
@@ -78,9 +83,10 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         // this is a response to a request from the hook
         if (hooks.remove(hookEntity)) {
             // notify client player
-            getOwner().ifPresent(owner -> PacketHandler.sendToPlayer(
-                    new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()), 
-                    (ServerPlayer) owner));
+            getOwner().ifPresent(owner -> PacketDistributor.sendToPlayer(
+                    (ServerPlayer) owner,
+                    new CHookPayload(CHookPayload.State.RETRACT_HOOK, hookEntity.getId())
+            ));
             if (hookEntity.getState().equals(HookEntity.State.RETRACTING)) {
                 hookEntity.setReason(HookEntity.Reason.EMPTY);
                 hookEntity.setState(HookEntity.State.DONE);
@@ -222,7 +228,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public void removeAllClientHooks(ServerPlayer player) {
-        PacketHandler.sendToPlayer(new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_ALL_HOOKS), player);
+        PacketDistributor.sendToPlayer(player, new CHookPayload(CHookPayload.State.RETRACT_ALL_HOOKS));
     }
 
     @Override

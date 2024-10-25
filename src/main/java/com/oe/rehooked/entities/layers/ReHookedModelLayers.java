@@ -6,8 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ReHookedModelLayers {
     public static final ModelLayerLocation HOOK_PROJECTILE_LAYER = 
-            new ModelLayerLocation(new ResourceLocation(ReHookedMod.MOD_ID, "hook_projectile_layer"), "hook_projectile_layer");
+            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "hook_projectile_layer"), "hook_projectile_layer");
     
     public static final ModelLayerLocation TEST_CUBE_LAYER = 
-            new ModelLayerLocation(new ResourceLocation(ReHookedMod.MOD_ID, "test_cube_layer"), "test_cube_layer");
+            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "test_cube_layer"), "test_cube_layer");
 }

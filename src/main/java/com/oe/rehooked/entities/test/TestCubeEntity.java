@@ -1,9 +1,11 @@
 package com.oe.rehooked.entities.test;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class TestCubeEntity extends Entity {
 
@@ -12,17 +14,14 @@ public class TestCubeEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag pCompound) {
-
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag pCompound) {
-
     }
 }

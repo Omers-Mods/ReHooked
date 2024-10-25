@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.oe.rehooked.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "common.player.PlayerMixin"
+  ],
+  "client": [
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

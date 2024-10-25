@@ -10,7 +10,7 @@ import java.util.Optional;
 public class HandlerHelper {
     public static Optional<? extends ICommonPlayerHookHandler> getHookHandler(Player player) {
         if (player == null) return Optional.empty();
-        if (player.level().isClientSide()) return IClientPlayerHookHandler.FromPlayer(player).resolve();
-        return IServerPlayerHookHandler.FromPlayer(player).resolve();
+        if (player.level().isClientSide()) return IClientPlayerHookHandler.fromPlayer(player);
+        return IServerPlayerHookHandler.fromPlayer(player);
     }
 }

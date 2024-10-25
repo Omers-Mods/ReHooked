@@ -11,8 +11,6 @@ import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -28,10 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.network.NetworkHooks;
+import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -184,7 +179,6 @@ public class HookEntity extends Projectile {
         if (handledReason) setReason(Reason.EMPTY);
     }
     
-    @OnlyIn(Dist.CLIENT)
     public void createParticles() {
         ticksSinceParticles++;
         getHookData().ifPresent(hookData -> {
@@ -425,21 +419,18 @@ public class HookEntity extends Projectile {
     }
 
     @Override
-    protected void defineSynchedData() {
-        entityData.define(HIT_POS, Optional.empty());
-        entityData.define(STATE, State.SHOT.ordinal());
-        entityData.define(PREV_STATE, State.SHOT.ordinal());
-        entityData.define(DELTA_MOVEMENT, new Vector3f(0, 0, 0));
-        entityData.define(REASON, Reason.EMPTY.ordinal());
-        entityData.define(HOOK_TYPE, "");
-        entityData.define(OWNER_ID, -1);
-        entityData.define(RENDER_PARTICLES, true);
-        entityData.define(DIRECTION, Vec3.ZERO.toVector3f());
-    }
-
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder
+                .define(HIT_POS, Optional.empty())
+                .define(STATE, State.SHOT.ordinal())
+                .define(PREV_STATE, State.SHOT.ordinal())
+                .define(DELTA_MOVEMENT, new Vector3f(0, 0, 0))
+                .define(REASON, Reason.EMPTY.ordinal())
+                .define(HOOK_TYPE, "")
+                .define(OWNER_ID, -1)
+                .define(RENDER_PARTICLES, true)
+                .define(DIRECTION, Vec3.ZERO.toVector3f())
+                .build();
     }
     
     public enum State {

@@ -7,19 +7,19 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
 public class ReHookedTags {
-    public class Items {
+    public static class Items {
         public static final TagKey<Item> HOOK = curiosTag("hook");
         
         private static TagKey<Item> tag(String name) {
-            return ItemTags.create(new ResourceLocation(ReHookedMod.MOD_ID, name));
+            return ItemTags.create(ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, name));
         }
 
         private static TagKey<Item> forgeTag(String name) {
-            return ItemTags.create(new ResourceLocation("forge", name));
+            return ItemTags.create(ResourceLocation.fromNamespaceAndPath("forge", name));
         }
         
         private static TagKey<Item> curiosTag(String name) {
-            return ItemTags.create(new ResourceLocation("curios", name));
+            return ItemTags.create(ResourceLocation.fromNamespaceAndPath("curios", name));
         }
     }
 }

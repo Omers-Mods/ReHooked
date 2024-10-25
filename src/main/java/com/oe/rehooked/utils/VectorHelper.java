@@ -1,7 +1,6 @@
 package com.oe.rehooked.utils;
 
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
-import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -10,8 +9,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.HashSet;
 import java.util.List;
@@ -38,10 +35,7 @@ public class VectorHelper {
     
     /**
      * Based on <a href="https://github.com/coolAlias/ZeldaSwordSkills/blob/master/src/main/java/zeldaswordskills/util/TargetUtils.java">ZeldaSwordSkills</a>
-     * <p> 
-     * This method is client-side only!
      */
-    @OnlyIn(Dist.CLIENT)
     public static <T extends Entity> Optional<T> acquireLookTarget(Class<T> clazz, Player seeker, double radius) {
         Vec3 lookAngle = seeker.getLookAngle();
         double targetX = seeker.getX();
@@ -49,7 +43,7 @@ public class VectorHelper {
         double targetZ = seeker.getZ();
         double distanceTraveled = 0;
 
-        Optional<IClientPlayerHookHandler> optHandler = IClientPlayerHookHandler.FromPlayer(seeker).resolve();
+        Optional<IClientPlayerHookHandler> optHandler = IClientPlayerHookHandler.fromPlayer(seeker);
         if (optHandler.isPresent()) {
             IClientPlayerHookHandler handler = optHandler.get();
             double range = handler.getMaxHookDistance();

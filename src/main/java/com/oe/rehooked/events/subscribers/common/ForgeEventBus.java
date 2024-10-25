@@ -2,62 +2,44 @@ package com.oe.rehooked.events.subscribers.common;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
-import com.oe.rehooked.capabilities.hooks.ClientHookCapabilityProvider;
-import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
-import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
+import com.oe.rehooked.handlers.hook.server.SPlayerHookHandler;
+import com.oe.rehooked.mixin.common.player.IReHookedPlayerExtension;
 import com.oe.rehooked.utils.HandlerHelper;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import org.slf4j.Logger;
 
-@Mod.EventBusSubscriber(modid = ReHookedMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ReHookedMod.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class ForgeEventBus {
     private static final Logger LOGGER = LogUtils.getLogger();
-    
-    @SubscribeEvent
-    public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof Player player) {
-            if (player.level().isClientSide()) {
-                if (!IClientPlayerHookHandler.FromPlayer(player).isPresent()) {
-                    event.addCapability(new ResourceLocation(ReHookedMod.MOD_ID, "capabilities.hook.client"),
-                            new ClientHookCapabilityProvider());
-                }
-            }
-            else {
-                if (!player.level().isClientSide()) {
-                    if (!IServerPlayerHookHandler.FromPlayer(player).isPresent()) {
-                        event.addCapability(new ResourceLocation(ReHookedMod.MOD_ID, "capabilities.hook.server"),
-                                new ServerHookCapabilityProvider());
-                    }
-                }
-            }
-        }
-    }
 
     @SubscribeEvent
-    public static void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
-        IServerPlayerHookHandler.FromPlayer(event.getEntity()).ifPresent(IServerPlayerHookHandler::removeAllHooks);
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        LOGGER.debug("Instantiating server player hook handler...");
+        Player player = event.getEntity();
+        ((IReHookedPlayerExtension) player).reHooked$setHookHandler(new SPlayerHookHandler().setOwner(player));
     }
     
     @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase.equals(TickEvent.Phase.END)) return;
-        event.getServer().getPlayerList().getPlayers().forEach(player -> {
-            IServerPlayerHookHandler.FromPlayer(player).ifPresent(handler -> {
-                handler.setOwner(player).update();
-                if (handler.shouldMoveThisTick()) {
-                    player.setDeltaMovement(handler.getDeltaVThisTick());
-                }
-                handler.storeLastPlayerPosition();
-            });
-        });
+    public static void onPlayerQuit(PlayerEvent.PlayerLoggedOutEvent event) {
+        LOGGER.debug("Cleaning up server player hook handler...");
+        IServerPlayerHookHandler.fromPlayer(event.getEntity()).ifPresent(IServerPlayerHookHandler::removeAllHooks);
+    }
+    
+    @SubscribeEvent
+    public static void onServerTick(ServerTickEvent event) {
+        event.getServer().getPlayerList().getPlayers().forEach(player -> 
+                IServerPlayerHookHandler.fromPlayer(player).ifPresent(handler -> {
+                    handler.setOwner(player).update();
+                    if (handler.shouldMoveThisTick()) {
+                        player.setDeltaMovement(handler.getDeltaVThisTick());
+                    }
+                    handler.storeLastPlayerPosition();
+                }));
     }
     
     @SubscribeEvent

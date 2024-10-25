@@ -11,12 +11,12 @@ import com.oe.rehooked.item.hook.HookItem;
 import com.oe.rehooked.particle.ReHookedParticles;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
@@ -28,20 +28,20 @@ public class ReHookedItems {
     public static final String ENDER = "ender";
     public static final String BLAZE = "blaze";
     
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ReHookedMod.MOD_ID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, ReHookedMod.MOD_ID);
     
-    public static final RegistryObject<Item> WOOD_HOOK = CreateHookItem(WOOD);
-    public static final RegistryObject<Item> IRON_HOOK = CreateHookItem(IRON);
-    public static final RegistryObject<Item> DIAMOND_HOOK = CreateHookItem(DIAMOND);
-    public static final RegistryObject<Item> RED_HOOK = CreateHookItem(RED);
-    public static final RegistryObject<Item> BLAZE_HOOK = CreateHookItem(BLAZE);
-    public static final RegistryObject<Item> ENDER_HOOK = CreateHookItem(ENDER);
+    public static final DeferredHolder<Item, HookItem> WOOD_HOOK = CreateHookItem(WOOD);
+    public static final DeferredHolder<Item, HookItem> IRON_HOOK = CreateHookItem(IRON);
+    public static final DeferredHolder<Item, HookItem> DIAMOND_HOOK = CreateHookItem(DIAMOND);
+    public static final DeferredHolder<Item, HookItem> RED_HOOK = CreateHookItem(RED);
+    public static final DeferredHolder<Item, HookItem> BLAZE_HOOK = CreateHookItem(BLAZE);
+    public static final DeferredHolder<Item, HookItem> ENDER_HOOK = CreateHookItem(ENDER);
     
-    private static RegistryObject<Item> CreateHookItem(String type) {
+    private static DeferredHolder<Item, HookItem> CreateHookItem(String type) {
         return ITEMS.register(type + "_hook", () -> new HookItem(type));
     }
     
-    public static void Init(IEventBus eventBus) {
+    public static void init(IEventBus eventBus) {
         // register the objects
         ITEMS.register(eventBus);
     }
@@ -63,7 +63,7 @@ public class ReHookedItems {
     }
     
     private static ResourceLocation getHookTexture(String name) {
-        return new ResourceLocation(ReHookedMod.MOD_ID, "textures/entity/hook/" + name + "/" + name + ".png");
+        return ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "textures/entity/hook/" + name + "/" + name + ".png");
     }
     
     private static void RegisterHookWithParticles(String type, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {

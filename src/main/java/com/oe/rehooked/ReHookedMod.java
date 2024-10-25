@@ -6,18 +6,12 @@ import com.oe.rehooked.config.ReHookedConfig;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.item.ReHookedComponents;
 import com.oe.rehooked.item.ReHookedItems;
-import com.oe.rehooked.network.handlers.PacketHandler;
-import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
-import com.oe.rehooked.network.packets.client.processing.CHookCapabilityProcessor;
 import com.oe.rehooked.particle.ReHookedParticles;
 import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.tabs.ReHookedCreativeModeTab;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 
 @Mod(ReHookedMod.MOD_ID)
@@ -25,36 +19,25 @@ public class ReHookedMod {
     public static final String MOD_ID = "rehooked";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public ReHookedMod() {
+    public ReHookedMod(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("ReHooked started initializing...");
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        
-        // Register packets
-        PacketHandler.Init();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> 
-                () -> {
-                    PacketHandler.addHandler(CHookCapabilityPacket.class, CHookCapabilityProcessor::handle);
-                });
 
         // register config
-        ReHookedConfig.Init();
+        ReHookedConfig.init(modContainer);
         // register mod sounds
-        ReHookedSounds.Init(modEventBus);
+        ReHookedSounds.init(modEventBus);
         // register mod particles
-        ReHookedParticles.Init(modEventBus);
+        ReHookedParticles.init(modEventBus);
         // Register mod entities
-        ReHookedEntities.Init(modEventBus);
+        ReHookedEntities.init(modEventBus);
         // Register mod creative tab
-        ReHookedCreativeModeTab.Init(modEventBus);
+        ReHookedCreativeModeTab.init(modEventBus);
         // Register mod items
-        ReHookedItems.Init(modEventBus);
+        ReHookedItems.init(modEventBus);
         // Register mod blocks
-        ReHookedBlocks.Init(modEventBus);
+        ReHookedBlocks.init(modEventBus);
         // Register mod crafting components
-        ReHookedComponents.Init(modEventBus);
-
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
+        ReHookedComponents.init(modEventBus);
         
         LOGGER.info("ReHooked finished registration.");
     }

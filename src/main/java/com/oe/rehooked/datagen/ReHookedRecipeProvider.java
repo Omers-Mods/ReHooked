@@ -3,26 +3,25 @@ package com.oe.rehooked.datagen;
 import com.oe.rehooked.item.ReHookedComponents;
 import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
 public class ReHookedRecipeProvider extends RecipeProvider implements IConditionBuilder {
-
-    public ReHookedRecipeProvider(PackOutput pOutput) {
-        super(pOutput);
+    public ReHookedRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, registries);
     }
 
     @Override
-    protected void buildRecipes(Consumer<FinishedRecipe> pWriter) {
+    protected void buildRecipes(RecipeOutput recipeOutput) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.WOOD_HOOK.get())
                 .pattern("WWP")
                 .pattern(" CW")
@@ -32,7 +31,7 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                 .define('P', Items.WOODEN_PICKAXE)
                 .unlockedBy("has_rod_wooden", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.RODS_WOODEN).build()))
-                .save(pWriter);
+                .save(recipeOutput);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.IRON_HOOK.get())
                 .pattern("IIP")
@@ -48,7 +47,7 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.INGOTS_IRON).build()))
                 .unlockedBy("has_chain", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(Items.CHAIN).build()))
-                .save(pWriter);
+                .save(recipeOutput);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.DIAMOND_HOOK.get())
                 .pattern("DDP")
@@ -62,7 +61,7 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                         inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.IRON_HOOK.get()).build()))
                 .unlockedBy("has_diamond", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.GEMS_DIAMOND).build()))
-                .save(pWriter);
+                .save(recipeOutput);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.RED_HOOK.get())
                 .pattern("HRH")
@@ -74,7 +73,7 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                         inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.IRON_HOOK.get()).build()))
                 .unlockedBy("has_redstone", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.DUSTS_REDSTONE).build()))
-                .save(pWriter);
+                .save(recipeOutput);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.BLAZE_HOOK.get())
                 .pattern("DBH")
@@ -89,7 +88,7 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.RODS_BLAZE).build()))
                 .unlockedBy("has_glowstone", 
                         inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.DUSTS_GLOWSTONE).build()))
-                .save(pWriter);
+                .save(recipeOutput);
                 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedItems.ENDER_HOOK.get())
                 .pattern("EEH")
@@ -100,22 +99,24 @@ public class ReHookedRecipeProvider extends RecipeProvider implements ICondition
                 .define('H', ReHookedItems.DIAMOND_HOOK.get())
                 .unlockedBy("has_diamond_hook",
                         inventoryTrigger(ItemPredicate.Builder.item().of(ReHookedItems.DIAMOND_HOOK.get()).build()))
-                .save(pWriter);
+                .save(recipeOutput);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedComponents.WOOD_CHAIN.get())
                 .pattern(" SS")
                 .pattern("S S")
                 .pattern("SS ")
                 .define('S', Tags.Items.RODS_WOODEN)
-                .unlockedBy("blank", inventoryTrigger())
-                .save(pWriter);
+                .unlockedBy("has_rod_wooden",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.RODS_WOODEN).build()))
+                .save(recipeOutput);
         
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ReHookedComponents.DIAMOND_CHAIN.get())
                 .pattern(" DD")
                 .pattern("D D")
                 .pattern("DD ")
                 .define('D', Tags.Items.GEMS_DIAMOND)
-                .unlockedBy("blank", inventoryTrigger())
-                .save(pWriter);
+                .unlockedBy("has_diamond",
+                        inventoryTrigger(ItemPredicate.Builder.item().of(Tags.Items.GEMS_DIAMOND).build()))
+                .save(recipeOutput);
     }
 }

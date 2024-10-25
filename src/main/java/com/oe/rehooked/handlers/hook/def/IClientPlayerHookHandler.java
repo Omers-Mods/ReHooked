@@ -1,27 +1,27 @@
 package com.oe.rehooked.handlers.hook.def;
 
-import com.oe.rehooked.capabilities.hooks.ClientHookCapabilityProvider;
-import com.oe.rehooked.network.handlers.PacketHandler;
-import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
+import com.oe.rehooked.mixin.common.player.IReHookedPlayerExtension;
+import com.oe.rehooked.network.payloads.server.SHookPayload;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-@AutoRegisterCapability
+import java.util.Optional;
+
 public interface IClientPlayerHookHandler extends ICommonPlayerHookHandler {
-    static LazyOptional<IClientPlayerHookHandler> FromPlayer(Player player) {
-        return player.getCapability(ClientHookCapabilityProvider.CLIENT_HOOK_HANDLER);
+    static Optional<IClientPlayerHookHandler> fromPlayer(Player player) {
+        return ((IReHookedPlayerExtension) player).reHooked$getHookHandler()
+                .map(handler -> (IClientPlayerHookHandler) handler);
     }
-
+    
     double getMaxHookDistance();
 
     @Override
     default void jump() {
         getOwner().ifPresent(owner -> {
             if (owner.isCrouching()) 
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS));
+                PacketDistributor.sendToServer(new SHookPayload(SHookPayload.State.RETRACT_ALL_HOOKS));
             else {
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.JUMP));
+                PacketDistributor.sendToServer(new SHookPayload(SHookPayload.State.JUMP));
                 ICommonPlayerHookHandler.super.jump();
             }
         });
@@ -29,6 +29,6 @@ public interface IClientPlayerHookHandler extends ICommonPlayerHookHandler {
 
     @Override
     default void killHook(int id) {
-        PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.KILL, id));
+        PacketDistributor.sendToServer(new SHookPayload(SHookPayload.State.KILL, id));
     }
 }

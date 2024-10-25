@@ -3,18 +3,16 @@ package com.oe.rehooked.handlers.hook.client;
 import com.oe.rehooked.data.AdditionalHandlersRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.additional.def.IClientHandler;
-import com.oe.rehooked.handlers.additional.def.IServerHandler;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
-import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
-import com.oe.rehooked.network.handlers.PacketHandler;
-import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
+import com.oe.rehooked.network.payloads.server.SHookPayload;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -66,7 +64,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
 
     @Override
     public void removeHook(HookEntity hookEntity) {
-        PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_HOOK, hookEntity.getId()));
+        PacketDistributor.sendToServer(new SHookPayload(SHookPayload.State.RETRACT_HOOK.ordinal(), hookEntity.getId(), 0, 0));
         hooks.remove(hookEntity);
     }
 
@@ -76,14 +74,14 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
         // this is a response to a key press from the player
         // notify the server
         getOwner().ifPresent(owner -> 
-                PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.RETRACT_ALL_HOOKS)));
+                PacketDistributor.sendToServer(new SHookPayload(SHookPayload.State.RETRACT_ALL_HOOKS.ordinal(), 0, 0, 0)));
         // clear hooks
         hooks.clear();
     }
 
     @Override
     public void shootFromRotation(float xRot, float yRot) {
-        PacketHandler.sendToServer(new SHookCapabilityPacket(SHookCapabilityPacket.State.SHOOT, 0, xRot, yRot));
+        PacketDistributor.sendToServer(new SHookPayload(SHookPayload.State.SHOOT.ordinal(), 0, xRot, yRot));
     }
 
     @Override

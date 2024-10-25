@@ -6,9 +6,9 @@ import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 public class ReHookedItemModelProvider extends ItemModelProvider {
     public ReHookedItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
@@ -30,13 +30,13 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
         componentItem(ReHookedComponents.ENDER_CHAIN);
     }
     
-    private void simpleItem(RegistryObject<Item> item) {
-        withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
-                .texture("layer0", new ResourceLocation(ReHookedMod.MOD_ID, "item/" + item.getId().getPath()));
+    private void simpleItem(DeferredHolder<Item, ? extends Item> item) {
+        withExistingParent(item.getId().getPath(), ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/generated"))
+                .texture("layer0", ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/" + item.getId().getPath()));
     }
     
-    private void componentItem(RegistryObject<Item> item) {
-        withExistingParent(item.getId().getPath(), new ResourceLocation("item/generated"))
-                .texture("layer0", new ResourceLocation(ReHookedMod.MOD_ID, "item/component/" + item.getId().getPath()));
+    private void componentItem(DeferredHolder<Item, ? extends Item> item) {
+        withExistingParent(item.getId().getPath(), ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/generated"))
+                .texture("layer0", ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/component/" + item.getId().getPath()));
     }
 }
