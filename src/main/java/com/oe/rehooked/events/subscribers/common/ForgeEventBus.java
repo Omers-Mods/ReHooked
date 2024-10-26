@@ -4,7 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.server.SPlayerHookHandler;
-import com.oe.rehooked.mixin.common.player.IReHookedPlayerExtension;
+import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
 import com.oe.rehooked.utils.HandlerHelper;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -31,7 +31,7 @@ public class ForgeEventBus {
     }
     
     @SubscribeEvent
-    public static void onServerTick(ServerTickEvent event) {
+    public static void onServerTick(ServerTickEvent.Post event) {
         event.getServer().getPlayerList().getPlayers().forEach(player -> 
                 IServerPlayerHookHandler.fromPlayer(player).ifPresent(handler -> {
                     handler.setOwner(player).update();

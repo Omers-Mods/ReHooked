@@ -1,6 +1,6 @@
 package com.oe.rehooked.handlers.hook.def;
 
-import com.oe.rehooked.mixin.common.player.IReHookedPlayerExtension;
+import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
 import com.oe.rehooked.network.payloads.server.SHookPayload;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;

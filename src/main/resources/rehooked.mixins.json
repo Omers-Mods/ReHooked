@@ -2,6 +2,7 @@
   "required": true,
   "package": "com.oe.rehooked.mixin",
   "compatibilityLevel": "JAVA_21",
+  "refmap": "rehooked.refmap.json",
   "mixins": [
     "common.player.PlayerMixin"
   ],

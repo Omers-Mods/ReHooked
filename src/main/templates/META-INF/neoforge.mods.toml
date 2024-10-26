@@ -20,7 +20,7 @@ issueTrackerURL="https://github.com/OE100/ReHooked/issues/" #optional
 [[mods]] #mandatory
 
 # The modid of the mod
-modId="${mod_id}" #mandatory
+modId="rehooked" #mandatory
 
 # The version number of the mod
 version="${mod_version}" #mandatory
@@ -35,7 +35,7 @@ displayName="${mod_name}" #mandatory
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
 
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="ReHookedModIcon.png" #optional
+logoFile= "ReHookedModIcon.png" #optional
 
 # A text field displayed in the mod UI
 #credits="" #optional
@@ -52,8 +52,8 @@ config="${mod_id}.mixins.json"
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.
 # If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
-#[[accessTransformers]]
-#file="META-INF/accesstransformer.cfg"
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
 
 # The coremods config file path is not configurable and is always loaded from META-INF/coremods.json
 
@@ -78,7 +78,7 @@ config="${mod_id}.mixins.json"
     modId="curios"
     type="required"
     versionRange="[${curios_version},)"
-    ordering="AFTER"
+    ordering="NONE"
     side="BOTH"
 
 

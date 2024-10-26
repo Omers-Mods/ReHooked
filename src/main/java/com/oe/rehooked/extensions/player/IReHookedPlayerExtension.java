@@ -1,4 +1,4 @@
-package com.oe.rehooked.mixin.common.player;
+package com.oe.rehooked.extensions.player;
 
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 

@@ -1,6 +1,5 @@
 package com.oe.rehooked.events.subscribers.client;
 
-import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.client.KeyBindings;
 import com.oe.rehooked.data.HookData;
@@ -8,7 +7,7 @@ import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.client.CPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.item.hook.HookItem;
-import com.oe.rehooked.mixin.common.player.IReHookedPlayerExtension;
+import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.client.Minecraft;
@@ -19,7 +18,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 
@@ -28,7 +26,7 @@ public class ClientForgeEvents {
     private static long ticksSinceShot = 0;
     
     @SubscribeEvent
-    public static void onClientTick(ClientTickEvent event) {
+    public static void onClientTick(ClientTickEvent.Post event) {
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
         ticksSinceShot++;

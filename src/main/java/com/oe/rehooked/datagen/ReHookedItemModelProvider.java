@@ -4,7 +4,6 @@ import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.item.ReHookedComponents;
 import com.oe.rehooked.item.ReHookedItems;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -31,12 +30,12 @@ public class ReHookedItemModelProvider extends ItemModelProvider {
     }
     
     private void simpleItem(DeferredHolder<Item, ? extends Item> item) {
-        withExistingParent(item.getId().getPath(), ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/generated"))
-                .texture("layer0", ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/" + item.getId().getPath()));
+        withExistingParent(item.getId().getPath(), mcLoc("item/generated"))
+                .texture("layer0", modLoc("item/" + item.getId().getPath()));
     }
     
     private void componentItem(DeferredHolder<Item, ? extends Item> item) {
-        withExistingParent(item.getId().getPath(), ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/generated"))
-                .texture("layer0", ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, "item/component/" + item.getId().getPath()));
+        withExistingParent(item.getId().getPath(), mcLoc("item/generated"))
+                .texture("layer0", modLoc("item/component/" + item.getId().getPath()));
     }
 }

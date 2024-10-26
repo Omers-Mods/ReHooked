@@ -1,7 +1,7 @@
 package com.oe.rehooked.handlers.hook.def;
 
 import com.oe.rehooked.entities.hook.HookEntity;
-import com.oe.rehooked.mixin.common.player.IReHookedPlayerExtension;
+import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 

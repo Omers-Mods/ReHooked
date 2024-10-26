@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public record SHookPayload(int state, int id, float xRot, float yRot) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<SHookPayload> TYPE =
-            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, SHookPayload.class.getSimpleName()));
+            new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(ReHookedMod.MOD_ID, SHookPayload.class.getSimpleName().toLowerCase()));
 
     public static final StreamCodec<ByteBuf, SHookPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT,
