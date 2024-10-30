@@ -1,4 +1,4 @@
-![](https://media.forgecdn.net/attachments/995/940/description.png)
+![](https://github.com/Omers-Mods/ReHooked/blob/1.20.1/photos/description.png)
 
 Inspired by the fantastic [Hooked](https://www.curseforge.com/minecraft/mc-mods/hooked) mod by TheCodeWarrior.
 
