@@ -1,0 +1,31 @@
+{
+  "item.rehooked.wood_hook": "木制抓钩",
+  "item.rehooked.iron_hook": "铁制抓钩",
+  "item.rehooked.diamond_hook": "钻石抓钩",
+  "item.rehooked.red_hook": "红石抓钩",
+  "item.rehooked.ender_hook": "末影抓钩",
+  
+  "creative.tab.hooks": "抓钩",
+
+  "tooltip.rehooked:wood_hook.info": "逃离沟渠和爬树的简单解决方案",
+  "tooltip.rehooked:iron_hook.info": "通过在相对点发射两个抓钩，允许漂浮在半空中",
+  "tooltip.rehooked:diamond_hook.info": "抓钩多，速度快",
+  "tooltip.rehooked:red_hook.info": "在抓钩确定的范围内创造性地飞行",
+  "tooltip.rehooked:ender_hook.info": "速度快，非常非常快",
+  "tooltip.rehooked.press_shift_more_info": "<按 Shift 键查看控制>",
+  "tooltip.rehooked.press_fire": "按 %1$s 发射",
+  "tooltip.rehooked.press_retract": "查看抓钩时按 %1$s 收回抓钩",
+  "tooltip.rehooked.press_retract_all": "按 %1$s 收回所有抓钩",
+  
+  "curios.identifier.hook": "抓钩",
+  
+  "key.categories.rehooked": "抓钩：重生",
+  "key.rehooked.fire_hook_key": "火焰抓钩",
+  "key.rehooked.retract_hook_key": "收回抓钩",
+  "key.rehooked.remove_all_hooks_key": "移除所有抓钩",
+  
+  "sounds.rehooked.hook_hit": "抓钩撞击表面",
+  "sounds.rehooked.hook_retract": "收回抓钩",
+  "sounds.rehooked.hook_shoot": "钩射",
+  "sounds.rehooked.hook_miss": "脱钩"
+}
