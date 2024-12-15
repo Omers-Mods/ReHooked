@@ -5,13 +5,13 @@ import java.util.Map;
 import java.util.Optional;
 
 public class HookRegistry {
-    private static final Map<String, HookData> HOOKS = new HashMap<>();
+    private static final Map<String, IHookDataProvider> HOOKS = new HashMap<>();
     
-    public static void registerHook(String hookType, HookData hookData) {
+    public static void registerHook(String hookType, IHookDataProvider hookData) {
         HOOKS.put(hookType, hookData);
     }
     
-    public static Optional<HookData> getHookData(String hookType) {
+    public static Optional<IHookDataProvider> getHookData(String hookType) {
         return Optional.ofNullable(HOOKS.getOrDefault(hookType, null));
     }
 }

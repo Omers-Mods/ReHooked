@@ -1,6 +1,6 @@
 package com.oe.rehooked.handlers.hook.server;
 
-import com.oe.rehooked.data.HookData;
+import com.oe.rehooked.data.IHookDataProvider;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -32,7 +32,7 @@ public class FlightHandler {
 
     private boolean shouldEnableClientFlight(ServerPlayer owner, IServerPlayerHookHandler handler) {
         return externalFlight || 
-                (handler.getHookData().map(HookData::isCreative).orElse(false) && handler.countPulling() >= 2);
+                (handler.getHookData().map(IHookDataProvider::isCreative).orElse(false) && handler.countPulling() >= 2);
     }
 
     private boolean shouldEnableServerFlight(ServerPlayer owner, IServerPlayerHookHandler handler) {

@@ -1,7 +1,7 @@
 package com.oe.rehooked.entities.hook;
 
-import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
+import com.oe.rehooked.data.IHookDataProvider;
 import com.oe.rehooked.entities.ReHookedEntities;
 import com.oe.rehooked.sound.ReHookedSounds;
 import com.oe.rehooked.utils.CurioUtils;
@@ -9,7 +9,6 @@ import com.oe.rehooked.utils.HandlerHelper;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -182,11 +181,12 @@ public class HookEntity extends Projectile {
     public void createParticles() {
         ticksSinceParticles++;
         getHookData().ifPresent(hookData -> {
+            if (!hookData.useParticles()) return;
             if (ticksSinceParticles >= hookData.ticksBetweenSpawns() || (getState().equals(State.PULLING) && !getRenderParticles())) return;
             ticksSinceParticles = 0;
-            ParticleOptions particleType = hookData.particleType().get();
+            var particleType = hookData.particleType().get();
             if (particleType == null) return;
-            Player owner = tryGetOwnerFromCachedId();
+            var owner = tryGetOwnerFromCachedId();
             if (owner != null) {
                 Vec3 ownerWaist = PositionHelper.getWaistPosition(owner);
                 Vec3 particleSpeed = owner.getDeltaMovement().reverse().scale(0.8);
@@ -231,9 +231,9 @@ public class HookEntity extends Projectile {
 
     protected void tickShot() {
         // move the hook in the goal direction, checking for hits in the process
-        Optional<HookData> optHookData = getHookData();
+        var optHookData = getHookData();
         if (optHookData.isPresent()) {
-            HookData hookData = optHookData.get();
+            var hookData = optHookData.get();
             // check if needs to destroy instant hook
             if (!level().isClientSide() && !firstTickInState && hookData.speed() / 20f >= hookData.range()) {
                 setReason(Reason.MISS);
@@ -322,7 +322,7 @@ public class HookEntity extends Projectile {
 
     public boolean hasChain() {
         return getHookData()
-                .map(hookData -> hookData.particleType().get() == null && !(getState().equals(State.RETRACTING) && hookData.speed() / 20f >= hookData.range()))
+                .map(hookData -> !hookData.useParticles() && !(getState().equals(State.RETRACTING) && hookData.speed() / 20f >= hookData.range()))
                 .orElse(false);
     }
     
@@ -352,7 +352,7 @@ public class HookEntity extends Projectile {
         return entityData.get(HIT_POS);
     }
     
-    public Optional<HookData> getHookData() {
+    public Optional<IHookDataProvider> getHookData() {
         return HookRegistry.getHookData(getHookType());
     }
     

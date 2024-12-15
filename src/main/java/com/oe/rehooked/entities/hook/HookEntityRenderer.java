@@ -3,7 +3,7 @@ package com.oe.rehooked.entities.hook;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.oe.rehooked.data.ChainRegistry;
-import com.oe.rehooked.data.HookData;
+import com.oe.rehooked.data.IHookDataProvider;
 import com.oe.rehooked.entities.layers.ReHookedModelLayers;
 import com.oe.rehooked.utils.PositionHelper;
 import net.minecraft.client.Minecraft;
@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     protected EntityModel<HookEntity> model;
@@ -97,7 +98,9 @@ public class HookEntityRenderer extends EntityRenderer<HookEntity> {
     }
     
     @Override
-    public ResourceLocation getTextureLocation(HookEntity pEntity) {
-        return pEntity.getHookData().map(HookData::texture).orElseGet(null);
+    public @NotNull ResourceLocation getTextureLocation(HookEntity pEntity) {
+        // todo: maybe add missing texture hook texture to avoid null texture
+        return pEntity.getHookData().map(IHookDataProvider::texture)
+                .orElseThrow(() -> new IllegalStateException("Hook texture can't be null"));
     }
 }

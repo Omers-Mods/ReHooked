@@ -139,11 +139,13 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         getOwner().ifPresent(owner -> {
             flightHandler.updateFlight((ServerPlayer) owner, this);
             if (additional != null) additional.Update();
-            final boolean[] creative = {false};
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
                 owner.setOnGround(false);
+
+                var renderParticles = hookData.isCreative() || actualPlayerPositionChange().length() > THRESHOLD;
+                getHooks().forEach(hookEntity -> hookEntity.setRenderParticles(renderParticles));
                 
                 float vPT = hookData.pullSpeed() / 20f;
                 Vec3 ownerWaistPos = PositionHelper.getWaistPosition(owner);
@@ -155,7 +157,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                     moveVector = new Vec3(x, y, z);
                 }
                 else {
-                    creative[0] = true;
                     // check if all hooks are at a legal™ distance from the player
                     List<HookEntity> list = getHooks().stream()
                             .filter(entity -> entity.position().distanceTo(ownerWaistPos) > hookData.range() * (2f + THRESHOLD))
@@ -181,8 +182,6 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
                 if (moveVector.length() < THRESHOLD) moveVector = Vec3.ZERO;
             });
             updateMomentum();
-            boolean renderParticles = creative[0] || actualPlayerPositionChange().length() > THRESHOLD;
-            getHooks().forEach(hookEntity -> hookEntity.setRenderParticles(renderParticles));
         });
     }
 

@@ -1,7 +1,7 @@
 package com.oe.rehooked.handlers.hook.def;
 
-import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.data.HookRegistry;
+import com.oe.rehooked.data.IHookDataProvider;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
@@ -25,7 +25,7 @@ public interface ICommonPlayerHookHandler {
     void shootFromRotation(float xRot, float yRot);
     ICommonPlayerHookHandler setOwner(Player owner);
     Optional<Player> getOwner();
-    default Optional<HookData> getHookData() {
+    default Optional<IHookDataProvider> getHookData() {
         return getOwner()
                 .flatMap(CurioUtils::GetHookType)
                 .flatMap(HookRegistry::getHookData);
