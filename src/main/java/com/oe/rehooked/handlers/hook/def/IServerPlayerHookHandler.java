@@ -2,7 +2,6 @@ package com.oe.rehooked.handlers.hook.def;
 
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
@@ -13,25 +12,19 @@ public interface IServerPlayerHookHandler extends ICommonPlayerHookHandler {
                 .map(handler -> (IServerPlayerHookHandler) handler);
     }
     
-    void removeAllClientHooks(ServerPlayer player);
+    void removeAllClientHooks();
 
     @Override
     default void onUnequip() {
         ICommonPlayerHookHandler.super.onUnequip();
-        getOwner().ifPresent(owner -> {
-            if (owner instanceof ServerPlayer player)
-                removeAllClientHooks(player);
-        });
+        removeAllClientHooks();
         update();
     }
 
     @Override
     default void onEquip() {
         ICommonPlayerHookHandler.super.onEquip();
-        getOwner().ifPresent(owner -> {
-            if (owner instanceof ServerPlayer player)
-                removeAllClientHooks(player);
-        });
+        removeAllClientHooks();
         update();
     }
     
@@ -43,5 +36,7 @@ public interface IServerPlayerHookHandler extends ICommonPlayerHookHandler {
         });
     }
     
-    void copyFrom(IServerPlayerHookHandler handler);
+    default IServerPlayerHookHandler copyFrom(IServerPlayerHookHandler handler) {
+        return this;
+    }
 }

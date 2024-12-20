@@ -6,6 +6,7 @@ import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.utils.CurioUtils;
 import com.oe.rehooked.utils.PositionHelper;
 import com.oe.rehooked.utils.VectorHelper;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -24,12 +25,13 @@ public interface ICommonPlayerHookHandler {
     void removeAllHooks();
     void shootFromRotation(float xRot, float yRot);
     ICommonPlayerHookHandler setOwner(Player owner);
-    Optional<Player> getOwner();
+    Optional<? extends Player> getOwner();
     default Optional<IHookDataProvider> getHookData() {
         return getOwner()
                 .flatMap(CurioUtils::GetHookType)
                 .flatMap(HookRegistry::getHookData);
     }
+    default void afterDeath() {}
     void update();
     boolean shouldMoveThisTick();
     Vec3 getDeltaVThisTick();

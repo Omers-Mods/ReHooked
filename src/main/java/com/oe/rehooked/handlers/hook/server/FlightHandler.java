@@ -17,6 +17,13 @@ public class FlightHandler {
         serverFlightEnabled = false;
     }
     
+    public void afterDeath(ServerPlayer owner) {
+        if (serverFlightEnabled && !clientFlightEnabled && !externalFlight) {
+            serverFlightEnabled = owner.getAbilities().mayfly = owner.getAbilities().flying = false;
+            owner.onUpdateAbilities();
+        }
+    }
+    
     public void updateFlight(ServerPlayer owner, IServerPlayerHookHandler handler) {
         // check if flight was changed externally and we need to restore
         boolean externalFlightChanged = externalFlightChanged(owner);

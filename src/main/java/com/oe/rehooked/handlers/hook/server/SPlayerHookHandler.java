@@ -23,7 +23,7 @@ import java.util.Optional;
 public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private final List<HookEntity> hooks;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<Player> owner;
+    private Optional<ServerPlayer> owner;
     
     private Vec3 moveVector;
     private Vec3 momentum;
@@ -124,20 +124,29 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public ICommonPlayerHookHandler setOwner(Player owner) {
-        this.owner = Optional.of(owner);
+        this.owner = Optional.of((ServerPlayer) owner);
         return this;
     }
 
     @Override
-    public Optional<Player> getOwner() {
+    public Optional<ServerPlayer> getOwner() {
         return owner;
     }
-    
+
+    @Override
+    public void afterDeath() {
+        owner.ifPresent(player -> {
+            IServerPlayerHookHandler.super.afterDeath();
+            flightHandler.afterDeath(player);
+            update();
+        });
+    }
+
     @Override
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {
-            flightHandler.updateFlight((ServerPlayer) owner, this);
+            flightHandler.updateFlight(owner, this);
             if (additional != null) additional.Update();
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
@@ -226,15 +235,16 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     }
 
     @Override
-    public void removeAllClientHooks(ServerPlayer player) {
-        PacketDistributor.sendToPlayer(player, new CHookPayload(CHookPayload.State.RETRACT_ALL_HOOKS));
+    public void removeAllClientHooks() {
+        getOwner().ifPresent(player -> PacketDistributor.sendToPlayer(player, new CHookPayload(CHookPayload.State.RETRACT_ALL_HOOKS)));
     }
 
     @Override
-    public void copyFrom(IServerPlayerHookHandler handler) {
+    public IServerPlayerHookHandler copyFrom(IServerPlayerHookHandler handler) {
         if (handler instanceof SPlayerHookHandler other) {
             this.flightHandler = other.flightHandler;
         }
+        return this;
     }
 
     @Override

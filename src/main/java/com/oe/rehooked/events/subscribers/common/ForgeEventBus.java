@@ -2,6 +2,7 @@ package com.oe.rehooked.events.subscribers.common;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.server.SPlayerHookHandler;
 import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
@@ -33,13 +34,15 @@ public class ForgeEventBus {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         event.getServer().getPlayerList().getPlayers().forEach(player -> 
-                IServerPlayerHookHandler.fromPlayer(player).ifPresent(handler -> {
+                IServerPlayerHookHandler.fromPlayer(player).ifPresentOrElse(handler -> {
                     handler.setOwner(player).update();
                     if (handler.shouldMoveThisTick()) {
                         player.setDeltaMovement(handler.getDeltaVThisTick());
                     }
                     handler.storeLastPlayerPosition();
-                }));
+                }, () -> ((IReHookedPlayerExtension) player)
+                        .reHooked$setHookHandler(new SPlayerHookHandler().setOwner(player)))
+        );
     }
     
     @SubscribeEvent
@@ -53,15 +56,19 @@ public class ForgeEventBus {
     @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event) {
         if (event.getEntity().level().isClientSide()) return;
-        HandlerHelper.getHookHandler(event.getEntity()).ifPresent(newHandler -> {
-            HandlerHelper.getHookHandler(event.getOriginal()).ifPresent(oldHandler -> {
-                if (newHandler instanceof IServerPlayerHookHandler newServerHandler && 
-                        oldHandler instanceof IServerPlayerHookHandler oldServerHandler) {
-                    newServerHandler.copyFrom(oldServerHandler);
-                    newHandler.setOwner(event.getEntity());
-                    newHandler.update();
-                }
-            });
+        IServerPlayerHookHandler.fromPlayer(event.getOriginal()).ifPresent(handler -> {
+            handler.removeAllHooks();
+            handler.copyFrom(handler).setOwner(event.getEntity()).afterDeath();
+            ((IReHookedPlayerExtension) event.getEntity()).reHooked$setHookHandler(handler);
+        });
+    }
+    
+    @SubscribeEvent
+    public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity().level().isClientSide()) return;
+        HandlerHelper.getHookHandler(event.getEntity()).ifPresent(handler -> {
+            handler.removeAllHooks();
+            handler.afterDeath();
         });
     }
 }
