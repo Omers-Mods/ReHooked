@@ -24,7 +24,7 @@ public interface ICommonPlayerHookHandler {
     void removeAllHooks();
     void shootFromRotation(float xRot, float yRot);
     ICommonPlayerHookHandler setOwner(Player owner);
-    Optional<Player> getOwner();
+    Optional<? extends Player> getOwner();
     default Optional<HookData> getHookData() {
         return getOwner()
                 .flatMap(CurioUtils::GetHookType)
