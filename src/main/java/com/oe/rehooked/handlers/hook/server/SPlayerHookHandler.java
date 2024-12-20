@@ -15,12 +15,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public class SPlayerHookHandler implements IServerPlayerHookHandler {
     private final List<HookEntity> hooks;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<Player> owner;
+    private Optional<ServerPlayer> owner;
     
     private Vec3 moveVector;
     private Vec3 momentum;
@@ -118,12 +121,12 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
 
     @Override
     public ICommonPlayerHookHandler setOwner(Player owner) {
-        this.owner = Optional.of(owner);
+        this.owner = Optional.of((ServerPlayer) owner);
         return this;
     }
 
     @Override
-    public Optional<Player> getOwner() {
+    public Optional<ServerPlayer> getOwner() {
         return owner;
     }
     
@@ -221,8 +224,8 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     }
 
     @Override
-    public void removeAllClientHooks(ServerPlayer player) {
-        PacketHandler.sendToPlayer(new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_ALL_HOOKS), player);
+    public void removeAllClientHooks() {
+        owner.ifPresent(player -> PacketHandler.sendToPlayer(new CHookCapabilityPacket(CHookCapabilityPacket.State.RETRACT_ALL_HOOKS), player));
     }
 
     @Override

@@ -13,25 +13,19 @@ public interface IServerPlayerHookHandler extends ICommonPlayerHookHandler {
         return player.getCapability(ServerHookCapabilityProvider.SERVER_HOOK_HANDLER);
     }
     
-    void removeAllClientHooks(ServerPlayer player);
+    void removeAllClientHooks();
 
     @Override
     default void onUnequip() {
         ICommonPlayerHookHandler.super.onUnequip();
-        getOwner().ifPresent(owner -> {
-            if (owner instanceof ServerPlayer player)
-                removeAllClientHooks(player);
-        });
+        removeAllClientHooks();
         update();
     }
 
     @Override
     default void onEquip() {
         ICommonPlayerHookHandler.super.onEquip();
-        getOwner().ifPresent(owner -> {
-            if (owner instanceof ServerPlayer player)
-                removeAllClientHooks(player);
-        });
+        removeAllClientHooks();
         update();
     }
     
