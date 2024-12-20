@@ -3,8 +3,11 @@ package com.oe.rehooked.handlers.hook.server;
 import com.oe.rehooked.data.HookData;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import net.minecraft.server.level.ServerPlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FlightHandler {
+    private static final Logger log = LoggerFactory.getLogger(FlightHandler.class);
     private boolean prevMayFly;
     private boolean externalFlight;
     private boolean clientFlightEnabled;
@@ -15,6 +18,13 @@ public class FlightHandler {
         externalFlight = false;
         clientFlightEnabled = false;
         serverFlightEnabled = false;
+    }
+    
+    public void afterDeath(ServerPlayer owner) {
+        if (serverFlightEnabled && !clientFlightEnabled && !externalFlight) {
+            serverFlightEnabled = owner.getAbilities().mayfly = owner.getAbilities().flying = false;
+            owner.onUpdateAbilities();
+        }
     }
     
     public void updateFlight(ServerPlayer owner, IServerPlayerHookHandler handler) {

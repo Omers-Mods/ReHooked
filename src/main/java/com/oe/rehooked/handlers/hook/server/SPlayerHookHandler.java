@@ -129,12 +129,21 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public Optional<ServerPlayer> getOwner() {
         return owner;
     }
-    
+
+    @Override
+    public void afterDeath() {
+        owner.ifPresent(player -> {
+            IServerPlayerHookHandler.super.afterDeath();
+            flightHandler.afterDeath(player);
+            update();
+        });
+    }
+
     @Override
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {
-            flightHandler.updateFlight((ServerPlayer) owner, this);
+            flightHandler.updateFlight(owner, this);
             if (additional != null) additional.Update();
             final boolean[] creative = {false};
             getHookData().ifPresent(hookData -> {

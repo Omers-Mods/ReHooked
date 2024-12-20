@@ -30,6 +30,7 @@ public interface ICommonPlayerHookHandler {
                 .flatMap(CurioUtils::GetHookType)
                 .flatMap(HookRegistry::getHookData);
     }
+    default void afterDeath() {}
     void update();
     boolean shouldMoveThisTick();
     Vec3 getDeltaVThisTick();

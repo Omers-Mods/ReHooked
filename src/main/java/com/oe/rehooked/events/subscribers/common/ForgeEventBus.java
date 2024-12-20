@@ -75,11 +75,21 @@ public class ForgeEventBus {
             HandlerHelper.getHookHandler(event.getOriginal()).ifPresent(oldHandler -> {
                 if (newHandler instanceof IServerPlayerHookHandler newServerHandler && 
                         oldHandler instanceof IServerPlayerHookHandler oldServerHandler) {
+                    oldServerHandler.removeAllHooks();
                     newServerHandler.copyFrom(oldServerHandler);
                     newHandler.setOwner(event.getEntity());
-                    newHandler.update();
+                    newHandler.afterDeath();
                 }
             });
+        });
+    }
+    
+    @SubscribeEvent
+    public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity().level().isClientSide()) return;
+        HandlerHelper.getHookHandler(event.getEntity()).ifPresent(handler -> {
+            handler.removeAllHooks();
+            handler.afterDeath();
         });
     }
 }
