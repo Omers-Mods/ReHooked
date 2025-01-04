@@ -1,7 +1,7 @@
 package com.oe.rehooked.mixin.common.player;
 
-import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
+import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.extensions.IPlayerExtension;
 import org.spongepowered.asm.mixin.Mixin;

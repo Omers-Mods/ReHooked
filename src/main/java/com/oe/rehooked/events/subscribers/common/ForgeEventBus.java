@@ -2,10 +2,9 @@ package com.oe.rehooked.events.subscribers.common;
 
 import com.mojang.logging.LogUtils;
 import com.oe.rehooked.ReHookedMod;
-import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
+import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.server.SPlayerHookHandler;
-import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
 import com.oe.rehooked.utils.HandlerHelper;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
