@@ -22,10 +22,6 @@ There's also a keybind for retracting all hooks ('space' by default), though it 
 
 While a player is moving by hook all fall damage is disabled, this means hook "clutches" are possible.
 
- 
-
-Note: The current version is still work in progress, that means that there are still some bugs to iron out, if you find anything please let me know and I'll try to fix it as soon as possible.
 
  
-
 For modpack creators: in the spirit of open source and the original creator feel free to use this mod in your modpacks, also feel free to comment here with the name of your modpack, I'd love to see people use the mod :)
