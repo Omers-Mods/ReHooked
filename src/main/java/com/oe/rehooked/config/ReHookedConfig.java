@@ -16,13 +16,13 @@ public class ReHookedConfig {
     
     private static void createConfig() {
         // server config entries
-        HookStatsConfig.Init(SERVER_BUILDER);
+        HookStatsConfig.init(SERVER_BUILDER);
         
         // client config entries
-        HookVisualsConfig.Init(CLIENT_BUILDER);
+        HookVisualsConfig.init(CLIENT_BUILDER);
     }
     
-    public static void Init() {
+    public static void init() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_BUILDER.build());
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_BUILDER.build());
     }

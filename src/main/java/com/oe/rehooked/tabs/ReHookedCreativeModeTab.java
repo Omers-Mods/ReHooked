@@ -33,7 +33,7 @@ public class ReHookedCreativeModeTab {
                     })
                     .build());
     
-    public static void Init(IEventBus eventBus) {
+    public static void init(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
     }
 }

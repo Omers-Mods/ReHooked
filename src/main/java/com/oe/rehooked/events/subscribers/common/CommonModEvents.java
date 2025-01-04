@@ -22,6 +22,6 @@ public class CommonModEvents {
     }
     
     private static void loadConfig() {
-        ReHookedItems.RegisterConfigProperties();
+        ReHookedItems.registerConfigProperties();
     }
 }

@@ -1,6 +1,5 @@
 package com.oe.rehooked.network.packets.client.processing;
 
-import com.mojang.logging.LogUtils;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.network.handlers.IHandler;
 import com.oe.rehooked.network.packets.client.CHookCapabilityPacket;
@@ -9,14 +8,12 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CHookCapabilityProcessor implements IHandler {
-    public static final Logger LOGGER = LogUtils.getLogger();
-    
+
     public static void handle(CHookCapabilityPacket packet, Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() ->
                 DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handle(packet)));

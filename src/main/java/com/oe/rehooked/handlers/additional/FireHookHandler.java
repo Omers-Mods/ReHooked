@@ -13,10 +13,10 @@ public class FireHookHandler implements IServerHandler {
     }
 
     @Override
-    public void Update() {
+    public void update() {
         handler.getOwner().ifPresent(owner -> 
                 handler.getHooks().forEach(hook -> 
-                        VectorHelper.EntitiesInRange(hook.level(), owner.position(), hook.position(), 
+                        VectorHelper.entitiesInRange(hook.level(), owner.position(), hook.position(), 
                                         hook.getBoundingBox().getSize(), entity -> filter(owner, hook, entity))
                                 .forEach(entity -> entity.setSecondsOnFire(5))));
     }

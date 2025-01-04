@@ -40,7 +40,7 @@ public class ClientForgeEvents {
         IClientPlayerHookHandler handler = optHandler.get();
         if (KeyBindings.FIRE_HOOK_KEY.consumeClick() && ticksSinceShot > 5) {
             ticksSinceShot = 0;
-            CurioUtils.GetCuriosOfType(HookItem.class, player).flatMap(CurioUtils::GetIfUnique).ifPresent(hookStack -> {
+            CurioUtils.getCuriosOfType(HookItem.class, player).flatMap(CurioUtils::getIfUnique).ifPresent(hookStack -> {
                 Entity camera = Minecraft.getInstance().getCameraEntity();
                 handler.shootFromRotation(camera.getXRot(), camera.getYRot());
             });

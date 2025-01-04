@@ -1,7 +1,6 @@
 package com.oe.rehooked.utils;
 
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
-import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -68,7 +67,7 @@ public class VectorHelper {
         return Optional.empty();
     }
 
-    public static Set<Entity> EntitiesInRange(Level level, Vec3 orig, Vec3 dest, double radius, Predicate<Entity> predicate) {
+    public static Set<Entity> entitiesInRange(Level level, Vec3 orig, Vec3 dest, double radius, Predicate<Entity> predicate) {
         Vec3 way = orig.vectorTo(dest);
         Vec3 norm = way.normalize();
         int distanceTraveled = 0;

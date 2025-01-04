@@ -27,7 +27,7 @@ public interface ICommonPlayerHookHandler {
     Optional<? extends Player> getOwner();
     default Optional<HookData> getHookData() {
         return getOwner()
-                .flatMap(CurioUtils::GetHookType)
+                .flatMap(CurioUtils::getHookType)
                 .flatMap(HookRegistry::getHookData);
     }
     default void afterDeath() {}

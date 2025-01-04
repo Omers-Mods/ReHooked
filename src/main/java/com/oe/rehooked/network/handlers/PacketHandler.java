@@ -42,7 +42,7 @@ public class PacketHandler {
         else context.get().setPacketHandled(true);
     }
     
-    public static void Init() {
+    public static void init() {
         LOGGER.debug("Packet handler register started...");
         int id = 0;
         

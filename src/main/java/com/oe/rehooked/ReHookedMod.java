@@ -30,26 +30,26 @@ public class ReHookedMod {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         
         // Register packets
-        PacketHandler.Init();
+        PacketHandler.init();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> 
                 () -> {
                     PacketHandler.addHandler(CHookCapabilityPacket.class, CHookCapabilityProcessor::handle);
                 });
 
         // register config
-        ReHookedConfig.Init();
+        ReHookedConfig.init();
         // register mod sounds
-        ReHookedSounds.Init(modEventBus);
+        ReHookedSounds.init(modEventBus);
         // register mod particles
-        ReHookedParticles.Init(modEventBus);
+        ReHookedParticles.init(modEventBus);
         // Register mod entities
         ReHookedEntities.Init(modEventBus);
         // Register mod creative tab
-        ReHookedCreativeModeTab.Init(modEventBus);
+        ReHookedCreativeModeTab.init(modEventBus);
         // Register mod items
-        ReHookedItems.Init(modEventBus);
+        ReHookedItems.init(modEventBus);
         // Register mod blocks
-        ReHookedBlocks.Init(modEventBus);
+        ReHookedBlocks.init(modEventBus);
         // Register mod crafting components
         ReHookedComponents.Init(modEventBus);
 

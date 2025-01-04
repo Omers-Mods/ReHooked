@@ -25,7 +25,7 @@ public class ReHookedSounds {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(loc));
     }
     
-    public static void Init(IEventBus eventBus) {
+    public static void init(IEventBus eventBus) {
         SoundEvents.add(HOOK_HIT);
         SoundEvents.add(HOOK_MISS);
         SoundEvents.add(HOOK_SHOOT);
@@ -36,11 +36,11 @@ public class ReHookedSounds {
     
     private static final List<RegistryObject<SoundEvent>> SoundEvents = new ArrayList<>();
     
-    public static RegistryObject<SoundEvent> GetEvent(int index) {
+    public static RegistryObject<SoundEvent> getEvent(int index) {
         return SoundEvents.get(index);
     }
     
-    public static int GetIndex(RegistryObject<SoundEvent> registry) {
+    public static int getIndex(RegistryObject<SoundEvent> registry) {
         return SoundEvents.indexOf(registry);
     }
 }

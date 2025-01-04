@@ -37,7 +37,7 @@ public class SHookCapabilityPacket {
     }
 
     public SHookCapabilityPacket(FriendlyByteBuf buf) {
-        packetType = State.Get(buf.readInt());
+        packetType = State.get(buf.readInt());
         id = buf.readInt();
         xRot = buf.readFloat();
         yRot = buf.readFloat();
@@ -72,7 +72,7 @@ public class SHookCapabilityPacket {
         FORCE_UPDATE,
         KILL;
         
-        public static State Get(int ordinal) {
+        public static State get(int ordinal) {
             return State.values()[ordinal];
         }
     }

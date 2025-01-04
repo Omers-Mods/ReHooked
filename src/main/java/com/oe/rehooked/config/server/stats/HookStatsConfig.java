@@ -20,7 +20,7 @@ public class HookStatsConfig {
         builder.push(hookType);
         
         HookConfigData
-                .Create(builder, 
+                .create(builder, 
                         partialHookData.count(), 
                         partialHookData.range(),
                         partialHookData.travelSpeed(),
@@ -31,7 +31,7 @@ public class HookStatsConfig {
         builder.pop();
     }
     
-    public static void Init(ForgeConfigSpec.Builder builder) {
+    public static void init(ForgeConfigSpec.Builder builder) {
         builder.push("hook_stats");
         
         createHookCategory(ReHookedItems.WOOD, builder,
@@ -55,7 +55,7 @@ public class HookStatsConfig {
         builder.pop();
     }
     
-    public static Optional<HookConfigData> GetConfigDataForType(String hookType) {
+    public static Optional<HookConfigData> getConfigDataForType(String hookType) {
         return Optional.ofNullable(HOOK_CONFIG_DATA_MAP.get(hookType));
     }
     
@@ -75,7 +75,7 @@ public class HookStatsConfig {
             IS_CREATIVE = isCreative;
         }
         
-        public static HookConfigData Create(ForgeConfigSpec.Builder builder, int count, double range, double travelSpeed, double pullSpeed, boolean isCreative) {
+        public static HookConfigData create(ForgeConfigSpec.Builder builder, int count, double range, double travelSpeed, double pullSpeed, boolean isCreative) {
             return new HookConfigData(
                     builder.comment("The number of hooks")
                             .defineInRange("count", count, 1, Integer.MAX_VALUE),

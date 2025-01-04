@@ -3,10 +3,8 @@ package com.oe.rehooked.handlers.hook.client;
 import com.oe.rehooked.data.AdditionalHandlersRegistry;
 import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.additional.def.IClientHandler;
-import com.oe.rehooked.handlers.additional.def.IServerHandler;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.ICommonPlayerHookHandler;
-import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.network.handlers.PacketHandler;
 import com.oe.rehooked.network.packets.server.SHookCapabilityPacket;
 import com.oe.rehooked.utils.CurioUtils;
@@ -121,7 +119,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {
-            if (additional != null) additional.Update();
+            if (additional != null) additional.update();
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.setOnGround(false);
@@ -202,7 +200,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     public void onEquip() {
         IClientPlayerHookHandler.super.onEquip();
         additional = null;
-        owner.flatMap(CurioUtils::GetHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
+        owner.flatMap(CurioUtils::getHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
             try {
                 additional = (IClientHandler) cl.getDeclaredConstructor(IClientPlayerHookHandler.class).newInstance(this);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |

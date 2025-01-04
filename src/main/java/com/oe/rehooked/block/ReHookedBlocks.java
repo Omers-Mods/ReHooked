@@ -21,7 +21,7 @@ public class ReHookedBlocks {
     public static final RegistryObject<Block> BLAZE_CHAIN = BLOCKS.register("blaze_chain", () -> new ChainBlock(CHAIN_PROPS));
     public static final RegistryObject<Block> ENDER_CHAIN = BLOCKS.register("ender_chain", () -> new ChainBlock(CHAIN_PROPS));
     
-    public static void Init(IEventBus eventBus) {
+    public static void init(IEventBus eventBus) {
         BLOCKS.register(eventBus);
 
         ChainRegistry.registerChain(ReHookedItems.WOOD, WOOD_CHAIN);

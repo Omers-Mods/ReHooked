@@ -14,7 +14,7 @@ public class HookVisualsConfig {
     
     private static final Map<String, ForgeConfigSpec.ConfigValue<String>> CHAIN_PARTICLE_SETTINGS = new HashMap<>();
     
-    public static void Init(ForgeConfigSpec.Builder builder) {
+    public static void init(ForgeConfigSpec.Builder builder) {
         builder.push("visuals");
 
         List<String> chainOrParticle = List.of(PARTICLES, CHAIN);

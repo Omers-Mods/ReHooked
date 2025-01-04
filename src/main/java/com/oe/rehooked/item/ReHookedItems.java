@@ -41,22 +41,22 @@ public class ReHookedItems {
         return ITEMS.register(type + "_hook", () -> new HookItem(type));
     }
     
-    public static void Init(IEventBus eventBus) {
+    public static void init(IEventBus eventBus) {
         // register the objects
         ITEMS.register(eventBus);
     }
     
-    private static HookData CompleteConfigData(String type, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {
+    private static HookData completeConfigData(String type, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {
         return HookStatsConfig
-                .GetConfigDataForType(type)
+                .getConfigDataForType(type)
                 .map(HookStatsConfig.HookConfigData::getData)
                 .map(partial -> partial.complete(type, getHookTexture(type), particleType, minParticlesPerBlock, maxParticlesPerBlock, radius, ticksBetweenSpawns))
                 .orElse(null);
     }
     
-    private static HookData CompleteConfigData(String type) {
+    private static HookData completeConfigData(String type) {
         return HookStatsConfig
-                .GetConfigDataForType(type)
+                .getConfigDataForType(type)
                 .map(HookStatsConfig.HookConfigData::getData)
                 .map(partial -> partial.complete(type, getHookTexture(type), () -> null, 0, 0, 0, 0))
                 .orElse(null);
@@ -66,32 +66,32 @@ public class ReHookedItems {
         return new ResourceLocation(ReHookedMod.MOD_ID, "textures/entity/hook/" + name + "/" + name + ".png");
     }
     
-    private static void RegisterHookWithParticles(String type, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {
-        HookRegistry.registerHook(type, CompleteConfigData(type, particleType, minParticlesPerBlock, maxParticlesPerBlock, radius, ticksBetweenSpawns));
+    private static void registerHookWithParticles(String type, Supplier<ParticleOptions> particleType, int minParticlesPerBlock, int maxParticlesPerBlock, double radius, int ticksBetweenSpawns) {
+        HookRegistry.registerHook(type, completeConfigData(type, particleType, minParticlesPerBlock, maxParticlesPerBlock, radius, ticksBetweenSpawns));
     }
-    private static void RegisterHookWithChain(String type) {
-        HookRegistry.registerHook(type, CompleteConfigData(type));
+    private static void registerHookWithChain(String type) {
+        HookRegistry.registerHook(type, completeConfigData(type));
     }
     
-    public static void RegisterConfigProperties() {
+    public static void registerConfigProperties() {
         // define all hook variants
-        RegisterHookWithChain(WOOD);
+        registerHookWithChain(WOOD);
         
-        RegisterHookWithChain(IRON);
+        registerHookWithChain(IRON);
         
-        RegisterHookWithChain(DIAMOND);
+        registerHookWithChain(DIAMOND);
         
         if (HookVisualsConfig.getChainSetting(ENDER).map(value -> value.get().equals(HookVisualsConfig.CHAIN)).orElse(false))
-            RegisterHookWithChain(ENDER);
+            registerHookWithChain(ENDER);
         else
-            RegisterHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 1, 2, 0.2, 4);
+            registerHookWithParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 1, 2, 0.2, 4);
         
-        RegisterHookWithParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 1, 2, 0.1, 4);
+        registerHookWithParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 1, 2, 0.1, 4);
 
         if (HookVisualsConfig.getChainSetting(BLAZE).map(value -> value.get().equals(HookVisualsConfig.CHAIN)).orElse(false))
-            RegisterHookWithChain(BLAZE);
+            registerHookWithChain(BLAZE);
         else
-            RegisterHookWithParticles(BLAZE, ParticleTypes.FLAME::getType, 0, 1, 0.1, 20);
+            registerHookWithParticles(BLAZE, ParticleTypes.FLAME::getType, 0, 1, 0.1, 20);
         AdditionalHandlersRegistry.registerHandler(BLAZE, FireHookHandler.class);
     }
 }
