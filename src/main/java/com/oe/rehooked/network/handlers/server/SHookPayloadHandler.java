@@ -16,7 +16,7 @@ public class SHookPayloadHandler {
             if (optHandler.isPresent()) {
                 IServerPlayerHookHandler handler = optHandler.get();
                 handler.setOwner(player);
-                switch (SHookPayload.State.Get(payload.state())) {
+                switch (SHookPayload.State.get(payload.state())) {
                     case SHOOT -> handler.shootFromRotation(payload.xRot(), payload.yRot());
                     case RETRACT_HOOK -> handler.removeHook(payload.id());
                     case RETRACT_ALL_HOOKS -> handler.removeAllHooks();

@@ -17,7 +17,7 @@ public class CHookPayloadHandler {
             Optional<IClientPlayerHookHandler> optHandler = IClientPlayerHookHandler.fromPlayer(player);
             if (optHandler.isPresent()) {
                 IClientPlayerHookHandler handler = optHandler.get();
-                switch (CHookPayload.State.Get(payload.state())) {
+                switch (CHookPayload.State.get(payload.state())) {
                     case ADD_HOOK -> handler.addHook(payload.id());
                     case RETRACT_HOOK -> handler.removeHook(payload.id());
                     case RETRACT_ALL_HOOKS -> handler.removeAllHooks();

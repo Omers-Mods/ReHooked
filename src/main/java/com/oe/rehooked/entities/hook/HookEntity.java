@@ -82,7 +82,7 @@ public class HookEntity extends Projectile {
         noCulling = true;
         setOwner(player);
         setPos(player.getEyePosition());
-        CurioUtils.GetHookType(player).ifPresent(this::setHookType);
+        CurioUtils.getHookType(player).ifPresent(this::setHookType);
     }
 
     @Override

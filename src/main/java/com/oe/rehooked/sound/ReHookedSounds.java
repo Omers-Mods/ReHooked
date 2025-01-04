@@ -36,11 +36,11 @@ public class ReHookedSounds {
     
     private static final List<DeferredHolder<SoundEvent, SoundEvent>> SoundEvents = new ArrayList<>();
     
-    public static DeferredHolder<SoundEvent, SoundEvent> GetEvent(int index) {
+    public static DeferredHolder<SoundEvent, SoundEvent> getEvent(int index) {
         return SoundEvents.get(index);
     }
     
-    public static int GetIndex(DeferredHolder<SoundEvent, SoundEvent> registry) {
+    public static int getIndex(DeferredHolder<SoundEvent, SoundEvent> registry) {
         return SoundEvents.indexOf(registry);
     }
 }

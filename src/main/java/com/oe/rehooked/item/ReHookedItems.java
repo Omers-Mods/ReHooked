@@ -26,14 +26,14 @@ public class ReHookedItems {
     
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, ReHookedMod.MOD_ID);
     
-    public static final DeferredHolder<Item, HookItem> WOOD_HOOK = CreateHookItem(WOOD);
-    public static final DeferredHolder<Item, HookItem> IRON_HOOK = CreateHookItem(IRON);
-    public static final DeferredHolder<Item, HookItem> DIAMOND_HOOK = CreateHookItem(DIAMOND);
-    public static final DeferredHolder<Item, HookItem> RED_HOOK = CreateHookItem(RED);
-    public static final DeferredHolder<Item, HookItem> BLAZE_HOOK = CreateHookItem(BLAZE);
-    public static final DeferredHolder<Item, HookItem> ENDER_HOOK = CreateHookItem(ENDER);
+    public static final DeferredHolder<Item, HookItem> WOOD_HOOK = createHookItem(WOOD);
+    public static final DeferredHolder<Item, HookItem> IRON_HOOK = createHookItem(IRON);
+    public static final DeferredHolder<Item, HookItem> DIAMOND_HOOK = createHookItem(DIAMOND);
+    public static final DeferredHolder<Item, HookItem> RED_HOOK = createHookItem(RED);
+    public static final DeferredHolder<Item, HookItem> BLAZE_HOOK = createHookItem(BLAZE);
+    public static final DeferredHolder<Item, HookItem> ENDER_HOOK = createHookItem(ENDER);
     
-    private static DeferredHolder<Item, HookItem> CreateHookItem(String type) {
+    private static DeferredHolder<Item, HookItem> createHookItem(String type) {
         return ITEMS.register(type + "_hook", () -> new HookItem(type));
     }
     
@@ -51,7 +51,7 @@ public class ReHookedItems {
                 .setTicksBetweenSpawns(ticksBetweenSpawns));
     }
     
-    public static void RegisterConfigProperties() {
+    public static void registerConfigProperties() {
         setHookParticles(ENDER, ReHookedParticles.ENDER_HOOK_PARTICLE::get, 1, 2, 0.2, 4);
         
         setHookParticles(RED, ReHookedParticles.RED_HOOK_PARTICLE::get, 1, 2, 0.1, 4);

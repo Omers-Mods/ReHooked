@@ -38,7 +38,7 @@ public record CHookPayload(int state, int id) implements CustomPacketPayload {
         RETRACT_ALL_HOOKS,
         FORCE_UPDATE;
 
-        public static State Get(int ordinal) {
+        public static State get(int ordinal) {
             return State.values()[ordinal];
         }
     } 

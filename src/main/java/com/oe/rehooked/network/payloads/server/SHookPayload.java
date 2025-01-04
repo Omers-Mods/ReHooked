@@ -44,7 +44,7 @@ public record SHookPayload(int state, int id, float xRot, float yRot) implements
         FORCE_UPDATE,
         KILL;
 
-        public static State Get(int ordinal) {
+        public static State get(int ordinal) {
             return State.values()[ordinal];
         }
     }

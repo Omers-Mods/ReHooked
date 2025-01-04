@@ -147,7 +147,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
         moveVector = null;
         getOwner().ifPresent(owner -> {
             flightHandler.updateFlight(owner, this);
-            if (additional != null) additional.Update();
+            if (additional != null) additional.update();
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.resetFallDistance();
@@ -257,7 +257,7 @@ public class SPlayerHookHandler implements IServerPlayerHookHandler {
     public void onEquip() {
         IServerPlayerHookHandler.super.onEquip();
         additional = null;
-        owner.flatMap(CurioUtils::GetHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
+        owner.flatMap(CurioUtils::getHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
             try {
                 additional = (IServerHandler) cl.getDeclaredConstructor(IServerPlayerHookHandler.class).newInstance(this);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ignore) {

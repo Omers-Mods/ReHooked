@@ -119,7 +119,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     public void update() {
         moveVector = null;
         getOwner().ifPresent(owner -> {
-            if (additional != null) additional.Update();
+            if (additional != null) additional.update();
             getHookData().ifPresent(hookData -> {
                 if (countPulling() == 0) return;
                 owner.setOnGround(false);
@@ -200,7 +200,7 @@ public class CPlayerHookHandler implements IClientPlayerHookHandler {
     public void onEquip() {
         IClientPlayerHookHandler.super.onEquip();
         additional = null;
-        owner.flatMap(CurioUtils::GetHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
+        owner.flatMap(CurioUtils::getHookType).flatMap(AdditionalHandlersRegistry::getHandler).ifPresent(cl -> {
             try {
                 additional = (IClientHandler) cl.getDeclaredConstructor(IClientPlayerHookHandler.class).newInstance(this);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |

@@ -62,7 +62,7 @@ public class VectorHelper {
         return Optional.empty();
     }
 
-    public static Set<Entity> EntitiesInRange(Level level, Vec3 orig, Vec3 dest, double radius, Predicate<Entity> predicate) {
+    public static Set<Entity> entitiesInRange(Level level, Vec3 orig, Vec3 dest, double radius, Predicate<Entity> predicate) {
         Vec3 way = orig.vectorTo(dest);
         Vec3 norm = way.normalize();
         int distanceTraveled = 0;
