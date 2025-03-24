@@ -8,8 +8,10 @@ import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.utils.HandlerHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -60,9 +62,14 @@ public class ForgeEventBus {
     
     @SubscribeEvent
     public static void onBreakEvent(PlayerEvent.BreakSpeed event) {
-        HandlerHelper.getHookHandler(event.getEntity()).ifPresent(handler -> {
-            // negate the in-air mining speed debuff
-            if (handler.countPulling() > 0) event.setNewSpeed(event.getNewSpeed() * 5);
+        var player = event.getEntity();
+        HandlerHelper.getHookHandler(player).ifPresent(handler -> {
+            // negate the in-air/water mining speed debuff
+            if (handler.countPulling() > 0) {
+                var mult = (player.isEyeInFluid(FluidTags.WATER) && !EnchantmentHelper.hasAquaAffinity(player) ? 5 : 1) *
+                        (player.onGround() ? 1 : 5);
+                event.setNewSpeed(event.getNewSpeed() * mult);
+            }
         });
     }
     
