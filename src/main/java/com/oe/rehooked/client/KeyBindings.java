@@ -2,9 +2,13 @@ package com.oe.rehooked.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.oe.rehooked.ReHookedMod;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyModifier;
+import org.apache.commons.lang3.StringUtils;
 
 public class KeyBindings {
     private static final String CATEGORY = "key.categories." + ReHookedMod.MOD_ID;
@@ -31,11 +35,26 @@ public class KeyBindings {
             CATEGORY
     );
     
-    public static String getCombinedKeyName(KeyMapping mapping) {
-        StringBuilder builder = new StringBuilder();
-        if (!mapping.getKeyModifier().equals(KeyModifier.NONE)) 
-            builder.append(mapping.getKeyModifier().name().toLowerCase()).append(" + ");
-        builder.append(mapping.getKey().getDisplayName().getString().toLowerCase());
+    public static String getCombinedKeyName(KeyMapping mapping, boolean capitalize) {
+        var builder = new StringBuilder();
+        if (!mapping.getKeyModifier().equals(KeyModifier.NONE)) {
+            var lower = mapping.getKeyModifier().name().toLowerCase(); 
+            builder.append(capitalize ? StringUtils.capitalize(lower) : lower).append(" + ");
+        }
+        var lower = mapping.getKey().getDisplayName().getString().toLowerCase();
+        builder.append(capitalize ? StringUtils.capitalize(lower) : lower);
         return builder.toString();
+    }
+    
+    public static Component getKeyBindComponent(KeyMapping mapping) {
+        return getKeyBindComponent(mapping, true);
+    }
+    
+    public static Component getKeyBindComponent(KeyMapping mapping, boolean capitalize) {
+        return getKeyBindComponent(mapping, capitalize, Style.EMPTY.withColor(ChatFormatting.YELLOW));
+    }
+    
+    public static Component getKeyBindComponent(KeyMapping mapping, boolean capitalize, Style style) {
+        return Component.literal(getCombinedKeyName(mapping, capitalize)).withStyle(style);
     }
 }

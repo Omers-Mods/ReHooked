@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import org.apache.commons.lang3.StringUtils;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
@@ -35,16 +36,16 @@ public class HookItem extends Item implements ICurioItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (!(stack.getItem() instanceof HookItem)) return;
-        tooltipComponents.add(Component.translatable("tooltip.rehooked:" + hookType + "_hook.info"));
+        tooltipComponents.add(Component.translatable("tooltip.rehooked:" + hookType + "_hook.info").withStyle(ChatFormatting.GRAY));
         if (Screen.hasShiftDown()) {
             tooltipComponents.add(Component.translatable("tooltip.rehooked.press_fire",
-                    KeyBindings.getCombinedKeyName(KeyBindings.FIRE_HOOK_KEY)));
+                    KeyBindings.getKeyBindComponent(KeyBindings.FIRE_HOOK_KEY)).withStyle(ChatFormatting.GRAY));
             tooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract",
-                    KeyBindings.getCombinedKeyName(KeyBindings.RETRACT_HOOK_KEY)));
+                    KeyBindings.getKeyBindComponent(KeyBindings.RETRACT_HOOK_KEY)).withStyle(ChatFormatting.GRAY));
             HookRegistry.getHookData(hookType).ifPresent(hookData -> {
                 if (!hookData.isCreative()) {
                     tooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract_all",
-                            KeyBindings.getCombinedKeyName(KeyBindings.REMOVE_ALL_HOOKS_KEY)));
+                            KeyBindings.getKeyBindComponent(KeyBindings.REMOVE_ALL_HOOKS_KEY)).withStyle(ChatFormatting.GRAY));
                 }
             });
         }
