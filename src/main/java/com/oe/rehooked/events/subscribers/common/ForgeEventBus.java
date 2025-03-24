@@ -3,6 +3,7 @@ package com.oe.rehooked.events.subscribers.common;
 import com.oe.rehooked.ReHookedMod;
 import com.oe.rehooked.capabilities.hooks.ClientHookCapabilityProvider;
 import com.oe.rehooked.capabilities.hooks.ServerHookCapabilityProvider;
+import com.oe.rehooked.entities.hook.HookEntity;
 import com.oe.rehooked.handlers.hook.def.IClientPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.utils.HandlerHelper;
@@ -85,7 +86,8 @@ public class ForgeEventBus {
     public static void onDimensionChange(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getEntity().level().isClientSide()) return;
         HandlerHelper.getHookHandler(event.getEntity()).ifPresent(handler -> {
-            handler.removeAllHooks();
+            handler.getHooks().forEach(HookEntity::discard);
+            handler.getHooks().clear();
             handler.afterDeath();
         });
     }
