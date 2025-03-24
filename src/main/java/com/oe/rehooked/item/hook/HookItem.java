@@ -35,26 +35,26 @@ public class HookItem extends Item implements ICurioItem {
     }
     
     @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        if (!(pStack.getItem() instanceof HookItem)) return;
-        pTooltipComponents.add(Component.translatable("tooltip.rehooked:" + hookType + "_hook.info"));
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        if (!(stack.getItem() instanceof HookItem)) return;
+        tooltipComponents.add(Component.translatable("tooltip.rehooked:" + hookType + "_hook.info").withStyle(ChatFormatting.GRAY));
         if (Screen.hasShiftDown()) {
-            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_fire", 
-                    KeyBindings.getCombinedKeyName(KeyBindings.FIRE_HOOK_KEY)));
-            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract", 
-                    KeyBindings.getCombinedKeyName(KeyBindings.RETRACT_HOOK_KEY)));
+            tooltipComponents.add(Component.translatable("tooltip.rehooked.press_fire", 
+                    KeyBindings.getKeyBindComponent(KeyBindings.FIRE_HOOK_KEY)).withStyle(ChatFormatting.GRAY));
+            tooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract", 
+                    KeyBindings.getKeyBindComponent(KeyBindings.RETRACT_HOOK_KEY)).withStyle(ChatFormatting.GRAY));
             HookRegistry.getHookData(hookType).ifPresent(hookData -> {
                 if (!hookData.isCreative()) {
-                    pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract_all", 
-                            KeyBindings.getCombinedKeyName(KeyBindings.REMOVE_ALL_HOOKS_KEY)));
+                    tooltipComponents.add(Component.translatable("tooltip.rehooked.press_retract_all", 
+                            KeyBindings.getKeyBindComponent(KeyBindings.REMOVE_ALL_HOOKS_KEY)).withStyle(ChatFormatting.GRAY));
                 }
             });
         }
         else {
-            pTooltipComponents.add(Component.translatable("tooltip.rehooked.press_shift_more_info")
+            tooltipComponents.add(Component.translatable("tooltip.rehooked.press_shift_more_info")
                     .withStyle(ChatFormatting.GRAY));
         }
-        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
     @Override
