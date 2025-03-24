@@ -1,0 +1,47 @@
+{
+  "item.rehooked.wood_hook": "木制钩爪",
+  "item.rehooked.iron_hook": "铁制钩爪",
+  "item.rehooked.diamond_hook": "钻制钩爪",
+  "item.rehooked.red_hook": "红石钩爪",
+  "item.rehooked.blaze_hook": "烈焰钩爪",
+  "item.rehooked.ender_hook": "末影钩爪",
+  "item.rehooked.deja_vu_hook": "逮虾户钩爪",
+  
+  "block.rehooked.wood_chain": "木制锁链",
+  "block.rehooked.diamond_chain": "钻制锁链",
+  "block.rehooked.blaze_chain": "烈焰锁链",
+  "block.rehooked.ender_chain": "末影锁链",
+  "item.rehooked.wood_chain": "木制锁链",
+  "item.rehooked.diamond_chain": "钻制锁链",
+  "item.rehooked.blaze_chain": "烈焰锁链",
+  "item.rehooked.ender_chain": "末影锁链",
+  
+  "creative.tab.hooks": "钩爪",
+
+  "tooltip.rehooked:wood_hook.info": "一个帮助你逃出深沟或爬上树梢的简单实用的道具",
+  "tooltip.rehooked:iron_hook.info": "允许你用两个钩爪作为支撑点悬浮在半空",
+  "tooltip.rehooked:diamond_hook.info": "有更长的钩爪链，以及更快的速度",
+  "tooltip.rehooked:red_hook.info": "用钩爪实现的创造飞行，可能有点小瑕疵",
+  "tooltip.rehooked:blaze_hook.info": "闪电般的速度 (也如同闪电一样热)",
+  "tooltip.rehooked:ender_hook.info": "很快，非常非常的快",
+  "tooltip.rehooked:deja_vu_hook.info": "“歌词”在街道上风驰电掣（Higher on the street!）",
+  "tooltip.rehooked.press_shift_more_info": "按<左Shift>查看控制方法",
+  "tooltip.rehooked.press_fire": "按 %1$s 发射",
+  "tooltip.rehooked.press_retract": "按 %1$s 同时看着已发射的其中一个钩爪可以将其收回",
+  "tooltip.rehooked.press_retract_all": "按 %1$s 收回所有钩爪",
+  "tooltip.rehooked:wood_chain.info": "不是很结实，下次可能要找更好的材料了",
+  "tooltip.rehooked:diamond_chain.info": "超级闪现，只不过可能不如光快",
+  
+  "curios.identifier.hook": "钩爪",
+  
+  "key.categories.rehooked": "钩爪：重生",
+  "key.rehooked.fire_hook_key": "发射钩爪",
+  "key.rehooked.retract_hook_key": "收回钩爪",
+  "key.rehooked.remove_all_hooks_key": "收回所有钩爪",
+  
+  "sounds.rehooked.hook_hit": "钩爪击中了方块表面",
+  "sounds.rehooked.hook_retract": "回收钩爪",
+  "sounds.rehooked.hook_shoot": "发射钩爪",
+  "sounds.rehooked.hook_miss": "脱钩了",
+  "sounds.rehooked.meme.deja_vu": "逮虾户开始演奏"
+}
