@@ -7,7 +7,10 @@ import com.oe.rehooked.extensions.player.IReHookedPlayerExtension;
 import com.oe.rehooked.handlers.hook.def.IServerPlayerHookHandler;
 import com.oe.rehooked.handlers.hook.server.SPlayerHookHandler;
 import com.oe.rehooked.utils.HandlerHelper;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -47,9 +50,19 @@ public class ForgeEventBus {
     
     @SubscribeEvent
     public static void onBreakEvent(PlayerEvent.BreakSpeed event) {
-        HandlerHelper.getHookHandler(event.getEntity()).ifPresent(handler -> {
-            // negate the in-air mining speed debuff
-            if (handler.countPulling() > 0) event.setNewSpeed(event.getNewSpeed() * 5);
+        var player = event.getEntity();
+        HandlerHelper.getHookHandler(player).ifPresent(handler -> {
+            // negate the in-air/water mining speed debuff
+            if (handler.countPulling() > 0) {
+                float mult = 1;
+                if (player.isEyeInFluid(FluidTags.WATER)) {
+                    mult /= (float) player.getAttribute(Attributes.SUBMERGED_MINING_SPEED).getValue();
+                }
+                if (!player.onGround()) {
+                    mult *= 5;
+                }
+                event.setNewSpeed(event.getNewSpeed() * mult);
+            }
         });
     }
     
