@@ -2,7 +2,7 @@
 
 Inspired by the fantastic [Hooked](https://www.curseforge.com/minecraft/mc-mods/hooked) mod by TheCodeWarrior.
 
-Many thanks to TheCodeWarrior for the original idea and some of the assets, all credit should go to him.
+Many thanks to TheCodeWarrior for the original idea and some of the assets, all credit should go to her.
 
 
 
